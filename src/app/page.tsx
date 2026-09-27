@@ -154,13 +154,6 @@ function ParallelChart() {
 
   return (
     <figure aria-label="Timeline of roles running in parallel" className="relative">
-      {/* Faint aurora haze behind the cluster of current roles */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-y-6 right-0 w-1/2 rounded-full opacity-25 blur-3xl dark:opacity-20"
-        style={{ backgroundImage: "var(--aurora)" }}
-      />
-
       <div aria-hidden className="pointer-events-none absolute inset-0">
         {years.map((year) => (
           <div
