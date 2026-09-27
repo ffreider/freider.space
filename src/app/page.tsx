@@ -1,4 +1,7 @@
 import Image from "next/image";
+import { Unbounded } from "next/font/google";
+
+const display = Unbounded({ subsets: ["latin"], weight: "600" });
 
 type YearMonth = [year: number, month: number];
 
@@ -282,7 +285,7 @@ export default function Home() {
           priority
           className="size-32 rounded-full object-cover"
         />
-        <h1 className="mt-8 text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h1 className={`${display.className} mt-8 text-3xl sm:text-4xl`}>
           Freider Fløan
         </h1>
         <p className="mt-3 text-zinc-500 dark:text-zinc-400">

@@ -14,7 +14,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #030304;
     --foreground: #ededed;
   }
 }
@@ -54,14 +54,16 @@ body {
   --blob-blue: rgb(59 130 246 / 0.12);
   --blob-magenta: rgb(217 70 239 / 0.1);
   --grain-opacity: 0.35;
+  --glow: rgb(45 212 191 / 0.12);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --blob-teal: rgb(13 148 136 / 0.34);
-    --blob-blue: rgb(37 99 235 / 0.26);
-    --blob-magenta: rgb(162 28 175 / 0.26);
+    --blob-teal: rgb(13 148 136 / 0.26);
+    --blob-blue: rgb(37 99 235 / 0.2);
+    --blob-magenta: rgb(162 28 175 / 0.2);
     --grain-opacity: 0.22;
+    --glow: rgb(94 234 212 / 0.09);
   }
 }
 
@@ -71,6 +73,12 @@ body {
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
+}
+
+.blob-wrap {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
 }
 
 .blob {
@@ -85,39 +93,57 @@ body {
   left: -20vmax;
   top: 10vh;
   background: radial-gradient(circle, var(--blob-teal), transparent 65%);
-  animation: drift-a 38s ease-in-out infinite alternate;
+  animation: drift-a 17s ease-in-out infinite alternate;
 }
 
 .blob-blue {
   left: 20vw;
   top: 40vh;
   background: radial-gradient(circle, var(--blob-blue), transparent 65%);
-  animation: drift-b 52s ease-in-out infinite alternate;
+  animation: drift-b 23s ease-in-out infinite alternate;
 }
 
 .blob-magenta {
   right: -30vmax;
   top: -25vmax;
   background: radial-gradient(circle, var(--blob-magenta), transparent 65%);
-  animation: drift-c 64s ease-in-out infinite alternate;
+  animation: drift-c 29s ease-in-out infinite alternate;
 }
 
 @keyframes drift-a {
   to {
-    transform: translate(18vw, -12vh) scale(1.15);
+    transform: translate(30vw, -18vh) scale(1.25);
   }
 }
 
 @keyframes drift-b {
   to {
-    transform: translate(-22vw, -18vh) scale(0.85);
+    transform: translate(-32vw, -26vh) scale(0.8);
   }
 }
 
 @keyframes drift-c {
   to {
-    transform: translate(-14vw, 22vh) scale(1.2);
+    transform: translate(-26vw, 34vh) scale(1.3);
   }
+}
+
+/* Soft light that trails the cursor */
+.cursor-glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 36vmax;
+  height: 36vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--glow), transparent 60%);
+  opacity: 0;
+  transition: opacity 600ms;
+  will-change: transform;
+}
+
+.cursor-glow.is-active {
+  opacity: 1;
 }
 
 .grain {

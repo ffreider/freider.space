@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Backdrop } from "./backdrop";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,13 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {/* Slowly drifting color fields with film grain on top */}
-        <div aria-hidden className="backdrop">
-          <div className="blob blob-teal" />
-          <div className="blob blob-blue" />
-          <div className="blob blob-magenta" />
-          <div className="grain" />
-        </div>
+        <Backdrop />
         {children}
       </body>
     </html>
