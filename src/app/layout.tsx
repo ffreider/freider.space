@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Freider",
-  description: "Personal website of Freider",
+  title: "Freider Fløan",
+  description: "Co-founder and President of NORSTEC. Host of Spacepodden. Building for the Norwegian space ecosystem.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
