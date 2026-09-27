@@ -179,7 +179,7 @@ function ParallelChart() {
         </div>
       </div>
 
-      <ol className="relative">
+      <ol className="chart-rows relative">
         {timeline.map((entry, i) => {
           const left = pct(toYears(entry.start));
           const ongoing = !entry.end;
@@ -189,10 +189,16 @@ function ParallelChart() {
           const labelBefore = left > 100 - right;
 
           return (
-            <li key={entry.org} className="relative h-6">
+            <li
+              key={entry.org}
+              tabIndex={0}
+              className="group relative h-6 cursor-default outline-none hover:z-10 focus:z-10"
+            >
               <span
                 className={`absolute top-1/2 h-[3px] -translate-y-1/2 origin-left rounded-full motion-safe:animate-[draw_1.4s_cubic-bezier(0.2,0.7,0.2,1)_both] ${
-                  ongoing ? "aurora-glow" : "opacity-40"
+                  ongoing
+                    ? "aurora-glow"
+                    : "opacity-40 transition-opacity group-hover:opacity-100 group-focus:opacity-100"
                 }`}
                 style={{
                   left: `${left}%`,
@@ -228,6 +234,37 @@ function ParallelChart() {
               >
                 {entry.short ?? entry.org}
               </span>
+
+              {/* Details card on hover or keyboard focus. Full width on phones,
+                  anchored to the line on larger screens. */}
+              <div
+                className={`pointer-events-none absolute inset-x-0 z-20 translate-y-1 rounded-lg border border-zinc-200 bg-background p-3 text-left opacity-0 shadow-xl transition duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus:translate-y-0 group-focus:opacity-100 sm:w-72 dark:border-zinc-800 ${
+                  i >= timeline.length / 2 ? "bottom-full mb-1" : "top-full mt-1"
+                } ${
+                  labelBefore
+                    ? "sm:left-auto sm:right-[var(--r)]"
+                    : "sm:right-auto sm:left-[var(--l)]"
+                }`}
+                style={
+                  {
+                    "--l": `${left}%`,
+                    "--r": `${100 - right}%`,
+                  } as React.CSSProperties
+                }
+              >
+                <p className="font-mono text-[10px] text-zinc-500">
+                  {period(entry)}
+                </p>
+                <p className="mt-0.5 text-sm font-medium">{entry.org}</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-300">
+                  {entry.role}
+                </p>
+                {entry.description && (
+                  <p className="mt-1.5 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+                    {entry.description}
+                  </p>
+                )}
+              </div>
             </li>
           );
         })}
@@ -252,7 +289,7 @@ export default function Home() {
           Freider Fløan
         </h1>
         <p className="mt-2 text-zinc-500 dark:text-zinc-400">
-          I build things for the Norwegian space ecosystem.
+          I like starting things, mostly about space.
         </p>
         <nav className="mt-4 flex gap-4 text-sm">
           {links.map((link) => (

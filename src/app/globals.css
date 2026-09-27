@@ -39,3 +39,11 @@ body {
 .aurora-glow {
   box-shadow: 0 0 12px -1px color-mix(in oklab, var(--aurora-end) 55%, transparent);
 }
+
+/* Hovering one line in the chart fades the others */
+.chart-rows > li {
+  transition: opacity 200ms;
+}
+.chart-rows:has(> li:hover, > li:focus) > li:not(:hover, :focus) {
+  opacity: 0.3;
+}
