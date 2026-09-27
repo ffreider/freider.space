@@ -24,3 +24,18 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
+
+:root {
+  --aurora: linear-gradient(90deg, #10b981, #06b6d4 45%, #8b5cf6 80%, #d946ef);
+  --aurora-end: #a855f7;
+}
+
+@keyframes draw {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.aurora-glow {
+  box-shadow: 0 0 12px -1px color-mix(in oklab, var(--aurora-end) 55%, transparent);
+}
