@@ -48,6 +48,7 @@ const timeline: Entry[] = [
   {
     start: [2024, 3],
     org: "Tekna Romfart",
+    href: "https://www.tekna.no/fag-og-nettverk/samferdsel-og-infrastruktur/tekna-romfart/",
     role: "Board member",
   },
   {
@@ -62,6 +63,7 @@ const timeline: Entry[] = [
     start: [2023, 10],
     end: [2024, 8],
     org: "Kongsberg Defence & Aerospace",
+    href: "https://www.kongsberg.com/what-we-do/space/",
     short: "Kongsberg",
     role: "Project liaison, then summer intern",
   },
@@ -69,6 +71,7 @@ const timeline: Entry[] = [
     start: [2023, 6],
     end: [2023, 8],
     org: "KSAT",
+    href: "https://www.ksat.no/",
     role: "Summer intern, Tromsø",
     description: "Satellite communication and orbital mechanics.",
   },
@@ -83,6 +86,7 @@ const timeline: Entry[] = [
     start: [2021, 8],
     end: [2026, 5],
     org: "Orbit NTNU",
+    href: "https://orbitntnu.com/",
     role: "Program director, project manager and head of finance",
     description:
       "Led the student satellite program: SelfieSat, FramSat-1/1.5 and BioSat.",
@@ -192,7 +196,7 @@ function ParallelChart() {
             <li
               key={entry.org}
               tabIndex={0}
-              className="group relative h-6 cursor-default outline-none hover:z-10 focus:z-10"
+              className="group relative h-8 cursor-default outline-none hover:z-10 focus:z-10"
             >
               <span
                 className={`absolute top-1/2 h-[3px] -translate-y-1/2 origin-left rounded-full motion-safe:animate-[draw_1.4s_cubic-bezier(0.2,0.7,0.2,1)_both] ${
@@ -275,23 +279,23 @@ function ParallelChart() {
 
 export default function Home() {
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-20 sm:py-28">
+    <main className="mx-auto w-full max-w-3xl px-6 py-24 sm:px-8 sm:py-40">
       <header className="flex flex-col items-center text-center">
         <Image
           src="/freider.jpg"
           alt="Freider Fløan"
-          width={112}
-          height={112}
+          width={128}
+          height={128}
           priority
-          className="size-28 rounded-full object-cover"
+          className="size-32 rounded-full object-cover"
         />
-        <h1 className="mt-6 text-3xl font-semibold tracking-tight">
+        <h1 className="mt-8 text-3xl font-semibold tracking-tight sm:text-4xl">
           Freider Fløan
         </h1>
-        <p className="mt-2 text-zinc-500 dark:text-zinc-400">
+        <p className="mt-3 text-zinc-500 dark:text-zinc-400">
           I like starting things, mostly about space.
         </p>
-        <nav className="mt-4 flex gap-4 text-sm">
+        <nav className="mt-6 flex gap-6 text-sm">
           {links.map((link) => (
             <a key={link.href} href={link.href} className={linkClass}>
               {link.label}
@@ -300,11 +304,11 @@ export default function Home() {
         </nav>
       </header>
 
-      <section className="mt-20">
+      <section className="mt-32 sm:mt-40">
         <ParallelChart />
       </section>
 
-      <ol className="mt-20 space-y-8">
+      <ol className="mt-32 space-y-12 sm:mt-40">
         {timeline.map((entry) => (
           <li key={entry.org} className="grid gap-x-6 sm:grid-cols-[7rem_1fr]">
             <p className="font-mono text-xs leading-6 text-zinc-500">
@@ -324,7 +328,7 @@ export default function Home() {
                 {entry.role}
               </p>
               {entry.description && (
-                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
                   {entry.description}
                 </p>
               )}
@@ -333,11 +337,11 @@ export default function Home() {
         ))}
       </ol>
 
-      <section className="mt-16 border-t border-zinc-200 pt-8 text-sm dark:border-zinc-800">
+      <section className="mt-32 border-t border-zinc-200 pt-12 text-sm sm:mt-40 dark:border-zinc-800">
         <h2 className="font-medium">Education</h2>
-        <ul className="mt-2 space-y-1 text-zinc-500 dark:text-zinc-400">
+        <ul className="mt-4 space-y-2 text-zinc-500 dark:text-zinc-400">
           {education.map((degree) => (
-            <li key={degree}>{degree}. Finishing soon.</li>
+            <li key={degree}>{degree}. Finishing soon ish.</li>
           ))}
         </ul>
       </section>
