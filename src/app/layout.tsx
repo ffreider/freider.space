@@ -33,6 +33,8 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image", title: "Freider Fløan", description: tagline },
   alternates: { canonical: "/", languages: { en: "/", nb: "/no" } },
+  // Ownership checks for search engines' webmaster tools.
+  verification: { other: { "msvalidate.01": "5A909B27A73DEDBB10036542303E740A" } },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
