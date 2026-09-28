@@ -62,6 +62,15 @@ function sunDirection(date: Date): Vec {
   };
 }
 
+// The point on Earth where the Sun is straight overhead, as [lon, lat].
+export function subsolarPoint(date: Date): [number, number] {
+  const sun = sunDirection(date);
+  const rightAscension = Math.atan2(sun.y, sun.x);
+  const declination = Math.asin(sun.z);
+  const lon = (rightAscension - gstime(date)) / deg;
+  return [((lon + 540) % 360) - 180, declination / deg];
+}
+
 // Whether the satellite is in sunlight, treating Earth's shadow as a cylinder.
 function isSunlit(position: Vec, date: Date) {
   const sun = sunDirection(date);

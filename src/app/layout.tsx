@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Syne } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { framsatTle } from "@/lib/framsat-tle";
+import { recentReceptions } from "@/lib/satnogs";
 import { Backdrop } from "./backdrop";
 import { LaunchEasterEgg } from "./launch";
 import "./globals.css";
@@ -30,10 +31,11 @@ export const metadata: Metadata = {
     type: "profile",
   },
   twitter: { card: "summary_large_image" },
+  alternates: { canonical: "/", languages: { en: "/", nb: "/no" } },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const tle = await framsatTle();
+  const [tle, stations] = await Promise.all([framsatTle(), recentReceptions()]);
 
   return (
     <html
@@ -41,7 +43,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`dark ${syne.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Backdrop tle={tle} />
+        <Backdrop tle={tle} stations={stations} />
         {children}
         <LaunchEasterEgg />
         <Analytics />

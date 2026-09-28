@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  geoCircle,
   geoDistance,
   geoGraticule10,
   geoInterpolate,
@@ -13,7 +14,8 @@ import { twoline2satrec } from "satellite.js";
 import { feature, mesh } from "topojson-client";
 import type { Tle } from "@/lib/framsat-tle";
 import { type SatState, TRONDHEIM, useFramsat } from "./framsat";
-import { groundTrack } from "./framsat-orbit";
+import type { Reception } from "@/lib/satnogs";
+import { groundTrack, subsolarPoint } from "./framsat-orbit";
 
 // Full-page background: a dotted Earth that follows FramSat-1. Through most
 // of the page it's a horizon rising from the bottom of the screen; when the
@@ -82,7 +84,7 @@ function dotPattern(ctx: CanvasRenderingContext2D, dpr: number) {
 
 type World = { land: GeoPermissibleObjects; borders: GeoPermissibleObjects };
 
-export function Backdrop({ tle }: { tle: Tle }) {
+export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const scrim = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLDivElement>(null);
@@ -91,6 +93,7 @@ export function Backdrop({ tle }: { tle: Tle }) {
   const satRef = useRef<SatState | null>(sat);
   const trackRef = useRef<ReturnType<typeof groundTrack> | null>(null);
   const wakeRef = useRef<() => void>(() => {});
+  const stationsRef = useRef(stations);
 
   // The satellite moved (once a second, or faster when time-travelling):
   // update its ground track and ease the view after it.
@@ -218,7 +221,38 @@ export function Backdrop({ tle }: { tle: Tle }) {
       ctx.arc(X, Y, R * 1.12, 0, Math.PI * 2);
       ctx.fill();
 
-      // 4. On top: the ground track (the last and next 50 minutes), then
+      // 4. Night: shade the half of the Earth facing away from the Sun, with
+      // a soft twilight edge. Follows the simulated time.
+      const [sunLon, sunLat] = subsolarPoint(new Date(satRef.current?.time ?? Date.now()));
+      const night: [number, number] = [sunLon + 180, -sunLat];
+      ctx.globalCompositeOperation = "source-over";
+      for (const [radius, alpha] of [
+        [90, 0.22],
+        [87, 0.2],
+        [84, 0.22],
+      ] as const) {
+        ctx.fillStyle = `rgba(2, 3, 12, ${alpha})`;
+        ctx.beginPath();
+        path(geoCircle().center(night).radius(radius)());
+        ctx.fill();
+      }
+
+      // 5. Ground stations that recently received FramSat-1 (SatNOGS).
+      const centreNow = projection.invert!([X, Y])!;
+      ctx.fillStyle = "#67e8f9";
+      ctx.strokeStyle = "rgba(103, 232, 249, 0.35)";
+      ctx.lineWidth = 3 * dpr;
+      for (const station of stationsRef.current) {
+        const at: [number, number] = [station.lon, station.lat];
+        if (!Number.isFinite(station.lat) || geoDistance(at, centreNow) >= Math.PI / 2) continue;
+        const [sx, sy] = projection(at)!;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 2.5 * dpr, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fill();
+      }
+
+      // 6. On top: the ground track (the last and next 50 minutes), then
       // Trondheim and the route from there to the satellite.
       ctx.globalCompositeOperation = "source-over";
       const track = trackRef.current;
