@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { Unbounded } from "next/font/google";
+import { type Episode, latestEpisode } from "@/lib/spacepodden";
+import { IssNow } from "./iss";
 
 const display = Unbounded({ subsets: ["latin"], weight: "600" });
 
@@ -38,7 +40,7 @@ const timeline: Entry[] = [
     org: "Spacepodden",
     href: "https://open.spotify.com/show/7ofO8qm8tRBk2llQEMK8JB",
     role: "Host",
-    description: "A weekly Norwegian-language podcast about space. 68+ episodes.",
+    description: "A weekly Norwegian-language podcast about space.",
   },
   {
     start: [2024, 9],
@@ -149,11 +151,51 @@ function auroraSlice(left: number, width: number) {
   };
 }
 
+// Spacepodden's description gets its episode count from the live feed.
+function describe(entry: Entry, episode: Episode | null) {
+  if (entry.org === "Spacepodden" && episode?.number) {
+    return `${entry.description} ${episode.number}+ episodes so far.`;
+  }
+  return entry.description;
+}
+
+function LatestEpisode({ episode }: { episode: Episode }) {
+  const date = episode.published.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    timeZone: "Europe/Oslo",
+  });
+  return (
+    <a
+      href={episode.url}
+      className="mt-4 flex max-w-md items-center gap-4 rounded-xl border border-zinc-200 bg-background/60 p-3 backdrop-blur transition hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+    >
+      {episode.image && (
+        <Image
+          src={episode.image}
+          alt=""
+          width={56}
+          height={56}
+          className="size-14 shrink-0 rounded-md object-cover"
+        />
+      )}
+      <span className="min-w-0">
+        <span className="block font-mono text-[10px] uppercase tracking-wide text-zinc-500">
+          Latest episode
+          {episode.number && ` · E${episode.number}`} · {date}
+          {episode.minutes && ` · ${episode.minutes} min`}
+        </span>
+        <span className="mt-1 line-clamp-2 block text-sm">{episode.title}</span>
+      </span>
+    </a>
+  );
+}
+
 const linkClass =
   "underline decoration-zinc-300 underline-offset-4 hover:decoration-current dark:decoration-zinc-600";
 
 // Every role as a line on a shared time axis, so overlaps are visible at a glance.
-function ParallelChart() {
+function ParallelChart({ episode }: { episode: Episode | null }) {
   const nowPct = pct(now);
 
   return (
@@ -262,7 +304,7 @@ function ParallelChart() {
                 </p>
                 {entry.description && (
                   <p className="mt-1.5 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-                    {entry.description}
+                    {describe(entry, episode)}
                   </p>
                 )}
               </div>
@@ -274,7 +316,11 @@ function ParallelChart() {
   );
 }
 
-export default function Home() {
+export const revalidate = 3600;
+
+export default async function Home() {
+  const episode = await latestEpisode();
+
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-24 sm:px-8 sm:py-40">
       <header className="flex flex-col items-center text-center">
@@ -284,6 +330,7 @@ export default function Home() {
           width={128}
           height={128}
           priority
+          data-launch
           className="size-32 rounded-full object-cover"
         />
         <h1 className={`${display.className} mt-8 text-3xl sm:text-4xl`}>
@@ -302,7 +349,7 @@ export default function Home() {
       </header>
 
       <section className="mt-32 sm:mt-40">
-        <ParallelChart />
+        <ParallelChart episode={episode} />
       </section>
 
       <ol className="mt-32 space-y-12 sm:mt-40">
@@ -326,8 +373,11 @@ export default function Home() {
               </p>
               {entry.description && (
                 <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-                  {entry.description}
+                  {describe(entry, episode)}
                 </p>
+              )}
+              {entry.org === "Spacepodden" && episode && (
+                <LatestEpisode episode={episode} />
               )}
             </div>
           </li>
@@ -342,6 +392,10 @@ export default function Home() {
           ))}
         </ul>
       </section>
+
+      <footer className="mt-24">
+        <IssNow />
+      </footer>
     </main>
   );
 }

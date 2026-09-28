@@ -239,3 +239,58 @@ body {
     animation: none;
   }
 }
+
+/* Easter egg rocket (see launch.tsx). It points up; the flight rotates it
+   toward the top-right while it crosses the screen. */
+.rocket {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  width: 28px;
+  height: 56px;
+  pointer-events: none;
+  color: var(--foreground);
+  animation: fly 3.4s cubic-bezier(0.45, 0, 0.25, 1) forwards;
+}
+
+.rocket-body {
+  position: absolute;
+  inset: 0;
+}
+
+.rocket-trail {
+  position: absolute;
+  left: 50%;
+  top: 85%;
+  width: 6px;
+  height: 45vh;
+  translate: -50% 0;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, #f59e0b, #d946ef 20%, #8b5cf6 45%, #06b6d4 70%, transparent);
+  filter: blur(3px);
+  opacity: 0.8;
+}
+
+.rocket-flame {
+  transform-origin: 12px 35px;
+  animation: flicker 90ms steps(2) infinite alternate;
+}
+
+@keyframes fly {
+  0% {
+    transform: translate(8vw, 110vh) rotate(18deg);
+  }
+  50% {
+    transform: translate(45vw, 45vh) rotate(35deg);
+  }
+  100% {
+    transform: translate(105vw, -60vh) rotate(52deg);
+  }
+}
+
+@keyframes flicker {
+  to {
+    transform: scaleY(1.35);
+  }
+}

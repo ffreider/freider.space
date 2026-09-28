@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Syne } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { Backdrop } from "./backdrop";
+import { LaunchEasterEgg } from "./launch";
 import "./globals.css";
 
 const syne = Syne({
@@ -13,9 +15,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const description =
+  "Co-founder and President of NORSTEC. Host of Spacepodden. Building for the Norwegian space ecosystem.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://freider.space"),
   title: "Freider Fløan",
-  description: "Co-founder and President of NORSTEC. Host of Spacepodden. Building for the Norwegian space ecosystem.",
+  description,
+  openGraph: {
+    title: "Freider Fløan",
+    description,
+    url: "/",
+    siteName: "Freider Fløan",
+    type: "profile",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -27,6 +41,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <Backdrop />
         {children}
+        <LaunchEasterEgg />
+        <Analytics />
       </body>
     </html>
   );
