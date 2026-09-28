@@ -20,6 +20,7 @@ const timeline: Entry[] = [
   {
     start: [2025, 11],
     org: "Meso Manufacturing",
+    href: "https://www.mesomanufacturing.com/",
     short: "Meso",
     role: "Co-founder",
     description:
