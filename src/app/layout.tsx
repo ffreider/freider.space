@@ -14,20 +14,24 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
-const description = "I like starting things, mostly about space.";
+// What search results show (title and description) is descriptive; link
+// previews (Open Graph) show the tagline.
+const tagline = "I like starting things, mostly about space.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://freider.space"),
-  title: "Freider Fløan",
-  description,
+  title: "Freider Fløan | Space, NORSTEC and Spacepodden",
+  description:
+    "Freider Fløan studies electronic systems design and space systems at NTNU in Trondheim, co-founded and leads NORSTEC, and hosts the Norwegian space podcast Spacepodden.",
   openGraph: {
     title: "Freider Fløan",
-    description,
+    description: tagline,
     url: "/",
     siteName: "Freider Fløan",
     type: "profile",
+    locale: "en_GB",
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", title: "Freider Fløan", description: tagline },
   alternates: { canonical: "/", languages: { en: "/", nb: "/no" } },
 };
 

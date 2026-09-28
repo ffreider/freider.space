@@ -134,6 +134,7 @@ const timeline: Entry[] = [
 const TEXT = {
   en: {
     tagline: "I like starting things, mostly about space.",
+    bio: "I’m Freider Fløan, a student of electronic systems design and space systems at NTNU in Trondheim, Norway. I co-founded NORSTEC, the Norwegian Space Technology Collective, and lead it as President. I also host the podcast Spacepodden, chair NASA HUNCH Norge and co-founded Meso Manufacturing.",
     otherLanguage: { label: "Norsk", href: "/no", lang: "nb" },
     chartAria: "Timeline of roles running in parallel",
     now: "now",
@@ -155,6 +156,7 @@ const TEXT = {
   },
   no: {
     tagline: "Jeg liker å starte ting, mest innen romfart.",
+    bio: "Jeg heter Freider Fløan og studerer elektronisk systemdesign med fordypning i romsystemer ved NTNU i Trondheim. Jeg er medgründer og president i NORSTEC, Norwegian Space Technology Collective. I tillegg er jeg programleder for podkasten Spacepodden, styreleder i NASA HUNCH Norge og medgründer av Meso Manufacturing.",
     otherLanguage: { label: "English", href: "/", lang: "en" },
     chartAria: "Tidslinje over roller som går parallelt",
     now: "nå",
@@ -175,6 +177,58 @@ const TEXT = {
       "Personvern: denne siden bruker ingen informasjonskapsler. Besøk telles anonymt med Vercel Web Analytics. Vannfallsdiagrammer lastes fra SatNOGS bare hvis du åpner et.",
   },
 };
+
+// schema.org description of the page and the person it's about. Only
+// facts that are also on the page.
+function structuredData(lang: Lang) {
+  const site = "https://freider.space";
+  const org = (name: string, url?: string) => ({ "@type": "Organization", name, ...(url && { url }) });
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    url: lang === "no" ? `${site}/no` : site,
+    inLanguage: lang === "no" ? "nb" : "en",
+    mainEntity: {
+      "@type": "Person",
+      "@id": `${site}/#person`,
+      name: "Freider Fløan",
+      alternateName: "Freider Floan",
+      url: site,
+      image: `${site}/freider.jpg`,
+      description: TEXT[lang].bio,
+      jobTitle: lang === "no" ? "President i NORSTEC" : "President of NORSTEC",
+      nationality: { "@type": "Country", name: "Norway" },
+      homeLocation: { "@type": "Place", name: "Trondheim, Norway" },
+      affiliation: [
+        { "@type": "CollegeOrUniversity", name: "NTNU", url: "https://www.ntnu.no" },
+        org("NORSTEC", "https://norstec.no"),
+        org("NORSTEC Summit", "https://norstec.no/summit"),
+        org("Spacepodden", "https://open.spotify.com/show/7ofO8qm8tRBk2llQEMK8JB"),
+        org("NASA HUNCH Norge", "https://nasahunch.no"),
+        org("Meso Manufacturing", "https://www.mesomanufacturing.com/"),
+        org("Tekna Romfart"),
+        org("Orbit NTNU", "https://orbitntnu.com/"),
+      ],
+      knowsAbout: [
+        "Space technology",
+        "Small satellites",
+        "Satellite operations",
+        "Orbital mechanics",
+        "Student organizations",
+        "Additive manufacturing",
+      ],
+      sameAs: ["https://www.linkedin.com/in/freider/", "https://github.com/ffreider"],
+      subjectOf: {
+        "@type": "Article",
+        headline: "The extracurricular that left Earth",
+        url: "https://trondheim.com/journal/the-extracurricular-that-left-earth",
+        datePublished: "2026-09-03",
+        author: { "@type": "Person", name: "McKenna Starck" },
+        publisher: org("Trondheim.com", "https://trondheim.com"),
+      },
+    },
+  };
+}
 
 const links = [
   { label: "LinkedIn", href: "https://www.linkedin.com/in/freider/" },
@@ -321,6 +375,11 @@ export async function Home({ lang }: { lang: Lang }) {
 
   return (
     <div lang={lang === "no" ? "nb" : "en"} className="contents">
+      <script
+        type="application/ld+json"
+        // Structured data: who this page is about, for search engines and AI.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData(lang)) }}
+      />
       <main className="relative mx-auto w-full max-w-3xl px-6 pt-24 sm:px-8 sm:pt-40">
         <Link
           href={t.otherLanguage.href}
@@ -357,7 +416,9 @@ export async function Home({ lang }: { lang: Lang }) {
           </nav>
         </header>
 
-        <section className="mt-32 sm:mt-40">
+        <p className="mt-24 max-w-[60ch] text-lg leading-relaxed text-fg-2 sm:mt-32">{t.bio}</p>
+
+        <section className="mt-24 sm:mt-32">
           <ParallelChart lang={lang} />
         </section>
 
