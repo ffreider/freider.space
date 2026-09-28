@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
+/* The site is always dark. `dark:` classes apply via the `dark` class on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+  --background: #030304;
+  --foreground: #ededed;
 }
 
 @theme inline {
@@ -10,13 +14,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-syne);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #030304;
-    --foreground: #ededed;
-  }
 }
 
 body {
@@ -49,21 +46,6 @@ body {
 }
 
 /* Background: a dotted globe (see backdrop.tsx) under a film grain */
-:root {
-  --grain-opacity: 0.35;
-  --globe-opacity: 0.4;
-  --tint-blend: soft-light;
-  --tint-opacity: 0.4;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --grain-opacity: 0.22;
-    --globe-opacity: 0.5;
-    --tint-blend: color;
-    --tint-opacity: 0.6;
-  }
-}
 
 .backdrop {
   position: fixed;
@@ -82,7 +64,7 @@ body {
 
 .globe {
   display: block;
-  opacity: var(--globe-opacity);
+  opacity: 0.28;
 }
 
 /* Washes the globe's dots in the aurora colors, green in the west through
@@ -92,8 +74,8 @@ body {
   inset: 0;
   border-radius: 50%;
   background: linear-gradient(115deg, #10b981, #06b6d4 30%, #6366f1 55%, #a855f7 75%, #ec4899);
-  mix-blend-mode: var(--tint-blend);
-  opacity: var(--tint-opacity);
+  mix-blend-mode: color;
+  opacity: 0.5;
   /* Only over the Earth itself, not its glow */
   mask-image: radial-gradient(circle closest-side, black 72%, transparent 81%);
 }
@@ -101,7 +83,7 @@ body {
 .grain {
   position: absolute;
   inset: 0;
-  opacity: var(--grain-opacity);
+  opacity: 0.22;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }

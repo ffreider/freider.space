@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Unbounded } from "next/font/google";
-import { IssNow } from "./iss";
+import { framsatTle } from "@/lib/framsat-tle";
+import { FramsatNow } from "./framsat";
 import { SpotifyPlayer } from "./spotify";
 
 const display = Unbounded({ subsets: ["latin"], weight: "600" });
@@ -276,7 +277,9 @@ function ParallelChart() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const tle = await framsatTle();
+
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-24 sm:px-8 sm:py-40">
       <header className="flex flex-col items-center text-center">
@@ -348,11 +351,11 @@ export default function Home() {
       </section>
 
       <footer className="mt-24 space-y-4">
-        <IssNow />
+        <FramsatNow tle={tle} />
         <p className="text-xs text-zinc-400 dark:text-zinc-600">
           Privacy: this site sets no cookies. Visits are counted anonymously
-          with Vercel Web Analytics, and the ISS position is fetched from
-          wheretheiss.at. The Spotify player only loads if you press play.
+          with Vercel Web Analytics. The Spotify player only loads if you
+          press play.
         </p>
       </footer>
     </main>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Syne } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { framsatTle } from "@/lib/framsat-tle";
 import { Backdrop } from "./backdrop";
 import { LaunchEasterEgg } from "./launch";
 import "./globals.css";
@@ -31,14 +32,16 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const tle = await framsatTle();
+
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${syne.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Backdrop />
+        <Backdrop tle={tle} />
         {children}
         <LaunchEasterEgg />
         <Analytics />

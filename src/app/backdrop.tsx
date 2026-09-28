@@ -2,12 +2,12 @@
 
 import createGlobe, { type COBEOptions, type Globe } from "cobe";
 import { useEffect, useRef } from "react";
-import { TRONDHEIM } from "./iss";
-import { type IssPosition, useIss } from "./iss-store";
+import type { Tle } from "@/lib/framsat-tle";
+import { type SatPosition, TRONDHEIM, useFramsat } from "./framsat";
 
 // Full-page background: a dotted Earth rising from the bottom of the screen
 // like a horizon seen from orbit. It turns slowly, leans toward the pointer,
-// rises as you scroll, and marks Trondheim and the live ISS position.
+// rises as you scroll, and marks Trondheim and where FramSat-1 is right now.
 
 const TURN_PER_SECOND = 0.035; // radians; one full turn in about three minutes
 const deg = Math.PI / 180;
@@ -20,25 +20,15 @@ const facing = (lat: number, lon: number) => ({
 
 const START = facing(TRONDHEIM.lat, TRONDHEIM.lon);
 
-const themes: Record<"light" | "dark", Partial<COBEOptions>> = {
-  dark: {
-    dark: 1,
-    diffuse: 1.4,
-    mapBrightness: 5,
-    baseColor: [0.35, 0.35, 0.45],
-    glowColor: [0.18, 0.2, 0.35],
-    markerColor: [0.93, 0.35, 0.85],
-    arcColor: [0.55, 0.45, 1],
-  },
-  light: {
-    dark: 0,
-    diffuse: 1.2,
-    mapBrightness: 3,
-    baseColor: [1, 1, 1],
-    glowColor: [0.9, 0.9, 1],
-    markerColor: [0.85, 0.2, 0.75],
-    arcColor: [0.45, 0.35, 0.95],
-  },
+const colors: Partial<COBEOptions> = {
+  dark: 1,
+  diffuse: 1.6,
+  mapBrightness: 9,
+  mapBaseBrightness: 0.02,
+  baseColor: [0.4, 0.4, 0.5],
+  glowColor: [0.12, 0.13, 0.22],
+  markerColor: [0.93, 0.35, 0.85],
+  arcColor: [0.55, 0.45, 1],
 };
 
 type Spring = { x: number; v: number };
@@ -54,31 +44,31 @@ const scrollProgress = () => {
   return max > 0 ? window.scrollY / max : 0;
 };
 
-function markersFor(iss: IssPosition | null): Pick<COBEOptions, "markers" | "arcs"> {
+function markersFor(sat: SatPosition | null): Pick<COBEOptions, "markers" | "arcs"> {
   const home: [number, number] = [TRONDHEIM.lat, TRONDHEIM.lon];
-  if (!iss) return { markers: [{ location: home, size: 0.04 }], arcs: [] };
-  const station: [number, number] = [iss.lat, iss.lon];
+  if (!sat) return { markers: [{ location: home, size: 0.04 }], arcs: [] };
+  const satellite: [number, number] = [sat.lat, sat.lon];
   return {
     markers: [
       { location: home, size: 0.04 },
-      { location: station, size: 0.07 },
+      { location: satellite, size: 0.06 },
     ],
-    arcs: [{ from: home, to: station }],
+    arcs: [{ from: home, to: satellite }],
   };
 }
 
-export function Backdrop() {
+export function Backdrop({ tle }: { tle: Tle }) {
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const globe = useRef<Globe | null>(null);
-  const iss = useIss();
-  const issRef = useRef(iss);
+  const sat = useFramsat(tle);
+  const satRef = useRef(sat);
 
-  // New ISS position: move the pink marker and the arc from Trondheim.
+  // New satellite position: move the pink marker and the arc from Trondheim.
   useEffect(() => {
-    issRef.current = iss;
-    globe.current?.update(markersFor(iss));
-  }, [iss]);
+    satRef.current = sat;
+    globe.current?.update(markersFor(sat));
+  }, [sat]);
 
   useEffect(() => {
     const el = canvas.current;
@@ -86,8 +76,6 @@ export function Backdrop() {
     if (!el || !box) return;
 
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const theme = () => themes[darkQuery.matches ? "dark" : "light"];
 
     const pointer = { x: 0, y: 0 };
     const lean = { x: { x: 0, v: 0 }, y: { x: 0, v: 0 } };
@@ -107,7 +95,7 @@ export function Backdrop() {
         height: size * dpr,
         phi: START.phi,
         theta: 0.35,
-        mapSamples: 20000,
+        mapSamples: 64000,
         mapBrightness: 5,
         baseColor: [1, 1, 1],
         markerColor: [1, 1, 1],
@@ -117,8 +105,8 @@ export function Backdrop() {
         arcWidth: 0.6,
         arcHeight: 0.3,
         markerElevation: 0.02,
-        ...theme(),
-        ...markersFor(issRef.current),
+        ...colors,
+        ...markersFor(satRef.current),
       });
     };
 
@@ -156,7 +144,6 @@ export function Backdrop() {
       build();
       place();
     };
-    const onTheme = () => globe.current?.update(theme());
 
     build();
     place();
@@ -165,13 +152,11 @@ export function Backdrop() {
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
-    darkQuery.addEventListener("change", onTheme);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
-      darkQuery.removeEventListener("change", onTheme);
       globe.current?.destroy();
     };
   }, []);
