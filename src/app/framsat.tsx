@@ -16,6 +16,7 @@ import {
   upcomingPasses,
 } from "./framsat-orbit";
 import { type Lang, LOCALE, numbers } from "./i18n";
+import { placeName, useCountries } from "./place";
 import { goLive, setOffset, setSpeed, simNow, useSimClock } from "./sim-time";
 import { segments, TLE_FIELDS } from "./tle-fields";
 
@@ -51,9 +52,10 @@ export function useFramsat(tle: Tle) {
 
 const T = {
   en: {
-    intro:
-      "A student satellite I worked on at Orbit NTNU, in orbit since 5 September 2026. Everything here is computed in your browser from its orbital elements with the SGP4 model.",
-    hint: "Drag the globe to spin it. Scrub or fast-forward time to watch it orbit.",
+    introBefore: "A student satellite I worked on at ",
+    introAfter: ", launched on 5 September 2026.",
+    footnote:
+      "Everything here is computed in your browser from FramSat-1’s orbital elements with the SGP4 model. Drag the globe to spin it, or move the slider to travel in time.",
     now: "Live",
     localTime: "Oslo time",
     backToNow: "Back to now",
@@ -63,29 +65,26 @@ const T = {
     underMinute: "under a minute",
     tomorrow: "tomorrow",
     ago: (d: string) => `${d} ago`,
-    in: (d: string) => `in ${d}`,
     tabs: { overview: "Overview", telemetry: "Telemetry", passes: "Passes", signals: "Signals", tle: "TLE" },
     tabsAria: "FramSat-1 data",
     compass: ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
     compassLong: ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"],
-    position: "Position",
-    up: (lon: string, alt: string) => `${lon}, ${alt} km up`,
+    latitude: "Latitude",
+    longitude: "Longitude",
+    altitude: "Altitude",
+    kmh: "km/h",
+    summary: (alt: string, place: string, speed: string, sunlit: boolean) =>
+      `Right now it’s ${alt} km above ${place}, moving at ${speed} km/h ${sunlit ? "in sunlight" : "in Earth’s shadow"}.`,
+    overhead: (el: string) => `It’s above Trondheim’s horizon right now, ${el}° up.`,
+    nextPass: (inTime: string, el: string, when: string) =>
+      `It passes over Trondheim in ${inTime}, reaching ${el}° above the horizon ${when}.`,
+    noPass: "It won’t pass over Trondheim in the next three days.",
     fromTrondheim: "From Trondheim",
-    alongGround: "along the ground",
     speed: "Speed",
-    light: "Light",
-    sunlight: "Sunlight",
-    eclipse: "Eclipse",
-    sunlightNote: "Solar panels in the Sun",
-    eclipseNote: "In Earth’s shadow",
-    overTrondheim: "Over Trondheim",
-    overheadNow: "Overhead now",
-    aboveHorizon: (n: string) => `${n}° above the horizon`,
-    peaksAt: (n: string, when: string) => `peaks at ${n}°, ${when}`,
-    noPass: "no pass in the next 3 days",
     sinceLaunch: "Since launch",
     orbits: (n: string) => `${n} orbits`,
-    travelled: (km: string, days: number) => `${km} million km in ${days} days`,
+    travelled: "Travelled",
+    travelledValue: (km: string, days: number) => `${km} million km in ${days} days`,
     stateVector: "State vector · TEME frame",
     lookAngles: "Look angles from Trondheim",
     azimuth: "Azimuth",
@@ -134,9 +133,10 @@ const T = {
     days: "days",
   },
   no: {
-    intro:
-      "En studentsatellitt jeg jobbet med i Orbit NTNU, i bane siden 5. september 2026. Alt her beregnes i nettleseren din fra baneelementene med SGP4-modellen.",
-    hint: "Dra i jordkloden for å snurre den. Spol i tid for å se den gå i bane.",
+    introBefore: "En studentsatellitt jeg jobbet med i ",
+    introAfter: ", skutt opp 5. september 2026.",
+    footnote:
+      "Alt her beregnes i nettleseren din fra baneelementene til FramSat-1 med SGP4-modellen. Dra i jordkloden for å snurre den, eller flytt glidebryteren for å reise i tid.",
     now: "Direkte",
     localTime: "norsk tid",
     backToNow: "Tilbake til nå",
@@ -146,29 +146,26 @@ const T = {
     underMinute: "under ett minutt",
     tomorrow: "i morgen",
     ago: (d: string) => `for ${d} siden`,
-    in: (d: string) => `om ${d}`,
     tabs: { overview: "Oversikt", telemetry: "Telemetri", passes: "Passeringer", signals: "Signaler", tle: "TLE" },
     tabsAria: "Data om FramSat-1",
     compass: ["N", "NØ", "Ø", "SØ", "S", "SV", "V", "NV"],
     compassLong: ["nord", "nordøst", "øst", "sørøst", "sør", "sørvest", "vest", "nordvest"],
-    position: "Posisjon",
-    up: (lon: string, alt: string) => `${lon}, ${alt} km over bakken`,
+    latitude: "Breddegrad",
+    longitude: "Lengdegrad",
+    altitude: "Høyde",
+    kmh: "km/t",
+    summary: (alt: string, place: string, speed: string, sunlit: boolean) =>
+      `Akkurat nå er den ${alt} km over ${place}, i ${speed} km/t ${sunlit ? "i sollys" : "i jordskyggen"}.`,
+    overhead: (el: string) => `Den er over horisonten i Trondheim akkurat nå, ${el}° opp.`,
+    nextPass: (inTime: string, el: string, when: string) =>
+      `Den passerer over Trondheim om ${inTime} og når ${el}° over horisonten ${when}.`,
+    noPass: "Den passerer ikke over Trondheim de neste tre dagene.",
     fromTrondheim: "Fra Trondheim",
-    alongGround: "langs bakken",
     speed: "Fart",
-    light: "Lys",
-    sunlight: "Sollys",
-    eclipse: "Skygge",
-    sunlightNote: "Solcellepanelene er i sola",
-    eclipseNote: "I jordskyggen",
-    overTrondheim: "Over Trondheim",
-    overheadNow: "Over horisonten nå",
-    aboveHorizon: (n: string) => `${n}° over horisonten`,
-    peaksAt: (n: string, when: string) => `høyest ${n}°, ${when}`,
-    noPass: "ingen passering de neste 3 dagene",
     sinceLaunch: "Siden oppskyting",
     orbits: (n: string) => `${n} runder`,
-    travelled: (km: string, days: number) => `${km} millioner km på ${days} dager`,
+    travelled: "Tilbakelagt",
+    travelledValue: (km: string, days: number) => `${km} millioner km på ${days} dager`,
     stateVector: "Tilstandsvektor · TEME-ramme",
     lookAngles: "Retning fra Trondheim",
     azimuth: "Asimut",
@@ -258,7 +255,17 @@ function format(lang: Lang) {
       const h = Math.floor(minutes / 60);
       const m = minutes % 60;
       if (h >= 48) return `${Math.round(h / 24)} ${t.days}`;
-      return h ? `${h} ${t.hours} ${m} min` : `${m} min`;
+      if (!h) return `${m} min`;
+      return m ? `${h} ${t.hours} ${m} min` : `${h} ${t.hours}`;
+    },
+    // "at 15:26", "tomorrow at 04:12" (English) or "kl. 15:26", "i morgen
+    // kl. 04:12" (Norwegian), for use inside a sentence.
+    whenPhrase(date: Date, now: number) {
+      const at = lang === "en" ? `at ${clock(date)}` : `kl. ${clock(date)}`;
+      if (osloDay(date) === osloDay(new Date(now))) return at;
+      if (osloDay(date) === osloDay(new Date(now + 86_400_000))) return `${t.tomorrow} ${at}`;
+      const day = date.toLocaleDateString(locale, { weekday: "long", timeZone: "Europe/Oslo" });
+      return lang === "en" ? `on ${day} ${at}` : `på ${day} ${at}`;
     },
     // "15:26", "tomorrow 04:12" or "Wed 1 Oct 04:12", relative to `now`.
     when(date: Date, now: number) {
@@ -293,27 +300,20 @@ function TimeControls({ tick, speed, f }: { tick: SatTick; speed: number; f: For
   const minutes = Math.round(offset / 60_000);
 
   return (
-    <div className="mt-5 rounded-card border border-line p-3">
+    <div className="mt-6">
       <div className="flex items-baseline justify-between gap-3">
-        <p className="font-mono text-xs tabular-nums">
-          {live ? (
-            <span className="text-accent">{f.t.now}</span>
-          ) : (
-            <span className="text-fg">
-              {offset >= 0 ? "+" : "−"}
-              {f.duration(offset)}
-            </span>
-          )}
-          <span className="text-fg-3">
-            {", "}
-            {f.clock(new Date(tick.time))} {f.t.localTime}
+        <p className="tabular-nums">
+          <span className="font-mono text-2xl text-fg">{f.clock(new Date(tick.time))}</span>{" "}
+          <span className="text-sm text-fg-3">
+            {f.t.localTime}
+            {live ? `, ${f.t.now.toLowerCase()}` : `, ${offset >= 0 ? "+" : "−"}${f.duration(offset)}`}
           </span>
         </p>
         {!live && (
           <button
             type="button"
             onClick={goLive}
-            className="text-xs text-fg-2 underline decoration-fg-4 underline-offset-4 hover:decoration-accent"
+            className="text-sm text-fg-2 underline decoration-accent underline-offset-4 hover:text-fg"
           >
             {f.t.backToNow}
           </button>
@@ -329,18 +329,20 @@ function TimeControls({ tick, speed, f }: { tick: SatTick; speed: number; f: For
         onChange={(e) => setOffset(Number(e.target.value) * 60_000)}
         className="mt-3 w-full accent-[var(--accent)]"
       />
-      <div className="mt-1 flex items-center justify-between font-mono text-[10px] text-fg-4">
+      <div className="mt-1 flex items-center justify-between font-mono text-[11px] text-fg-4">
         <span>−12 {f.t.hours}</span>
-        <div className="flex gap-1" role="group" aria-label={f.t.speedAria}>
+        <div className="flex gap-3" role="group" aria-label={f.t.speedAria}>
           {SPEEDS.map((s) => (
             <button
               key={s}
               type="button"
               onClick={() => setSpeed(s)}
               aria-pressed={speed === s}
-              className={`rounded-card px-2 py-0.5 ${
-                speed === s ? "bg-fg text-background" : "text-fg-2 hover:bg-line"
-              }`}
+              className={
+                speed === s
+                  ? "text-fg underline decoration-accent decoration-2 underline-offset-4"
+                  : "text-fg-3 hover:text-fg"
+              }
             >
               {s}×
             </button>
@@ -354,24 +356,14 @@ function TimeControls({ tick, speed, f }: { tick: SatTick; speed: number; f: For
 
 // ————— Tabs —————
 
-function Stat({ name, value, note }: { name: string; value: string; note?: string }) {
+function Rows({ title, rows, className }: { title?: string; rows: [string, string][]; className?: string }) {
   return (
-    <div>
-      <dt className={label}>{name}</dt>
-      <dd className="mt-1 font-mono text-sm tabular-nums text-foreground">{value}</dd>
-      {note && <dd className="mt-0.5 text-xs leading-relaxed text-fg-3">{note}</dd>}
-    </div>
-  );
-}
-
-function Rows({ title, rows }: { title: string; rows: [string, string][] }) {
-  return (
-    <div>
-      <p className={label}>{title}</p>
-      <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 font-mono text-xs tabular-nums">
+    <div className={className}>
+      {title && <p className={`${label} mb-2`}>{title}</p>}
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 font-mono text-[13px] tabular-nums">
         {rows.map(([k, v]) => (
           <div key={k} className="contents">
-            <dt className="text-fg-3">{k}</dt>
+            <dt className="font-sans text-fg-3">{k}</dt>
             <dd className="text-right text-fg">{v}</dd>
           </div>
         ))}
@@ -385,55 +377,52 @@ function Overview({
   facts,
   next,
   f,
+  lang,
 }: {
   tick: SatTick;
   facts: ReturnType<typeof orbitFacts>;
   next: Pass | undefined;
   f: Format;
+  lang: Lang;
 }) {
   const { t } = f;
+  const countries = useCountries();
+  const place = placeName(countries, tick.lat, tick.lon, lang);
   const orbits =
     facts.revAtEpoch + (tick.time - facts.epoch.getTime()) / 60_000 / facts.periodMinutes;
   const travelledKm = orbits * 2 * Math.PI * facts.semiMajorAxisKm;
   const daysUp = Math.floor((tick.time - LAUNCH.getTime()) / 86_400_000);
-  const overhead = tick.elevation > 0;
   const [n, s, e, w] = [t.compass[0], t.compass[4], t.compass[2], t.compass[6]];
 
+  const pass =
+    tick.elevation > 0
+      ? t.overhead(tick.elevation.toFixed(0))
+      : next
+        ? t.nextPass(
+            f.duration(next.start.getTime() - tick.time),
+            next.maxElevation.toFixed(0),
+            f.whenPhrase(next.peak, tick.time),
+          )
+        : t.noPass;
+
   return (
-    <dl className="grid grid-cols-2 gap-x-4 gap-y-5">
-      <Stat
-        name={t.position}
-        value={f.coord(tick.lat, n, s)}
-        note={t.up(f.coord(tick.lon, e, w), f.whole(tick.altitude))}
+    <div>
+      <p className="text-lg leading-snug text-fg">
+        {t.summary(f.whole(tick.altitude), place, f.whole(tick.speed), tick.sunlit)} {pass}
+      </p>
+      <Rows
+        className="mt-6"
+        rows={[
+          [t.latitude, f.coord(tick.lat, n, s)],
+          [t.longitude, f.coord(tick.lon, e, w)],
+          [t.altitude, `${f.whole(tick.altitude)} km`],
+          [t.speed, `${f.whole(tick.speed)} ${t.kmh}`],
+          [t.fromTrondheim, `${f.whole(distanceKm(TRONDHEIM.lat, TRONDHEIM.lon, tick.lat, tick.lon))} km`],
+          [t.sinceLaunch, t.orbits(f.whole(orbits))],
+          [t.travelled, t.travelledValue(f.fixed(travelledKm / 1e6, 1), daysUp)],
+        ]}
       />
-      <Stat
-        name={t.fromTrondheim}
-        value={`${f.whole(distanceKm(TRONDHEIM.lat, TRONDHEIM.lon, tick.lat, tick.lon))} km`}
-        note={t.alongGround}
-      />
-      <Stat name={t.speed} value={`${f.whole(tick.speed)} km/h`} note={`${f.fixed(tick.speed / 3600, 2)} km/s`} />
-      <Stat
-        name={t.light}
-        value={tick.sunlit ? t.sunlight : t.eclipse}
-        note={tick.sunlit ? t.sunlightNote : t.eclipseNote}
-      />
-      <Stat
-        name={t.overTrondheim}
-        value={overhead ? t.overheadNow : next ? t.in(f.duration(next.start.getTime() - tick.time)) : "—"}
-        note={
-          overhead
-            ? t.aboveHorizon(tick.elevation.toFixed(0))
-            : next
-              ? t.peaksAt(next.maxElevation.toFixed(0), f.when(next.peak, tick.time))
-              : t.noPass
-        }
-      />
-      <Stat
-        name={t.sinceLaunch}
-        value={t.orbits(f.whole(orbits))}
-        note={t.travelled(f.fixed(travelledKm / 1e6, 1), daysUp)}
-      />
-    </dl>
+    </div>
   );
 }
 
@@ -818,21 +807,22 @@ export function FramsatSection({
       id="framsat"
       className="relative flex min-h-screen w-full flex-col justify-end px-6 pb-16 pt-[calc(88vmin+72px)] sm:px-8 lg:flex-row lg:items-center lg:justify-end lg:py-16 lg:pr-16"
     >
-      <aside className="w-full max-w-md rounded-card border border-line bg-surface p-6 lg:w-[440px] lg:max-w-none">
-        <h2 className="display text-2xl">
+      <aside className="w-full max-w-md border-t-2 border-fg bg-surface px-6 pb-6 pt-5 lg:w-[440px] lg:max-w-none">
+        <h2 className="display text-4xl">FramSat-1</h2>
+        <p className="mt-2 text-sm leading-relaxed text-fg-2">
+          {t.introBefore}
           <a href="https://orbitntnu.com/projects/FramSat-1" className={linkClass}>
-            FramSat-1
+            Orbit NTNU
           </a>
-        </h2>
-        <p className="mt-2 text-sm leading-relaxed text-fg-2">{t.intro}</p>
-        <p className="mt-2 hidden text-xs text-fg-3 [@media(pointer:fine)]:block">{t.hint}</p>
+          {t.introAfter}
+        </p>
 
         {tick && <TimeControls tick={tick} speed={speed} f={f} />}
 
         <div
           role="tablist"
           aria-label={t.tabsAria}
-          className="mt-5 flex gap-0.5 overflow-x-auto border-b border-line [scrollbar-width:none]"
+          className="mt-6 flex gap-4 overflow-x-auto border-b border-line [scrollbar-width:none]"
         >
           {TAB_IDS.map((id) => (
             <button
@@ -841,7 +831,7 @@ export function FramsatSection({
               role="tab"
               aria-selected={tab === id}
               onClick={() => setTab(id)}
-              className={`-mb-px shrink-0 border-b-2 px-2 py-2 text-sm ${
+              className={`-mb-px shrink-0 border-b-2 py-2 text-sm ${
                 tab === id
                   ? "border-accent text-fg"
                   : "border-transparent text-fg-3 hover:text-fg"
@@ -852,13 +842,15 @@ export function FramsatSection({
           ))}
         </div>
 
-        <div role="tabpanel" className="mt-5 min-h-[18rem]">
-          {tick && tab === "overview" && <Overview tick={tick} facts={facts} next={ahead[0]} f={f} />}
+        <div role="tabpanel" className="mt-5 min-h-[14rem]">
+          {tick && tab === "overview" && <Overview tick={tick} facts={facts} next={ahead[0]} f={f} lang={lang} />}
           {tick && tab === "telemetry" && <Telemetry tick={tick} f={f} />}
           {tick && tab === "passes" && <Passes passes={ahead} tick={tick} f={f} lang={lang} />}
           {tick && tab === "signals" && <Signals receptions={receptions} tick={tick} f={f} />}
           {tick && tab === "tle" && <TleView tle={tle} facts={facts} tick={tick} f={f} lang={lang} />}
         </div>
+
+        <p className="mt-6 border-t border-line pt-4 text-xs leading-relaxed text-fg-4">{t.footnote}</p>
       </aside>
     </section>
   );

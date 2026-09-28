@@ -22,16 +22,15 @@ async function googleFont(family: string, weight: number, text: string) {
   return (await fetch(src)).arrayBuffer();
 }
 
-// Mirrors the six current roles in the homepage chart.
-const lines = [0.78, 0.7, 0.58, 0.56, 0.49, 0.47];
-
 export default async function OpenGraphImage() {
-  const [unbounded, syne, photo] = await Promise.all([
-    googleFont("Unbounded", 600, NAME),
-    googleFont("Syne", 500, TAGLINE + "freider.space"),
+  const [heavy, regular, photo] = await Promise.all([
+    googleFont("Schibsted+Grotesk", 800, NAME),
+    googleFont("Schibsted+Grotesk", 400, TAGLINE + "freider.space"),
     readFile(join(process.cwd(), "public/freider.jpg")),
   ]);
 
+  // The same split as the homepage: the name huge on the left, the photo
+  // large on the right, on ice with one signal red.
   return new ImageResponse(
     (
       <div
@@ -39,60 +38,56 @@ export default async function OpenGraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: 80,
-          color: "#ededed",
-          backgroundColor: "#030304",
-          backgroundImage: [
-            "radial-gradient(circle at 12% 70%, rgba(13,148,136,0.45), transparent 45%)",
-            "radial-gradient(circle at 50% 110%, rgba(37,99,235,0.35), transparent 45%)",
-            "radial-gradient(circle at 92% 8%, rgba(162,28,175,0.45), transparent 45%)",
-            "radial-gradient(circle at 70% 40%, rgba(109,40,217,0.3), transparent 40%)",
-          ].join(", "),
+          backgroundColor: "#e7edf1",
+          color: "#16202a",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 48 }}>
-          <img
-            src={`data:image/jpeg;base64,${photo.toString("base64")}`}
-            width={170}
-            height={170}
-            style={{ borderRadius: 999 }}
-            alt=""
-          />
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ fontFamily: "Unbounded", fontSize: 76 }}>{NAME}</div>
-            <div style={{ fontFamily: "Syne", fontSize: 34, color: "#a1a1aa" }}>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: "72px 64px 64px 80px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              fontFamily: "Schibsted Heavy",
+              fontSize: 128,
+              lineHeight: 0.88,
+              letterSpacing: "-0.045em",
+            }}
+          >
+            <span>Freider</span>
+            <span>Fløan</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+            <div style={{ fontFamily: "Schibsted", fontSize: 40, lineHeight: 1.3, color: "#2a3642", maxWidth: 520 }}>
               {TAGLINE}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, fontFamily: "Schibsted", fontSize: 26, color: "#56626e" }}>
+              <div style={{ width: 14, height: 14, borderRadius: 999, backgroundColor: "#d42a3c" }} />
+              freider.space
             </div>
           </div>
         </div>
-
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-          <div style={{ fontFamily: "Syne", fontSize: 28, color: "#71717a" }}>
-            freider.space
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 14 }}>
-            {lines.map((width, i) => (
-              <div
-                key={i}
-                style={{
-                  width: 420 * (1 - width) + 60,
-                  height: 5,
-                  borderRadius: 999,
-                  backgroundImage: "linear-gradient(90deg, #06b6d4, #8b5cf6 60%, #d946ef)",
-                }}
-              />
-            ))}
-          </div>
-        </div>
+        <img
+          src={`data:image/jpeg;base64,${photo.toString("base64")}`}
+          width={480}
+          height={630}
+          style={{ objectFit: "cover" }}
+          alt=""
+        />
       </div>
     ),
     {
       ...size,
       fonts: [
-        { name: "Unbounded", data: unbounded, weight: 600 },
-        { name: "Syne", data: syne, weight: 500 },
+        { name: "Schibsted Heavy", data: heavy, weight: 800 },
+        { name: "Schibsted", data: regular, weight: 400 },
       ],
     },
   );

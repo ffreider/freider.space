@@ -1,12 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs>
-    <radialGradient id="aurora" cx="32%" cy="28%" r="80%">
-      <stop offset="0" stop-color="#5eead4"/>
-      <stop offset="0.4" stop-color="#3b82f6"/>
-      <stop offset="0.75" stop-color="#8b5cf6"/>
-      <stop offset="1" stop-color="#d946ef"/>
-    </radialGradient>
-  </defs>
-  <circle cx="32" cy="32" r="22" fill="url(#aurora)"/>
-  <ellipse cx="32" cy="32" rx="30" ry="9" fill="none" stroke="#a5b4fc" stroke-width="3" transform="rotate(-22 32 32)"/>
+  <circle cx="32" cy="32" r="21" fill="#16202a"/>
+  <ellipse cx="32" cy="32" rx="30" ry="10" fill="none" stroke="#16202a" stroke-width="3" transform="rotate(-22 32 32)"/>
+  <circle cx="57" cy="22" r="5" fill="#d42a3c"/>
 </svg>

@@ -17,11 +17,11 @@ import { type SatState, TRONDHEIM, useFramsat } from "./framsat";
 import type { Reception } from "@/lib/satnogs";
 import { groundTrack, subsolarPoint } from "./framsat-orbit";
 
-// Full-page background: a dotted Earth that follows FramSat-1. Through most
-// of the page it's a horizon rising from the bottom of the screen; when the
+// Full-page background: an Earth that follows FramSat-1. Through most of
+// the page it's a horizon rising from the bottom of the screen; when the
 // FramSat-1 section (#framsat) scrolls in, it opens into the whole planet
-// beside the stats, and you can drag it to spin it. Land is a halftone of
-// dots in the aurora colours with coastlines and faint country borders.
+// beside the stats, and you can drag it to spin it. Land is a flat fill with
+// coastlines and faint country borders.
 //
 // It only redraws while something is changing (scrolling, easing toward the
 // satellite, dragging), so an idle page costs almost nothing.
@@ -69,33 +69,16 @@ const scrollProgress = () => {
 // Shortest signed difference between two longitudes, in degrees.
 const lonDelta = (from: number, to: number) => ((to - from + 540) % 360) - 180;
 
-// A small tile with one dot, repeated to fill land as a halftone.
-function dotPattern(ctx: CanvasRenderingContext2D, dpr: number, color: string) {
-  const cell = Math.round(5 * dpr);
-  const tile = document.createElement("canvas");
-  tile.width = tile.height = cell;
-  const t = tile.getContext("2d")!;
-  t.fillStyle = color;
-  t.beginPath();
-  t.arc(cell / 2, cell / 2, 1.1 * dpr, 0, Math.PI * 2);
-  t.fill();
-  return ctx.createPattern(tile, "repeat")!;
-}
-
 type World = { land: GeoPermissibleObjects; borders: GeoPermissibleObjects };
 
-// The globe's colours and land style, from the --globe-* tokens of the
-// current design study (globals.css).
+// The globe's colours, from the --globe-* tokens in globals.css.
 type Palette = {
-  style: string; // "dots", "fill" or "outline"
-  tint: boolean; // wash land in the aurora gradient
   grid: string;
   land: string;
   coast: string;
   border: string;
   ocean1: string;
   ocean2: string;
-  glow: string;
   night: string;
   track: string;
   route: string;
@@ -107,15 +90,12 @@ function readPalette(): Palette {
   const css = getComputedStyle(document.documentElement);
   const v = (name: string) => css.getPropertyValue(`--globe-${name}`).trim();
   return {
-    style: v("style") || "dots",
-    tint: v("tint") === "aurora",
     grid: v("grid"),
     land: v("land"),
     coast: v("coast"),
     border: v("border"),
     ocean1: v("ocean-1"),
     ocean2: v("ocean-2"),
-    glow: v("glow"),
     night: v("night"),
     track: v("track"),
     route: v("route"),
@@ -162,8 +142,7 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
     const projection = geoOrthographic().clipAngle(90).precision(0.7);
     const path = geoPath(projection, ctx);
     let world: World | null = null;
-    let dots: CanvasPattern | null = null;
-    let palette = readPalette();
+    const palette = readPalette();
     let dpr = 1;
     let frame = 0;
     let cancelled = false;
@@ -214,41 +193,24 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
       const Y = cy * dpr;
       const R = r * dpr;
 
-      // 1. Grid, land and borders, in the study's style: a halftone of dots,
-      // a flat fill, or a line drawing.
+      // 1. Grid, land (a flat fill with coastlines) and country borders.
       ctx.globalCompositeOperation = "source-over";
       ctx.lineWidth = dpr;
       ctx.strokeStyle = palette.grid;
       ctx.beginPath();
       path(graticule);
       ctx.stroke();
-      if (world && dots) {
+      if (world) {
         ctx.beginPath();
         path(world.land);
-        ctx.fillStyle = palette.style === "dots" ? dots : palette.land;
+        ctx.fillStyle = palette.land;
         ctx.fill();
-        ctx.lineWidth = (palette.style === "outline" ? 1.2 : 1) * dpr;
         ctx.strokeStyle = palette.coast;
         ctx.stroke();
-        ctx.lineWidth = dpr;
         ctx.strokeStyle = palette.border;
         ctx.beginPath();
         path(world.borders);
         ctx.stroke();
-      }
-
-      // 2. In the aurora study, tint what's drawn so far, green in the west
-      // to pink in the east.
-      if (palette.tint) {
-        ctx.globalCompositeOperation = "source-atop";
-        const tint = ctx.createLinearGradient(X - R, Y - R, X + R, Y + R * 0.4);
-        tint.addColorStop(0, "#34d399");
-        tint.addColorStop(0.3, "#22d3ee");
-        tint.addColorStop(0.55, "#818cf8");
-        tint.addColorStop(0.78, "#c084fc");
-        tint.addColorStop(1, "#f472b6");
-        ctx.fillStyle = tint;
-        ctx.fillRect(0, 0, el.width, el.height);
       }
 
       // 3. Ocean and atmosphere underneath.
@@ -260,14 +222,6 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
       ctx.beginPath();
       ctx.arc(X, Y, R, 0, Math.PI * 2);
       ctx.fill();
-      const glow = ctx.createRadialGradient(X, Y, R * 0.96, X, Y, R * 1.12);
-      glow.addColorStop(0, palette.glow);
-      glow.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.fillStyle = glow;
-      ctx.beginPath();
-      ctx.arc(X, Y, R * 1.12, 0, Math.PI * 2);
-      ctx.fill();
-
       // 4. Night: shade the half of the Earth facing away from the Sun, with
       // a soft twilight edge. Follows the simulated time.
       const [sunLon, sunLat] = subsolarPoint(new Date(satRef.current?.time ?? Date.now()));
@@ -390,17 +344,8 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
       dpr = Math.min(window.devicePixelRatio, 1.5);
       el.width = Math.round(window.innerWidth * dpr);
       el.height = Math.round(window.innerHeight * dpr);
-      dots = dotPattern(ctx, dpr, palette.tint ? "#fff" : palette.land);
       wake();
     };
-
-    // Pick up the new colours when the design study changes.
-    const studyWatch = new MutationObserver(() => {
-      palette = readPalette();
-      dots = dotPattern(ctx, dpr, palette.tint ? "#fff" : palette.land);
-      wake();
-    });
-    studyWatch.observe(document.documentElement, { attributes: true, attributeFilter: ["data-study"] });
 
     // Dragging the whole Earth at the end of the page spins it. Only with a
     // mouse or pen, so touch scrolling keeps working on phones.
@@ -465,7 +410,6 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
     return () => {
       cancelled = true;
       cancelAnimationFrame(frame);
-      studyWatch.disconnect();
       wakeRef.current = () => {};
       document.documentElement.style.cursor = "";
       window.removeEventListener("scroll", wake);

@@ -321,8 +321,17 @@ export async function Home({ lang }: { lang: Lang }) {
 
   return (
     <div lang={lang === "no" ? "nb" : "en"} className="contents">
-      <main className="mx-auto w-full max-w-3xl px-6 pt-24 sm:px-8 sm:pt-40">
-        {/* Laid out per design study in globals.css (.hero). */}
+      <main className="relative mx-auto w-full max-w-3xl px-6 pt-24 sm:px-8 sm:pt-40">
+        <Link
+          href={t.otherLanguage.href}
+          hrefLang={t.otherLanguage.lang}
+          lang={t.otherLanguage.lang}
+          className="absolute right-6 top-6 text-sm text-fg-3 hover:text-fg sm:right-8 sm:top-8"
+        >
+          {t.otherLanguage.label}
+        </Link>
+
+        {/* Laid out in globals.css (.hero). */}
         <header className="hero">
           <Image
             src="/freider.jpg"
@@ -334,7 +343,8 @@ export async function Home({ lang }: { lang: Lang }) {
             className="hero-photo"
           />
           <h1 className="hero-name display">
-            Freider <span className="break" />
+            Freider
+            <br />
             Fløan
           </h1>
           <p className="hero-tagline">{t.tagline}</p>
@@ -344,9 +354,6 @@ export async function Home({ lang }: { lang: Lang }) {
                 {link.label}
               </a>
             ))}
-            <Link href={t.otherLanguage.href} hrefLang={t.otherLanguage.lang} className={linkClass}>
-              {t.otherLanguage.label}
-            </Link>
           </nav>
         </header>
 

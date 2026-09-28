@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-// Home-screen icon for iPhones and iPads: the aurora planet on a dark tile.
+// Home-screen icon for iPhones and iPads: the slate planet on an ice tile.
 
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
@@ -15,7 +15,7 @@ export default function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#030304",
+          backgroundColor: "#e7edf1",
         }}
       >
         <div
@@ -23,8 +23,7 @@ export default function AppleIcon() {
             width: 104,
             height: 104,
             borderRadius: 999,
-            backgroundImage:
-              "radial-gradient(circle at 32% 28%, #5eead4, #3b82f6 40%, #8b5cf6 75%, #d946ef)",
+            backgroundColor: "#16202a",
           }}
         />
       </div>
