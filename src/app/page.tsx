@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Unbounded } from "next/font/google";
 import { framsatTle } from "@/lib/framsat-tle";
-import { FramsatNow } from "./framsat";
+import { FramsatSection } from "./framsat";
 import { SpotifyPlayer } from "./spotify";
 
 const display = Unbounded({ subsets: ["latin"], weight: "600" });
@@ -350,8 +350,9 @@ export default async function Home() {
         </ul>
       </section>
 
+      <FramsatSection tle={tle} />
+
       <footer className="mt-24 space-y-4">
-        <FramsatNow tle={tle} />
         <p className="text-xs text-zinc-500">
           Privacy: this site sets no cookies. Visits are counted anonymously
           with Vercel Web Analytics. The Spotify player only loads if you
