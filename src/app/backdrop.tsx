@@ -6,11 +6,16 @@ import type { Tle } from "@/lib/framsat-tle";
 import { type SatPosition, TRONDHEIM, useFramsat } from "./framsat";
 
 // Full-page background: a dotted Earth rising from the bottom of the screen
-// like a horizon seen from orbit. It turns slowly, leans toward the pointer,
-// rises as you scroll, and marks Trondheim and where FramSat-1 is right now.
+// like a horizon seen from orbit. It turns to keep FramSat-1 in view, so the
+// Earth slides past underneath the satellite as it orbits. It also leans
+// toward the pointer, rises as you scroll, and marks Trondheim.
 
-const TURN_PER_SECOND = 0.035; // radians; one full turn in about three minutes
 const deg = Math.PI / 180;
+
+// How far above the globe's centre (radians of tilt) the satellite is held.
+// At the top of the page only the globe's upper part is on screen, so the
+// satellite is held high; as the globe rises it can sit closer to the middle.
+const liftAt = (rise: number) => 0.75 - 0.45 * rise;
 
 // Globe rotation that puts a place at the front of the globe.
 const facing = (lat: number, lon: number) => ({
@@ -20,6 +25,15 @@ const facing = (lat: number, lon: number) => ({
 
 const START = facing(TRONDHEIM.lat, TRONDHEIM.lon);
 
+// The view (phi, theta) that keeps a satellite in sight, choosing the phi
+// closest to `fromPhi` so the globe never spins the long way round.
+function followView(sat: SatPosition, fromPhi: number, rise: number) {
+  let { phi } = facing(sat.lat, sat.lon);
+  while (phi - fromPhi > Math.PI) phi -= 2 * Math.PI;
+  while (phi - fromPhi < -Math.PI) phi += 2 * Math.PI;
+  return { phi, theta: sat.lat * deg - liftAt(rise) };
+}
+
 const colors: Partial<COBEOptions> = {
   dark: 1,
   diffuse: 1.6,
@@ -27,7 +41,7 @@ const colors: Partial<COBEOptions> = {
   mapBaseBrightness: 0.02,
   baseColor: [0.4, 0.4, 0.5],
   glowColor: [0.12, 0.13, 0.22],
-  markerColor: [0.93, 0.35, 0.85],
+  markerColor: [1, 0.9, 1],
   arcColor: [0.55, 0.45, 1],
 };
 
@@ -46,12 +60,13 @@ const scrollProgress = () => {
 
 function markersFor(sat: SatPosition | null): Pick<COBEOptions, "markers" | "arcs"> {
   const home: [number, number] = [TRONDHEIM.lat, TRONDHEIM.lon];
-  if (!sat) return { markers: [{ location: home, size: 0.04 }], arcs: [] };
+  const homeMarker = { location: home, size: 0.035, color: [0.75, 0.85, 1] as [number, number, number] };
+  if (!sat) return { markers: [homeMarker], arcs: [] };
   const satellite: [number, number] = [sat.lat, sat.lon];
   return {
     markers: [
-      { location: home, size: 0.04 },
-      { location: satellite, size: 0.06 },
+      homeMarker,
+      { location: satellite, size: 0.09 },
     ],
     arcs: [{ from: home, to: satellite }],
   };
@@ -63,11 +78,16 @@ export function Backdrop({ tle }: { tle: Tle }) {
   const globe = useRef<Globe | null>(null);
   const sat = useFramsat(tle);
   const satRef = useRef(sat);
+  const stillRef = useRef(false);
 
-  // New satellite position: move the pink marker and the arc from Trondheim.
+  // New satellite position: move its marker and the arc from Trondheim.
+  // Without motion, also jump the view straight to it.
   useEffect(() => {
     satRef.current = sat;
     globe.current?.update(markersFor(sat));
+    if (sat && stillRef.current) {
+      globe.current?.update(followView(sat, START.phi, scrollProgress()));
+    }
   }, [sat]);
 
   useEffect(() => {
@@ -76,13 +96,17 @@ export function Backdrop({ tle }: { tle: Tle }) {
     if (!el || !box) return;
 
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    stillRef.current = still;
 
     const pointer = { x: 0, y: 0 };
     const lean = { x: { x: 0, v: 0 }, y: { x: 0, v: 0 } };
     const rise: Spring = { x: scrollProgress(), v: 0 };
+    const view = {
+      phi: { x: START.phi, v: 0 },
+      theta: { x: TRONDHEIM.lat * deg - liftAt(rise.x), v: 0 },
+    };
     let size = 0;
     let frame = 0;
-    const startTime = performance.now();
 
     const build = () => {
       globe.current?.destroy();
@@ -93,8 +117,8 @@ export function Backdrop({ tle }: { tle: Tle }) {
         devicePixelRatio: dpr,
         width: size * dpr,
         height: size * dpr,
-        phi: START.phi,
-        theta: 0.35,
+        phi: view.phi.x,
+        theta: view.theta.x,
         mapSamples: 64000,
         mapBrightness: 5,
         baseColor: [1, 1, 1],
@@ -117,14 +141,19 @@ export function Backdrop({ tle }: { tle: Tle }) {
       box.style.transform = `translate3d(${(window.innerWidth - size) / 2}px, ${top}px, 0)`;
     };
 
-    const render = (now: number) => {
+    const render = () => {
       step(lean.x, pointer.x);
       step(lean.y, pointer.y);
       step(rise, scrollProgress(), 0.06, 0.8);
+      if (satRef.current) {
+        const target = followView(satRef.current, view.phi.x, rise.x);
+        step(view.phi, target.phi, 0.02, 0.85);
+        step(view.theta, target.theta, 0.02, 0.85);
+      }
       place();
       globe.current?.update({
-        phi: START.phi + ((now - startTime) / 1000) * TURN_PER_SECOND + lean.x.x * 0.4,
-        theta: 0.35 + rise.x * 0.25 + lean.y.x * 0.15,
+        phi: view.phi.x + lean.x.x * 0.3,
+        theta: view.theta.x + lean.y.x * 0.1,
       });
       frame = requestAnimationFrame(render);
     };
@@ -167,6 +196,7 @@ export function Backdrop({ tle }: { tle: Tle }) {
         <canvas ref={canvas} className="globe" />
         <div className="globe-tint" />
       </div>
+      <div className="scrim" />
       <div className="grain" />
     </div>
   );

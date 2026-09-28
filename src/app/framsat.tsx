@@ -96,7 +96,7 @@ export function FramsatNow({ tle }: { tle: Tle }) {
         <span className="font-mono tabular-nums text-foreground">
           {km(sat.speed)} km/h
         </span>
-        . It’s the pink dot on the globe.
+        . It’s the bright dot on the globe, which turns to follow it.
       </span>
     </p>
   );
