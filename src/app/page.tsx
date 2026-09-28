@@ -305,18 +305,6 @@ export default async function Home() {
               </a>
             ))}
           </nav>
-          <a
-            href="https://trondheim.com/journal/the-extracurricular-that-left-earth"
-            className="mt-8 inline-flex items-center gap-3 rounded-full border border-zinc-800 bg-background/60 px-4 py-2 text-xs text-zinc-200 transition hover:border-zinc-600"
-          >
-            <span className="font-mono text-[10px] uppercase tracking-wide text-fuchsia-300">
-              Featured
-            </span>
-            <span>
-              “The extracurricular that left Earth”
-              <span className="text-zinc-400"> · Trondheim.com ↗</span>
-            </span>
-          </a>
         </header>
 
         <section className="mt-32 sm:mt-40">
@@ -351,6 +339,41 @@ export default async function Home() {
             </li>
           ))}
         </ol>
+
+        <section className="mt-32 sm:mt-40">
+          <p className="font-mono text-[10px] uppercase tracking-wide text-fuchsia-300">
+            Featured
+          </p>
+          <a
+            href="https://trondheim.com/journal/the-extracurricular-that-left-earth"
+            className="group mt-4 block overflow-hidden rounded-2xl border border-zinc-800 bg-background/85 transition hover:border-zinc-600"
+          >
+            <Image
+              src="https://cdn.sanity.io/images/x3figu6z/production/acfe7bfa0570bcc2a1856ea583d38181b80c7440-5611x3741.jpg?rect=0,425,5611,2946&w=1200&h=630"
+              alt="Freider Fløan, photographed for Trondheim.com"
+              width={1200}
+              height={630}
+              className="aspect-[1200/630] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+            />
+            <div className="p-6">
+              <p className="font-mono text-[10px] uppercase tracking-wide text-zinc-400">
+                Trondheim.com · 3 September 2026 · 6 min read
+              </p>
+              <h2 className="mt-2 text-lg font-medium">
+                The extracurricular that left Earth
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-300">
+                An NTNU engineering degree turned into satellites, SpaceX and
+                NORSTEC. A profile of the student helping shape Norway’s next
+                generation of space talent.
+              </p>
+              <p className="mt-4 text-xs text-zinc-400">
+                By McKenna Starck. Photo: Ludvik Hestbek, TRD Brand.{" "}
+                <span className="text-zinc-200 group-hover:underline">Read the article ↗</span>
+              </p>
+            </div>
+          </a>
+        </section>
 
         <section className="mt-32 border-t border-zinc-200 pt-12 text-sm sm:mt-40 dark:border-zinc-800">
           <h2 className="font-medium">Education</h2>
