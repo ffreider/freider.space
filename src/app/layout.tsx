@@ -1,10 +1,19 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Syne } from "next/font/google";
+import {
+  Archivo,
+  Geist_Mono,
+  IBM_Plex_Mono,
+  JetBrains_Mono,
+  Schibsted_Grotesk,
+  Syne,
+  Unbounded,
+} from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { framsatTle } from "@/lib/framsat-tle";
 import { recentReceptions } from "@/lib/satnogs";
 import { Backdrop } from "./backdrop";
 import { LaunchEasterEgg } from "./launch";
+import { StudySwitcher } from "./study-switcher";
 import "./globals.css";
 
 const syne = Syne({
@@ -16,6 +25,17 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// Fonts for the design studies (see globals.css).
+const unbounded = Unbounded({ variable: "--font-unbounded", subsets: ["latin"], weight: "600" });
+const archivo = Archivo({ variable: "--font-archivo", subsets: ["latin"] });
+const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"], weight: ["400", "500"] });
+const jetbrains = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin"] });
+const schibsted = Schibsted_Grotesk({ variable: "--font-schibsted", subsets: ["latin"] });
+
+const fontVariables = [syne, geistMono, unbounded, archivo, plexMono, jetbrains, schibsted]
+  .map((font) => font.variable)
+  .join(" ");
 
 const description = "I like starting things, mostly about space.";
 
@@ -40,12 +60,13 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`dark ${syne.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${fontVariables} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Backdrop tle={tle} stations={stations} />
         {children}
         <LaunchEasterEgg />
+        <StudySwitcher />
         <Analytics />
       </body>
     </html>

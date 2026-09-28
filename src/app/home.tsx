@@ -1,14 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Unbounded } from "next/font/google";
 import { framsatTle } from "@/lib/framsat-tle";
 import { recentReceptions } from "@/lib/satnogs";
 import { FramsatSection } from "./framsat";
 import type { L, Lang } from "./i18n";
 
 // The whole page, in English (/) or Norwegian (/no).
-
-const display = Unbounded({ subsets: ["latin"], weight: "600" });
 
 type YearMonth = [year: number, month: number];
 
@@ -141,11 +138,11 @@ const TEXT = {
     chartAria: "Timeline of roles running in parallel",
     now: "now",
     featured: "Featured",
-    articleMeta: "Trondheim.com · 3 September 2026 · 6 min read",
+    articleMeta: "Trondheim.com, 3 September 2026. A 6 minute read.",
     articleSummary:
       "An NTNU engineering degree turned into satellites, SpaceX and NORSTEC. A profile of the student helping shape Norway’s next generation of space talent.",
     articleByline: "By McKenna Starck. Photo: Ludvik Hestbek, TRD Brand.",
-    articleCta: "Read the article ↗",
+    articleCta: "Read the article",
     articleAlt: "Freider Fløan, photographed for Trondheim.com",
     education: "Education",
     degrees: [
@@ -162,11 +159,11 @@ const TEXT = {
     chartAria: "Tidslinje over roller som går parallelt",
     now: "nå",
     featured: "Omtalt",
-    articleMeta: "Trondheim.com · 3. september 2026 · 6 min lesing · på engelsk",
+    articleMeta: "Trondheim.com, 3. september 2026. Seks minutter, på engelsk.",
     articleSummary:
       "En ingeniørgrad fra NTNU som ble til satellitter, SpaceX og NORSTEC. Et portrett av studenten som er med på å forme neste generasjon norske romfartstalenter.",
     articleByline: "Av McKenna Starck. Foto: Ludvik Hestbek, TRD Brand.",
-    articleCta: "Les artikkelen ↗",
+    articleCta: "Les artikkelen",
     articleAlt: "Freider Fløan, fotografert for Trondheim.com",
     education: "Utdanning",
     degrees: [
@@ -199,23 +196,23 @@ const period = ({ start, end }: Entry, lang: Lang) =>
   end
     ? start[0] === end[0]
       ? `${start[0]}`
-      : `${start[0]} – ${end[0]}`
-    : `${start[0]} – ${TEXT[lang].now}`;
+      : `${start[0]}-${end[0]}`
+    : `${start[0]}-${TEXT[lang].now}`;
 
-// The aurora gradient is mapped to time across the whole chart, so every
-// bar shows the slice of color that matches the years it covers.
-function auroraSlice(left: number, width: number) {
+// The bar colour (--bar, set per design study) is mapped to time across the
+// whole chart, so with a gradient every bar shows the slice that matches the
+// years it covers.
+function barSlice(left: number, width: number) {
   const size = (100 / width) * 100;
   const position = width >= 100 ? 0 : (left / (100 - width)) * 100;
   return {
-    backgroundImage: "var(--aurora)",
+    background: "var(--bar)",
     backgroundSize: `${size}% 100%`,
     backgroundPosition: `${position}% 0`,
   };
 }
 
-const linkClass =
-  "underline decoration-zinc-300 underline-offset-4 hover:decoration-current dark:decoration-zinc-600";
+const linkClass = "underline decoration-fg-4 underline-offset-4 hover:decoration-accent";
 
 // Every role as a line on a shared time axis, so overlaps are visible at a glance.
 function ParallelChart({ lang }: { lang: Lang }) {
@@ -227,19 +224,19 @@ function ParallelChart({ lang }: { lang: Lang }) {
         {years.map((year) => (
           <div
             key={year}
-            className="absolute inset-y-0 border-l border-zinc-100 dark:border-zinc-900"
+            className="absolute inset-y-0 border-l border-line/60"
             style={{ left: `${pct(year)}%` }}
           >
-            <span className="absolute -bottom-6 left-1 font-mono text-[10px] text-zinc-500">
+            <span className="absolute -bottom-6 left-1 font-mono text-[10px] text-fg-4">
               ’{String(year).slice(2)}
             </span>
           </div>
         ))}
         <div
-          className="absolute inset-y-0 border-l border-dashed border-zinc-300 dark:border-zinc-700"
+          className="absolute inset-y-0 border-l border-dashed border-fg-4"
           style={{ left: `${nowPct}%` }}
         >
-          <span className="absolute -top-6 -translate-x-1/2 font-mono text-[10px] text-zinc-400">
+          <span className="absolute -top-6 -translate-x-1/2 font-mono text-[10px] text-fg-3">
             {TEXT[lang].now}
           </span>
         </div>
@@ -261,34 +258,29 @@ function ParallelChart({ lang }: { lang: Lang }) {
               className="group relative h-8 cursor-default outline-none hover:z-10 focus:z-10"
             >
               <span
-                className={`absolute top-1/2 h-[3px] -translate-y-1/2 origin-left rounded-full motion-safe:animate-[draw_1.4s_cubic-bezier(0.2,0.7,0.2,1)_both] ${
-                  ongoing
-                    ? "aurora-glow"
-                    : "opacity-40 transition-opacity group-hover:opacity-100 group-focus:opacity-100"
+                className={`absolute top-1/2 h-[3px] -translate-y-1/2 origin-left motion-safe:animate-[draw_1.4s_cubic-bezier(0.2,0.7,0.2,1)_both] ${
+                  ongoing ? "" : "opacity-[var(--bar-past)] transition-opacity group-hover:opacity-100 group-focus:opacity-100"
                 }`}
                 style={{
                   left: `${left}%`,
                   width: `${width}%`,
                   animationDelay: `${(timeline.length - i) * 60}ms`,
-                  ...auroraSlice(left, width),
+                  ...barSlice(left, width),
                 }}
               />
               <span
-                className="absolute top-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-400 dark:bg-zinc-500"
+                className="absolute top-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-fg-4"
                 style={{ left: `${left}%` }}
               />
               {ongoing && (
                 <span
-                  className="absolute top-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2"
+                  className="absolute top-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent"
                   style={{ left: `${nowPct}%` }}
-                >
-                  <span className="absolute inset-0 rounded-full bg-[var(--aurora-end)] motion-safe:animate-ping" />
-                  <span className="absolute inset-0 rounded-full bg-[var(--aurora-end)]" />
-                </span>
+                />
               )}
               <span
                 className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap text-[11px] ${
-                  ongoing ? "text-zinc-100" : "text-zinc-400"
+                  ongoing ? "text-fg" : "text-fg-3"
                 } ${labelBefore ? "pr-2.5" : "pl-2.5"}`}
                 style={labelBefore ? { right: `${100 - left}%` } : { left: `${right}%` }}
               >
@@ -298,7 +290,7 @@ function ParallelChart({ lang }: { lang: Lang }) {
               {/* Details card on hover or keyboard focus. Full width on phones,
                   anchored to the line on larger screens. */}
               <div
-                className={`pointer-events-none absolute inset-x-0 z-20 translate-y-1 rounded-lg border border-zinc-200 bg-background p-3 text-left opacity-0 shadow-xl transition duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus:translate-y-0 group-focus:opacity-100 sm:w-72 dark:border-zinc-800 ${
+                className={`pointer-events-none absolute inset-x-0 z-20 translate-y-1 rounded-card border border-line bg-background p-3 text-left opacity-0 transition duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus:translate-y-0 group-focus:opacity-100 sm:w-72 ${
                   i >= timeline.length / 2 ? "bottom-full mb-1" : "top-full mt-1"
                 } ${labelBefore ? "sm:left-auto sm:right-[var(--r)]" : "sm:right-auto sm:left-[var(--l)]"}`}
                 style={
@@ -308,11 +300,11 @@ function ParallelChart({ lang }: { lang: Lang }) {
                   } as React.CSSProperties
                 }
               >
-                <p className="font-mono text-[10px] text-zinc-400">{period(entry, lang)}</p>
+                <p className="font-mono text-[10px] text-fg-3">{period(entry, lang)}</p>
                 <p className="mt-0.5 text-sm font-medium">{entry.org[lang]}</p>
-                <p className="text-xs text-zinc-200">{entry.role[lang]}</p>
+                <p className="text-xs text-fg-2">{entry.role[lang]}</p>
                 {entry.description && (
-                  <p className="mt-1.5 text-xs leading-relaxed text-zinc-300">{entry.description[lang]}</p>
+                  <p className="mt-1.5 text-xs leading-relaxed text-fg-2">{entry.description[lang]}</p>
                 )}
               </div>
             </li>
@@ -330,19 +322,23 @@ export async function Home({ lang }: { lang: Lang }) {
   return (
     <div lang={lang === "no" ? "nb" : "en"} className="contents">
       <main className="mx-auto w-full max-w-3xl px-6 pt-24 sm:px-8 sm:pt-40">
-        <header className="flex flex-col items-center text-center">
+        {/* Laid out per design study in globals.css (.hero). */}
+        <header className="hero">
           <Image
             src="/freider.jpg"
             alt="Freider Fløan"
-            width={128}
-            height={128}
+            width={480}
+            height={480}
             priority
             data-launch
-            className="size-32 rounded-full object-cover"
+            className="hero-photo"
           />
-          <h1 className={`${display.className} mt-8 text-3xl sm:text-4xl`}>Freider Fløan</h1>
-          <p className="mt-3 text-zinc-300">{t.tagline}</p>
-          <nav className="mt-6 flex gap-6 text-sm">
+          <h1 className="hero-name display">
+            Freider <span className="break" />
+            Fløan
+          </h1>
+          <p className="hero-tagline">{t.tagline}</p>
+          <nav className="hero-links flex gap-6 text-sm">
             {links.map((link) => (
               <a key={link.href} href={link.href} className={linkClass}>
                 {link.label}
@@ -361,7 +357,7 @@ export async function Home({ lang }: { lang: Lang }) {
         <ol className="mt-32 space-y-12 sm:mt-40">
           {timeline.map((entry) => (
             <li key={entry.org.en} className="grid gap-x-6 sm:grid-cols-[7rem_1fr]">
-              <p className="font-mono text-xs leading-6 text-zinc-400">{period(entry, lang)}</p>
+              <p className="font-mono text-xs leading-6 text-fg-3">{period(entry, lang)}</p>
               <div>
                 <h2 className="font-medium">
                   {entry.href ? (
@@ -372,9 +368,9 @@ export async function Home({ lang }: { lang: Lang }) {
                     entry.org[lang]
                   )}
                 </h2>
-                <p className="text-sm text-zinc-200">{entry.role[lang]}</p>
+                <p className="text-sm text-fg-2">{entry.role[lang]}</p>
                 {entry.description && (
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-300">{entry.description[lang]}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-fg-2">{entry.description[lang]}</p>
                 )}
               </div>
             </li>
@@ -382,11 +378,11 @@ export async function Home({ lang }: { lang: Lang }) {
         </ol>
 
         <section className="mt-32 sm:mt-40">
-          <p className="font-mono text-[10px] uppercase tracking-wide text-fuchsia-300">{t.featured}</p>
+          <h2 className="display text-lg">{t.featured}</h2>
           <a
             href="https://trondheim.com/journal/the-extracurricular-that-left-earth"
             hrefLang="en"
-            className="group mt-4 block overflow-hidden rounded-2xl border border-zinc-800 bg-background/85 transition hover:border-zinc-600"
+            className="group mt-4 block overflow-hidden rounded-card border border-line bg-surface transition hover:border-fg-4"
           >
             <Image
               src="https://cdn.sanity.io/images/x3figu6z/production/acfe7bfa0570bcc2a1856ea583d38181b80c7440-5611x3741.jpg?rect=0,425,5611,2946&w=1200&h=630"
@@ -396,21 +392,21 @@ export async function Home({ lang }: { lang: Lang }) {
               className="aspect-[1200/630] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
             />
             <div className="p-6">
-              <p className="font-mono text-[10px] uppercase tracking-wide text-zinc-400">{t.articleMeta}</p>
-              <h2 lang="en" className="mt-2 text-lg font-medium">
+              <p className="font-mono text-xs text-fg-3">{t.articleMeta}</p>
+              <h3 lang="en" className="display mt-2 text-xl">
                 The extracurricular that left Earth
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-300">{t.articleSummary}</p>
-              <p className="mt-4 text-xs text-zinc-400">
-                {t.articleByline} <span className="text-zinc-200 group-hover:underline">{t.articleCta}</span>
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-fg-2">{t.articleSummary}</p>
+              <p className="mt-4 text-xs text-fg-3">
+                {t.articleByline} <span className="text-fg underline decoration-accent underline-offset-4">{t.articleCta}</span>
               </p>
             </div>
           </a>
         </section>
 
-        <section className="mt-32 border-t border-zinc-200 pt-12 text-sm sm:mt-40 dark:border-zinc-800">
-          <h2 className="font-medium">{t.education}</h2>
-          <ul className="mt-4 space-y-2 text-zinc-300">
+        <section className="mt-32 border-t border-line pt-12 text-sm sm:mt-40">
+          <h2 className="display text-lg">{t.education}</h2>
+          <ul className="mt-4 space-y-2 text-fg-2">
             {t.degrees.map((degree) => (
               <li key={degree}>
                 {degree}. {t.finishing}
@@ -423,7 +419,7 @@ export async function Home({ lang }: { lang: Lang }) {
       <FramsatSection tle={tle} receptions={receptions} lang={lang} />
 
       <footer className="mx-auto w-full max-w-3xl px-6 pb-12 sm:px-8">
-        <p className="text-xs text-zinc-500">{t.privacy}</p>
+        <p className="text-xs text-fg-4">{t.privacy}</p>
       </footer>
     </div>
   );

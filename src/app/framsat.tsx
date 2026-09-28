@@ -51,7 +51,6 @@ export function useFramsat(tle: Tle) {
 
 const T = {
   en: {
-    live: "Live from orbit",
     intro:
       "A student satellite I worked on at Orbit NTNU, in orbit since 5 September 2026. Everything here is computed in your browser from its orbital elements with the SGP4 model.",
     hint: "Drag the globe to spin it. Scrub or fast-forward time to watch it orbit.",
@@ -115,15 +114,15 @@ const T = {
       `Rises in the ${rise} at ${riseAt}, peaks ${peak}° above the horizon at ${peakAt}, sets in the ${set} at ${setAt} (Oslo time). Downlink 435.141 MHz, FSK 9k6. Follow it live: https://freider.space/#framsat`,
     icsAlarm: "FramSat-1 rises in 10 minutes",
     signalsIntro:
-      "Amateur radio ground stations in the SatNOGS network record FramSat-1’s signal as it passes over them. These are the latest good receptions, the cyan dots on the globe.",
+      "Amateur radio ground stations in the SatNOGS network record FramSat-1’s signal as it passes over them. These are the latest good receptions, marked as small dots on the globe.",
     noSignals: "No recent receptions to show right now.",
     lastHeard: (ago: string, station: string) => `Last heard ${ago} by ${station}`,
     showWaterfall: "Show waterfall",
-    waterfallNote: "Loads a 1–2 MB image from SatNOGS.",
+    waterfallNote: "Loads a 1 to 2 MB image from SatNOGS.",
     waterfallCaption:
       "The curve is FramSat-1’s signal sliding in frequency as it passes overhead: the Doppler effect. The short horizontal dashes are bursts of data.",
     waterfallAlt: (station: string) => `Waterfall of FramSat-1’s signal received by ${station}`,
-    openOnSatnogs: "Open on SatNOGS ↗",
+    openOnSatnogs: "Open on SatNOGS",
     tleIntro: "The raw two-line element set everything here is computed from. Hover or tab through the fields.",
     tlePoint: "Point at a field to see what it means.",
     tleLocation: (line: number, cols: string) => `Line ${line}, columns ${cols}`,
@@ -135,7 +134,6 @@ const T = {
     days: "days",
   },
   no: {
-    live: "Direkte fra bane",
     intro:
       "En studentsatellitt jeg jobbet med i Orbit NTNU, i bane siden 5. september 2026. Alt her beregnes i nettleseren din fra baneelementene med SGP4-modellen.",
     hint: "Dra i jordkloden for å snurre den. Spol i tid for å se den gå i bane.",
@@ -199,15 +197,15 @@ const T = {
       `Kommer opp i ${rise} kl. ${riseAt}, er høyest ${peak}° over horisonten kl. ${peakAt} og går ned i ${set} kl. ${setAt}. Nedlink 435,141 MHz, FSK 9k6. Følg den direkte: https://freider.space/no#framsat`,
     icsAlarm: "FramSat-1 kommer over horisonten om 10 minutter",
     signalsIntro:
-      "Amatørradiostasjoner i SatNOGS-nettverket tar opp signalet fra FramSat-1 når den passerer over dem. Dette er de siste gode mottakene, de turkise prikkene på jordkloden.",
+      "Amatørradiostasjoner i SatNOGS-nettverket tar opp signalet fra FramSat-1 når den passerer over dem. Dette er de siste gode mottakene, merket som små prikker på jordkloden.",
     noSignals: "Ingen nylige mottak å vise akkurat nå.",
     lastHeard: (ago: string, station: string) => `Sist hørt ${ago} av ${station}`,
     showWaterfall: "Vis vannfallsdiagram",
-    waterfallNote: "Laster et bilde på 1–2 MB fra SatNOGS.",
+    waterfallNote: "Laster et bilde på 1 til 2 MB fra SatNOGS.",
     waterfallCaption:
       "Kurven er signalet fra FramSat-1 som glir i frekvens mens den passerer over: dopplereffekten. De korte vannrette strekene er datapakker.",
     waterfallAlt: (station: string) => `Vannfallsdiagram av signalet fra FramSat-1, tatt opp av ${station}`,
-    openOnSatnogs: "Åpne i SatNOGS ↗",
+    openOnSatnogs: "Åpne i SatNOGS",
     tleIntro: "Det rå baneelementsettet (TLE) som alt her er beregnet fra. Hold over eller tab gjennom feltene.",
     tlePoint: "Pek på et felt for å se hva det betyr.",
     tleLocation: (line: number, cols: string) => `Linje ${line}, kolonne ${cols}`,
@@ -280,8 +278,8 @@ function format(lang: Lang) {
 
 type Format = ReturnType<typeof format>;
 
-const linkClass = "underline decoration-zinc-600 underline-offset-4 hover:decoration-current";
-const label = "font-mono text-[10px] uppercase tracking-wide text-zinc-400";
+const linkClass = "underline decoration-fg-4 underline-offset-4 hover:decoration-accent";
+const label = "text-xs text-fg-3";
 
 // ————— Time travel —————
 
@@ -295,27 +293,27 @@ function TimeControls({ tick, speed, f }: { tick: SatTick; speed: number; f: For
   const minutes = Math.round(offset / 60_000);
 
   return (
-    <div className="mt-5 rounded-xl border border-zinc-800 p-3">
+    <div className="mt-5 rounded-card border border-line p-3">
       <div className="flex items-baseline justify-between gap-3">
         <p className="font-mono text-xs tabular-nums">
           {live ? (
-            <span className="text-emerald-300">● {f.t.now}</span>
+            <span className="text-accent">{f.t.now}</span>
           ) : (
-            <span className="text-amber-200">
+            <span className="text-fg">
               {offset >= 0 ? "+" : "−"}
               {f.duration(offset)}
             </span>
           )}
-          <span className="text-zinc-400">
-            {" "}
-            · {f.clock(new Date(tick.time))} {f.t.localTime}
+          <span className="text-fg-3">
+            {", "}
+            {f.clock(new Date(tick.time))} {f.t.localTime}
           </span>
         </p>
         {!live && (
           <button
             type="button"
             onClick={goLive}
-            className="font-mono text-[10px] uppercase tracking-wide text-zinc-300 hover:text-white"
+            className="text-xs text-fg-2 underline decoration-fg-4 underline-offset-4 hover:decoration-accent"
           >
             {f.t.backToNow}
           </button>
@@ -329,9 +327,9 @@ function TimeControls({ tick, speed, f }: { tick: SatTick; speed: number; f: For
         step={1}
         value={Math.min(MAX_OFFSET, Math.max(MIN_OFFSET, minutes))}
         onChange={(e) => setOffset(Number(e.target.value) * 60_000)}
-        className="mt-3 w-full accent-fuchsia-400"
+        className="mt-3 w-full accent-[var(--accent)]"
       />
-      <div className="mt-1 flex items-center justify-between font-mono text-[10px] text-zinc-500">
+      <div className="mt-1 flex items-center justify-between font-mono text-[10px] text-fg-4">
         <span>−12 {f.t.hours}</span>
         <div className="flex gap-1" role="group" aria-label={f.t.speedAria}>
           {SPEEDS.map((s) => (
@@ -340,8 +338,8 @@ function TimeControls({ tick, speed, f }: { tick: SatTick; speed: number; f: For
               type="button"
               onClick={() => setSpeed(s)}
               aria-pressed={speed === s}
-              className={`rounded px-2 py-0.5 ${
-                speed === s ? "bg-zinc-100 text-zinc-900" : "text-zinc-300 hover:bg-zinc-800"
+              className={`rounded-card px-2 py-0.5 ${
+                speed === s ? "bg-fg text-background" : "text-fg-2 hover:bg-line"
               }`}
             >
               {s}×
@@ -361,7 +359,7 @@ function Stat({ name, value, note }: { name: string; value: string; note?: strin
     <div>
       <dt className={label}>{name}</dt>
       <dd className="mt-1 font-mono text-sm tabular-nums text-foreground">{value}</dd>
-      {note && <dd className="mt-0.5 text-xs leading-relaxed text-zinc-400">{note}</dd>}
+      {note && <dd className="mt-0.5 text-xs leading-relaxed text-fg-3">{note}</dd>}
     </div>
   );
 }
@@ -373,8 +371,8 @@ function Rows({ title, rows }: { title: string; rows: [string, string][] }) {
       <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 font-mono text-xs tabular-nums">
         {rows.map(([k, v]) => (
           <div key={k} className="contents">
-            <dt className="text-zinc-400">{k}</dt>
-            <dd className="text-right text-zinc-100">{v}</dd>
+            <dt className="text-fg-3">{k}</dt>
+            <dd className="text-right text-fg">{v}</dd>
           </div>
         ))}
       </dl>
@@ -478,7 +476,7 @@ function Telemetry({ tick, f }: { tick: SatTick; f: Format }) {
             [t.tuneTo, `${f.fixed((DOWNLINK_HZ + shift) / 1e6, 4)} MHz`],
           ]}
         />
-        <p className="mt-2 text-xs leading-relaxed text-zinc-400">
+        <p className="mt-2 text-xs leading-relaxed text-fg-3">
           {tick.elevation > 0 ? t.audible : t.inaudible} {t.frequencyPer}{" "}
           <a href="https://db.satnogs.org/satellite/BXJV-0815-0756-1233-1493" className={linkClass}>
             SatNOGS
@@ -516,9 +514,9 @@ function SkyPlot({ pass, tick, f }: { pass: Pass; tick: SatTick; f: Format }) {
       aria-label={f.t.skyAria(f.compassLong(first[0]), pass.maxElevation.toFixed(0), f.compassLong(last[0]))}
     >
       {[100, 66.7, 33.3].map((r) => (
-        <circle key={r} r={r} fill="none" stroke="rgb(63 63 70)" strokeWidth={r === 100 ? 1 : 0.6} />
+        <circle key={r} r={r} fill="none" stroke="var(--line)" strokeWidth={r === 100 ? 1 : 0.6} />
       ))}
-      <path d="M0,-100V100M-100,0H100" stroke="rgb(63 63 70)" strokeWidth={0.6} />
+      <path d="M0,-100V100M-100,0H100" stroke="var(--line)" strokeWidth={0.6} />
       {(
         [
           [n, 0, -108],
@@ -527,17 +525,17 @@ function SkyPlot({ pass, tick, f }: { pass: Pass; tick: SatTick; f: Format }) {
           [w, -108, 0],
         ] as const
       ).map(([text, x, y]) => (
-        <text key={text} x={x} y={y} fill="rgb(161 161 170)" fontSize={9} textAnchor="middle" dominantBaseline="middle" className="font-mono">
+        <text key={text} x={x} y={y} fill="var(--fg-3)" fontSize={9} textAnchor="middle" dominantBaseline="middle" className="font-mono">
           {text}
         </text>
       ))}
-      <text x={3} y={-69.7} fill="rgb(113 113 122)" fontSize={7} className="font-mono">30°</text>
-      <text x={3} y={-36.3} fill="rgb(113 113 122)" fontSize={7} className="font-mono">60°</text>
-      <polyline points={track} fill="none" stroke="#e879f9" strokeWidth={2} strokeLinecap="round" />
-      <circle cx={sx} cy={sy} r={3.5} fill="#34d399" />
-      <circle cx={ex} cy={ey} r={3.5} fill="#f87171" />
+      <text x={3} y={-69.7} fill="var(--fg-4)" fontSize={7} className="font-mono">30°</text>
+      <text x={3} y={-36.3} fill="var(--fg-4)" fontSize={7} className="font-mono">60°</text>
+      <polyline points={track} fill="none" stroke="var(--accent)" strokeWidth={2} strokeLinecap="round" />
+      <circle cx={sx} cy={sy} r={3.5} fill="var(--accent)" />
+      <circle cx={ex} cy={ey} r={3.5} fill="var(--bg)" stroke="var(--accent)" strokeWidth={1.5} />
       {during && (
-        <circle cx={cx} cy={cy} r={5} fill="#f0abfc" stroke="#030304" strokeWidth={1.5}>
+        <circle cx={cx} cy={cy} r={5} fill="var(--fg)" stroke="var(--bg)" strokeWidth={1.5}>
           <animate attributeName="r" values="4;6;4" dur="1.6s" repeatCount="indefinite" />
         </circle>
       )}
@@ -592,14 +590,14 @@ function downloadIcs(pass: Pass, f: Format, lang: Lang) {
 function Passes({ passes, tick, f, lang }: { passes: Pass[]; tick: SatTick; f: Format; lang: Lang }) {
   const { t } = f;
   const [selected, setSelected] = useState(0);
-  if (!passes.length) return <p className="text-sm text-zinc-300">{t.noPasses}</p>;
+  if (!passes.length) return <p className="text-sm text-fg-2">{t.noPasses}</p>;
   const pass = passes[Math.min(selected, passes.length - 1)];
   const first = pass.sky[0];
   const last = pass.sky[pass.sky.length - 1];
 
   return (
     <div>
-      <p className="text-xs leading-relaxed text-zinc-400">{t.passesIntro}</p>
+      <p className="text-xs leading-relaxed text-fg-3">{t.passesIntro}</p>
       <ul className="mt-3 space-y-1">
         {passes.map((p, i) => (
           <li key={p.start.getTime()}>
@@ -607,12 +605,12 @@ function Passes({ passes, tick, f, lang }: { passes: Pass[]; tick: SatTick; f: F
               type="button"
               onClick={() => setSelected(i)}
               aria-pressed={i === selected}
-              className={`grid w-full grid-cols-[1fr_auto_auto] gap-3 rounded-md px-2 py-1.5 text-left font-mono text-xs tabular-nums ${
-                i === selected ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-900"
+              className={`grid w-full grid-cols-[1fr_auto_auto] gap-3 rounded-card px-2 py-1.5 text-left font-mono text-xs tabular-nums ${
+                i === selected ? "bg-line text-fg" : "text-fg-2 hover:bg-line/50"
               }`}
             >
               <span>{f.when(p.start, tick.time)}</span>
-              <span className="text-zinc-400">{Math.round((p.end.getTime() - p.start.getTime()) / 60_000)} min</span>
+              <span className="text-fg-3">{Math.round((p.end.getTime() - p.start.getTime()) / 60_000)} min</span>
               <span>{p.maxElevation.toFixed(0)}°</span>
             </button>
           </li>
@@ -620,15 +618,14 @@ function Passes({ passes, tick, f, lang }: { passes: Pass[]; tick: SatTick; f: F
       </ul>
       <div className="mt-4">
         <SkyPlot pass={pass} tick={tick} f={f} />
-        <p className="mt-2 text-center font-mono text-[10px] text-zinc-400">
-          <span className="text-emerald-300">●</span> {t.rises} {f.compass(first[0])} {f.clock(pass.start)} ·{" "}
-          {t.peaks} {pass.maxElevation.toFixed(0)}° {f.clock(pass.peak)} ·{" "}
-          <span className="text-red-400">●</span> {t.sets} {f.compass(last[0])} {f.clock(pass.end)}
+        <p className="mt-2 text-center font-mono text-[10px] text-fg-3">
+          {t.rises} {f.compass(first[0])} {f.clock(pass.start)}, {t.peaks} {pass.maxElevation.toFixed(0)}°{" "}
+          {f.clock(pass.peak)}, {t.sets} {f.compass(last[0])} {f.clock(pass.end)}
         </p>
         <button
           type="button"
           onClick={() => downloadIcs(pass, f, lang)}
-          className="mx-auto mt-3 flex items-center gap-2 rounded-full border border-zinc-700 px-3 py-1.5 font-mono text-[11px] text-zinc-200 hover:border-zinc-500"
+          className="mx-auto mt-3 flex items-center gap-2 rounded-card border border-fg-4 px-3 py-1.5 text-xs text-fg hover:border-accent active:scale-[0.98]"
         >
           <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
             <rect x="2" y="3" width="12" height="11" rx="1.5" />
@@ -645,14 +642,14 @@ function Signals({ receptions, tick, f }: { receptions: Reception[]; tick: SatTi
   const { t } = f;
   const [selected, setSelected] = useState(0);
   const [showing, setShowing] = useState<number | null>(null);
-  if (!receptions.length) return <p className="text-sm text-zinc-300">{t.noSignals}</p>;
+  if (!receptions.length) return <p className="text-sm text-fg-2">{t.noSignals}</p>;
   const pick = receptions[Math.min(selected, receptions.length - 1)];
   const ago = (iso: string) => t.ago(f.duration(tick.real - new Date(iso).getTime()));
 
   return (
     <div>
-      <p className="text-xs leading-relaxed text-zinc-400">{t.signalsIntro}</p>
-      <p className="mt-3 font-mono text-xs text-cyan-200">
+      <p className="text-xs leading-relaxed text-fg-3">{t.signalsIntro}</p>
+      <p className="mt-3 text-sm text-fg">
         {t.lastHeard(ago(receptions[0].start), receptions[0].station)}
       </p>
       <ul className="mt-3 space-y-1">
@@ -662,12 +659,12 @@ function Signals({ receptions, tick, f }: { receptions: Reception[]; tick: SatTi
               type="button"
               onClick={() => setSelected(i)}
               aria-pressed={i === selected}
-              className={`grid w-full grid-cols-[1fr_auto_auto] gap-3 rounded-md px-2 py-1.5 text-left font-mono text-xs tabular-nums ${
-                i === selected ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-900"
+              className={`grid w-full grid-cols-[1fr_auto_auto] gap-3 rounded-card px-2 py-1.5 text-left font-mono text-xs tabular-nums ${
+                i === selected ? "bg-line text-fg" : "text-fg-2 hover:bg-line/50"
               }`}
             >
               <span className="truncate">{r.station}</span>
-              <span className="text-zinc-400">{ago(r.start)}</span>
+              <span className="text-fg-3">{ago(r.start)}</span>
               <span>{Number.isFinite(r.maxElevation) ? `${r.maxElevation.toFixed(0)}°` : ""}</span>
             </button>
           </li>
@@ -681,23 +678,23 @@ function Signals({ receptions, tick, f }: { receptions: Reception[]; tick: SatTi
             <img
               src={pick.waterfall}
               alt={t.waterfallAlt(pick.station)}
-              className="max-h-[420px] w-full rounded-lg object-cover object-top"
+              className="max-h-[420px] w-full rounded-card object-cover object-top"
             />
-            <figcaption className="mt-2 text-xs leading-relaxed text-zinc-400">{t.waterfallCaption}</figcaption>
+            <figcaption className="mt-2 text-xs leading-relaxed text-fg-3">{t.waterfallCaption}</figcaption>
           </figure>
         ) : (
           pick.waterfall && (
             <button
               type="button"
               onClick={() => setShowing(pick.id)}
-              className="w-full rounded-lg border border-dashed border-zinc-700 px-3 py-4 text-center font-mono text-xs text-zinc-200 hover:border-zinc-500"
+              className="w-full rounded-card border border-dashed border-fg-4 px-3 py-4 text-center text-sm text-fg hover:border-accent"
             >
               {t.showWaterfall}
-              <span className="mt-1 block text-[10px] text-zinc-500">{t.waterfallNote}</span>
+              <span className="mt-1 block text-xs text-fg-4">{t.waterfallNote}</span>
             </button>
           )
         )}
-        <a href={pick.url} className={`mt-3 inline-block font-mono text-[11px] text-zinc-300 ${linkClass}`}>
+        <a href={pick.url} className={`mt-3 inline-block text-xs text-fg-2 ${linkClass}`}>
           {t.openOnSatnogs}
         </a>
       </div>
@@ -726,8 +723,8 @@ function TleView({
 
   return (
     <div>
-      <p className="text-xs leading-relaxed text-zinc-400">{t.tleIntro}</p>
-      <pre className="mt-3 overflow-x-auto rounded-lg bg-black/60 p-3 font-mono text-[10.5px] leading-5 text-zinc-500">
+      <p className="text-xs leading-relaxed text-fg-3">{t.tleIntro}</p>
+      <pre className="mt-3 overflow-x-auto rounded-card border border-line p-3 font-mono text-[10.5px] leading-5 text-fg-4">
         {([1, 2] as const).map((n) => (
           <div key={n}>
             {segments(lines[n], n).map((seg, i) =>
@@ -739,8 +736,8 @@ function TleView({
                   tabIndex={0}
                   onMouseEnter={() => setActive(seg.field!)}
                   onFocus={() => setActive(seg.field!)}
-                  className={`cursor-help rounded-sm outline-none ${
-                    active === seg.field ? "bg-fuchsia-400/25 text-fuchsia-100" : "text-zinc-200 hover:text-white"
+                  className={`cursor-help outline-none ${
+                    active === seg.field ? "bg-accent text-on-accent" : "text-fg hover:text-accent"
                   }`}
                 >
                   {seg.text}
@@ -750,19 +747,19 @@ function TleView({
           </div>
         ))}
       </pre>
-      <div className="mt-3 min-h-[4.5rem] rounded-lg border border-zinc-800 p-3" aria-live="polite">
+      <div className="mt-3 min-h-[4.5rem] rounded-card border border-line p-3" aria-live="polite">
         {field ? (
           <>
             <p className={label}>
-              {t.tleLocation(field.line, field.to !== field.from ? `${field.from}–${field.to}` : `${field.from}`)} ·{" "}
+              {t.tleLocation(field.line, field.to !== field.from ? `${field.from}-${field.to}` : `${field.from}`)}:{" "}
               {field.name[lang]}
             </p>
-            <p className="mt-1 text-xs leading-relaxed text-zinc-200">
+            <p className="mt-1 text-xs leading-relaxed text-fg-2">
               {field.explain(lines[field.line].slice(field.from - 1, field.to), lang)}
             </p>
           </>
         ) : (
-          <p className="text-xs text-zinc-500">{t.tlePoint}</p>
+          <p className="text-xs text-fg-4">{t.tlePoint}</p>
         )}
       </div>
       <div className="mt-5">
@@ -821,28 +818,21 @@ export function FramsatSection({
       id="framsat"
       className="relative flex min-h-screen w-full flex-col justify-end px-6 pb-16 pt-[calc(88vmin+72px)] sm:px-8 lg:flex-row lg:items-center lg:justify-end lg:py-16 lg:pr-16"
     >
-      <aside className="w-full max-w-md rounded-2xl border border-zinc-800 bg-background/85 p-6 lg:w-[440px] lg:max-w-none">
-        <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wide text-fuchsia-300">
-          <span className="relative size-2">
-            <span className="absolute inset-0 rounded-full bg-fuchsia-400 motion-safe:animate-ping" />
-            <span className="absolute inset-0 rounded-full bg-fuchsia-400" />
-          </span>
-          {t.live}
-        </p>
-        <h2 className="mt-3 text-xl font-medium">
+      <aside className="w-full max-w-md rounded-card border border-line bg-surface p-6 lg:w-[440px] lg:max-w-none">
+        <h2 className="display text-2xl">
           <a href="https://orbitntnu.com/projects/FramSat-1" className={linkClass}>
             FramSat-1
           </a>
         </h2>
-        <p className="mt-2 text-sm leading-relaxed text-zinc-300">{t.intro}</p>
-        <p className="mt-2 hidden text-xs text-zinc-400 [@media(pointer:fine)]:block">{t.hint}</p>
+        <p className="mt-2 text-sm leading-relaxed text-fg-2">{t.intro}</p>
+        <p className="mt-2 hidden text-xs text-fg-3 [@media(pointer:fine)]:block">{t.hint}</p>
 
         {tick && <TimeControls tick={tick} speed={speed} f={f} />}
 
         <div
           role="tablist"
           aria-label={t.tabsAria}
-          className="mt-5 flex gap-0.5 overflow-x-auto border-b border-zinc-800 [scrollbar-width:none]"
+          className="mt-5 flex gap-0.5 overflow-x-auto border-b border-line [scrollbar-width:none]"
         >
           {TAB_IDS.map((id) => (
             <button
@@ -851,10 +841,10 @@ export function FramsatSection({
               role="tab"
               aria-selected={tab === id}
               onClick={() => setTab(id)}
-              className={`-mb-px shrink-0 border-b-2 px-2 py-2 font-mono text-[11px] uppercase tracking-wide ${
+              className={`-mb-px shrink-0 border-b-2 px-2 py-2 text-sm ${
                 tab === id
-                  ? "border-fuchsia-400 text-white"
-                  : "border-transparent text-zinc-400 hover:text-zinc-200"
+                  ? "border-accent text-fg"
+                  : "border-transparent text-fg-3 hover:text-fg"
               }`}
             >
               {t.tabs[id]}

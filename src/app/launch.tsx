@@ -65,7 +65,7 @@ export function LaunchEasterEgg() {
               d="M12 1c5 5 7 12 7 20v13H5V21c0-8 2-15 7-20z"
               fill="currentColor"
             />
-            <circle cx="12" cy="17" r="3" fill="var(--background)" />
+            <circle cx="12" cy="17" r="3" fill="var(--bg)" />
             <path d="M5 26l-4 8v4l4-3zM19 26l4 8v4l-4-3z" fill="currentColor" />
             <path className="rocket-flame" d="M8 35h8l-4 11z" fill="#f59e0b" />
           </svg>

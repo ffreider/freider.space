@@ -70,12 +70,12 @@ const scrollProgress = () => {
 const lonDelta = (from: number, to: number) => ((to - from + 540) % 360) - 180;
 
 // A small tile with one dot, repeated to fill land as a halftone.
-function dotPattern(ctx: CanvasRenderingContext2D, dpr: number) {
+function dotPattern(ctx: CanvasRenderingContext2D, dpr: number, color: string) {
   const cell = Math.round(5 * dpr);
   const tile = document.createElement("canvas");
   tile.width = tile.height = cell;
   const t = tile.getContext("2d")!;
-  t.fillStyle = "#fff";
+  t.fillStyle = color;
   t.beginPath();
   t.arc(cell / 2, cell / 2, 1.1 * dpr, 0, Math.PI * 2);
   t.fill();
@@ -83,6 +83,46 @@ function dotPattern(ctx: CanvasRenderingContext2D, dpr: number) {
 }
 
 type World = { land: GeoPermissibleObjects; borders: GeoPermissibleObjects };
+
+// The globe's colours and land style, from the --globe-* tokens of the
+// current design study (globals.css).
+type Palette = {
+  style: string; // "dots", "fill" or "outline"
+  tint: boolean; // wash land in the aurora gradient
+  grid: string;
+  land: string;
+  coast: string;
+  border: string;
+  ocean1: string;
+  ocean2: string;
+  glow: string;
+  night: string;
+  track: string;
+  route: string;
+  home: string;
+  station: string;
+};
+
+function readPalette(): Palette {
+  const css = getComputedStyle(document.documentElement);
+  const v = (name: string) => css.getPropertyValue(`--globe-${name}`).trim();
+  return {
+    style: v("style") || "dots",
+    tint: v("tint") === "aurora",
+    grid: v("grid"),
+    land: v("land"),
+    coast: v("coast"),
+    border: v("border"),
+    ocean1: v("ocean-1"),
+    ocean2: v("ocean-2"),
+    glow: v("glow"),
+    night: v("night"),
+    track: v("track"),
+    route: v("route"),
+    home: v("home"),
+    station: v("station"),
+  };
+}
 
 export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] }) {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -123,6 +163,7 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
     const path = geoPath(projection, ctx);
     let world: World | null = null;
     let dots: CanvasPattern | null = null;
+    let palette = readPalette();
     let dpr = 1;
     let frame = 0;
     let cancelled = false;
@@ -173,49 +214,55 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
       const Y = cy * dpr;
       const R = r * dpr;
 
-      // 1. Everything that gets the aurora colours: grid, land, borders.
+      // 1. Grid, land and borders, in the study's style: a halftone of dots,
+      // a flat fill, or a line drawing.
       ctx.globalCompositeOperation = "source-over";
       ctx.lineWidth = dpr;
-      ctx.strokeStyle = "rgba(255,255,255,0.08)";
+      ctx.strokeStyle = palette.grid;
       ctx.beginPath();
       path(graticule);
       ctx.stroke();
       if (world && dots) {
         ctx.beginPath();
         path(world.land);
-        ctx.fillStyle = dots;
+        ctx.fillStyle = palette.style === "dots" ? dots : palette.land;
         ctx.fill();
-        ctx.strokeStyle = "rgba(255,255,255,0.55)";
+        ctx.lineWidth = (palette.style === "outline" ? 1.2 : 1) * dpr;
+        ctx.strokeStyle = palette.coast;
         ctx.stroke();
-        ctx.strokeStyle = "rgba(255,255,255,0.22)";
+        ctx.lineWidth = dpr;
+        ctx.strokeStyle = palette.border;
         ctx.beginPath();
         path(world.borders);
         ctx.stroke();
       }
 
-      // 2. Tint what's drawn so far, green in the west to pink in the east.
-      ctx.globalCompositeOperation = "source-atop";
-      const tint = ctx.createLinearGradient(X - R, Y - R, X + R, Y + R * 0.4);
-      tint.addColorStop(0, "#34d399");
-      tint.addColorStop(0.3, "#22d3ee");
-      tint.addColorStop(0.55, "#818cf8");
-      tint.addColorStop(0.78, "#c084fc");
-      tint.addColorStop(1, "#f472b6");
-      ctx.fillStyle = tint;
-      ctx.fillRect(0, 0, el.width, el.height);
+      // 2. In the aurora study, tint what's drawn so far, green in the west
+      // to pink in the east.
+      if (palette.tint) {
+        ctx.globalCompositeOperation = "source-atop";
+        const tint = ctx.createLinearGradient(X - R, Y - R, X + R, Y + R * 0.4);
+        tint.addColorStop(0, "#34d399");
+        tint.addColorStop(0.3, "#22d3ee");
+        tint.addColorStop(0.55, "#818cf8");
+        tint.addColorStop(0.78, "#c084fc");
+        tint.addColorStop(1, "#f472b6");
+        ctx.fillStyle = tint;
+        ctx.fillRect(0, 0, el.width, el.height);
+      }
 
       // 3. Ocean and atmosphere underneath.
       ctx.globalCompositeOperation = "destination-over";
       const ocean = ctx.createRadialGradient(X - R * 0.3, Y - R * 0.4, 0, X, Y, R);
-      ocean.addColorStop(0, "rgba(40, 52, 90, 0.55)");
-      ocean.addColorStop(1, "rgba(10, 12, 28, 0.75)");
+      ocean.addColorStop(0, palette.ocean1);
+      ocean.addColorStop(1, palette.ocean2);
       ctx.fillStyle = ocean;
       ctx.beginPath();
       ctx.arc(X, Y, R, 0, Math.PI * 2);
       ctx.fill();
       const glow = ctx.createRadialGradient(X, Y, R * 0.96, X, Y, R * 1.12);
-      glow.addColorStop(0, "rgba(99, 102, 241, 0.35)");
-      glow.addColorStop(1, "rgba(99, 102, 241, 0)");
+      glow.addColorStop(0, palette.glow);
+      glow.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = glow;
       ctx.beginPath();
       ctx.arc(X, Y, R * 1.12, 0, Math.PI * 2);
@@ -226,12 +273,8 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
       const [sunLon, sunLat] = subsolarPoint(new Date(satRef.current?.time ?? Date.now()));
       const night: [number, number] = [sunLon + 180, -sunLat];
       ctx.globalCompositeOperation = "source-over";
-      for (const [radius, alpha] of [
-        [90, 0.22],
-        [87, 0.2],
-        [84, 0.22],
-      ] as const) {
-        ctx.fillStyle = `rgba(2, 3, 12, ${alpha})`;
+      ctx.fillStyle = palette.night;
+      for (const radius of [90, 87, 84]) {
         ctx.beginPath();
         path(geoCircle().center(night).radius(radius)());
         ctx.fill();
@@ -239,16 +282,13 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
 
       // 5. Ground stations that recently received FramSat-1 (SatNOGS).
       const centreNow = projection.invert!([X, Y])!;
-      ctx.fillStyle = "#67e8f9";
-      ctx.strokeStyle = "rgba(103, 232, 249, 0.35)";
-      ctx.lineWidth = 3 * dpr;
+      ctx.fillStyle = palette.station;
       for (const station of stationsRef.current) {
         const at: [number, number] = [station.lon, station.lat];
         if (!Number.isFinite(station.lat) || geoDistance(at, centreNow) >= Math.PI / 2) continue;
         const [sx, sy] = projection(at)!;
         ctx.beginPath();
-        ctx.arc(sx, sy, 2.5 * dpr, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.arc(sx, sy, 2.2 * dpr, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -258,11 +298,12 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
       const track = trackRef.current;
       if (track) {
         ctx.lineWidth = 1.5 * dpr;
-        ctx.strokeStyle = "rgba(244, 114, 182, 0.35)";
+        ctx.strokeStyle = palette.track;
+        ctx.globalAlpha = 0.35;
         ctx.beginPath();
         path({ type: "LineString", coordinates: track.past });
         ctx.stroke();
-        ctx.strokeStyle = "rgba(244, 114, 182, 0.9)";
+        ctx.globalAlpha = 1;
         ctx.setLineDash([2 * dpr, 5 * dpr]);
         ctx.lineCap = "round";
         ctx.beginPath();
@@ -274,7 +315,7 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
       const s = satRef.current;
       if (s) {
         const between = geoInterpolate(home, [s.lon, s.lat]);
-        ctx.strokeStyle = "rgba(196, 181, 253, 0.45)";
+        ctx.strokeStyle = palette.route;
         ctx.lineWidth = dpr;
         ctx.setLineDash([4 * dpr, 4 * dpr]);
         ctx.beginPath();
@@ -288,7 +329,7 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
       const centre = projection.invert!([X, Y])!;
       if (geoDistance(home, centre) < Math.PI / 2) {
         const [hx, hy] = projection(home)!;
-        ctx.fillStyle = "#dbeafe";
+        ctx.fillStyle = palette.home;
         ctx.beginPath();
         ctx.arc(hx, hy, 3 * dpr, 0, Math.PI * 2);
         ctx.fill();
@@ -349,9 +390,17 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
       dpr = Math.min(window.devicePixelRatio, 1.5);
       el.width = Math.round(window.innerWidth * dpr);
       el.height = Math.round(window.innerHeight * dpr);
-      dots = dotPattern(ctx, dpr);
+      dots = dotPattern(ctx, dpr, palette.tint ? "#fff" : palette.land);
       wake();
     };
+
+    // Pick up the new colours when the design study changes.
+    const studyWatch = new MutationObserver(() => {
+      palette = readPalette();
+      dots = dotPattern(ctx, dpr, palette.tint ? "#fff" : palette.land);
+      wake();
+    });
+    studyWatch.observe(document.documentElement, { attributes: true, attributeFilter: ["data-study"] });
 
     // Dragging the whole Earth at the end of the page spins it. Only with a
     // mouse or pen, so touch scrolling keeps working on phones.
@@ -416,6 +465,7 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
     return () => {
       cancelled = true;
       cancelAnimationFrame(frame);
+      studyWatch.disconnect();
       wakeRef.current = () => {};
       document.documentElement.style.cursor = "";
       window.removeEventListener("scroll", wake);
