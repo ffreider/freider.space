@@ -50,11 +50,17 @@ body {
 
 /* Background: large soft color fields that drift slowly, under a film grain */
 :root {
-  --blob-teal: rgb(20 184 166 / 0.16);
-  --blob-blue: rgb(59 130 246 / 0.12);
-  --blob-magenta: rgb(217 70 239 / 0.1);
+  --blob-teal: rgb(20 184 166 / 0.3);
+  --blob-blue: rgb(59 130 246 / 0.24);
+  --blob-magenta: rgb(217 70 239 / 0.22);
+  --blob-violet: rgb(139 92 246 / 0.24);
+  --blob-amber: rgb(251 146 60 / 0.24);
+  --trail-1: rgb(20 184 166 / 0.3);
+  --trail-2: rgb(59 130 246 / 0.24);
+  --trail-3: rgb(168 85 247 / 0.22);
+  --trail-4: rgb(236 72 153 / 0.2);
+  --trail-blend: multiply;
   --grain-opacity: 0.35;
-  --glow: rgb(45 212 191 / 0.12);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -62,8 +68,14 @@ body {
     --blob-teal: rgb(13 148 136 / 0.26);
     --blob-blue: rgb(37 99 235 / 0.2);
     --blob-magenta: rgb(162 28 175 / 0.2);
+    --blob-violet: rgb(109 40 217 / 0.2);
+    --blob-amber: rgb(234 88 12 / 0.12);
+    --trail-1: rgb(45 212 191 / 0.2);
+    --trail-2: rgb(59 130 246 / 0.16);
+    --trail-3: rgb(168 85 247 / 0.15);
+    --trail-4: rgb(236 72 153 / 0.13);
+    --trail-blend: screen;
     --grain-opacity: 0.22;
-    --glow: rgb(94 234 212 / 0.09);
   }
 }
 
@@ -110,6 +122,20 @@ body {
   animation: drift-c 29s ease-in-out infinite alternate;
 }
 
+.blob-violet {
+  left: 30vw;
+  top: -30vmax;
+  background: radial-gradient(circle, var(--blob-violet), transparent 65%);
+  animation: drift-d 21s ease-in-out infinite alternate;
+}
+
+.blob-amber {
+  left: -25vmax;
+  bottom: -35vmax;
+  background: radial-gradient(circle, var(--blob-amber), transparent 65%);
+  animation: drift-e 26s ease-in-out infinite alternate;
+}
+
 @keyframes drift-a {
   to {
     transform: translate(30vw, -18vh) scale(1.25);
@@ -128,22 +154,50 @@ body {
   }
 }
 
-/* Soft light that trails the cursor */
-.cursor-glow {
+@keyframes drift-d {
+  to {
+    transform: translate(28vw, 40vh) scale(1.2);
+  }
+}
+
+@keyframes drift-e {
+  to {
+    transform: translate(40vw, -30vh) scale(0.9);
+  }
+}
+
+/* Colored glows that chase the pointer (see backdrop.tsx) */
+.trail {
   position: absolute;
   left: 0;
   top: 0;
-  width: 36vmax;
-  height: 36vmax;
+  width: 22vmax;
+  height: 22vmax;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--glow), transparent 60%);
+  mix-blend-mode: var(--trail-blend);
   opacity: 0;
   transition: opacity 600ms;
   will-change: transform;
 }
 
-.cursor-glow.is-active {
+.trail.is-active {
   opacity: 1;
+}
+
+.trail-1 {
+  background: radial-gradient(circle, var(--trail-1), transparent 62%);
+}
+
+.trail-2 {
+  background: radial-gradient(circle, var(--trail-2), transparent 62%);
+}
+
+.trail-3 {
+  background: radial-gradient(circle, var(--trail-3), transparent 62%);
+}
+
+.trail-4 {
+  background: radial-gradient(circle, var(--trail-4), transparent 62%);
 }
 
 .grain {
