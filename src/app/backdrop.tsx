@@ -13,13 +13,11 @@ const fields = [
   { className: "blob blob-amber", mouse: 70, scroll: -200 },
 ];
 
-// Glows that chase the pointer on springs of decreasing stiffness. Standing
-// still they stack into one light; moving fast they smear into a comet tail.
+// Two soft, shape-shifting color forms that drift lazily after the pointer,
+// the second following the first. They swell a little while moving.
 const trail = [
-  { className: "trail trail-1", stiffness: 0.16 },
-  { className: "trail trail-2", stiffness: 0.1 },
-  { className: "trail trail-3", stiffness: 0.065 },
-  { className: "trail trail-4", stiffness: 0.04 },
+  { className: "orb orb-1", stiffness: 0.02, damping: 0.9 },
+  { className: "orb orb-2", stiffness: 0.012, damping: 0.92 },
 ];
 
 const scrollProgress = () => {
@@ -68,20 +66,17 @@ export function Backdrop() {
         }
       });
 
-      // Pointer trail: each glow stretches along its direction of travel
-      // and swells with speed.
+      // Pointer forms: the first follows the pointer, the second follows the
+      // first, so they wander apart while moving and reunite when still.
       if (pointer.seen) {
         trail.forEach((t, i) => {
           const b = trailBodies[i];
-          if (step(b, pointer.x, pointer.y, t.stiffness, 0.8)) moving = true;
-          const speed = Math.hypot(b.vx, b.vy);
-          const angle = Math.atan2(b.vy, b.vx);
-          const stretch = Math.min(speed / 40, 1.4);
+          const lead = i === 0 ? pointer : trailBodies[i - 1];
+          if (step(b, lead.x, lead.y, t.stiffness, t.damping)) moving = true;
+          const swell = 1 + Math.min(Math.hypot(b.vx, b.vy) / 60, 0.3);
           const el = trailEls.current[i];
           if (el) {
-            el.style.transform =
-              `translate3d(${b.x}px, ${b.y}px, 0) translate(-50%, -50%) ` +
-              `rotate(${angle}rad) scale(${1 + stretch}, ${1 - stretch * 0.3})`;
+            el.style.transform = `translate3d(${b.x}px, ${b.y}px, 0) translate(-50%, -50%) scale(${swell})`;
           }
         });
       }
@@ -110,17 +105,6 @@ export function Backdrop() {
       wake();
     };
 
-    // A click scatters the trail outward; the springs pull it back together.
-    const onDown = (e: PointerEvent) => {
-      onMove(e);
-      trailBodies.forEach((b, i) => {
-        const angle = (i / trailBodies.length) * Math.PI * 2 + Math.random();
-        b.vx += Math.cos(angle) * 45;
-        b.vy += Math.sin(angle) * 45;
-      });
-      wake();
-    };
-
     const onScroll = () => {
       scroll = scrollProgress();
       wake();
@@ -130,7 +114,6 @@ export function Backdrop() {
       trailEls.current.forEach((el) => el?.classList.remove("is-active"));
 
     window.addEventListener("pointermove", onMove, { passive: true });
-    window.addEventListener("pointerdown", onDown, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     document.documentElement.addEventListener("pointerleave", onLeave);
     wake();
@@ -138,7 +121,6 @@ export function Backdrop() {
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("scroll", onScroll);
       document.documentElement.removeEventListener("pointerleave", onLeave);
     };
@@ -164,7 +146,9 @@ export function Backdrop() {
             trailEls.current[i] = el;
           }}
           className={t.className}
-        />
+        >
+          <div className="orb-shape" />
+        </div>
       ))}
       <div className="grain" />
     </div>

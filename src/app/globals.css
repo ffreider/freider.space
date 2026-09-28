@@ -166,38 +166,63 @@ body {
   }
 }
 
-/* Colored glows that chase the pointer (see backdrop.tsx) */
-.trail {
+/* Soft color forms that drift after the pointer (see backdrop.tsx). The
+   outer element is positioned from JS; the inner one slowly morphs its
+   outline, turns and shifts hue on its own, so it feels alive even at rest. */
+.orb {
   position: absolute;
   left: 0;
   top: 0;
-  width: 22vmax;
-  height: 22vmax;
-  border-radius: 50%;
+  width: 26vmax;
+  height: 26vmax;
   mix-blend-mode: var(--trail-blend);
   opacity: 0;
-  transition: opacity 600ms;
+  transition: opacity 1200ms;
   will-change: transform;
 }
 
-.trail.is-active {
+.orb.is-active {
   opacity: 1;
 }
 
-.trail-1 {
-  background: radial-gradient(circle, var(--trail-1), transparent 62%);
+.orb-shape {
+  position: absolute;
+  inset: 0;
+  filter: blur(36px);
+  animation:
+    morph 14s ease-in-out infinite alternate,
+    hue 22s linear infinite alternate;
 }
 
-.trail-2 {
-  background: radial-gradient(circle, var(--trail-2), transparent 62%);
+.orb-1 .orb-shape {
+  background: radial-gradient(circle at 40% 40%, var(--trail-1), var(--trail-2) 45%, transparent 72%);
 }
 
-.trail-3 {
-  background: radial-gradient(circle, var(--trail-3), transparent 62%);
+.orb-2 .orb-shape {
+  background: radial-gradient(circle at 60% 60%, var(--trail-3), var(--trail-4) 45%, transparent 72%);
+  animation-duration: 18s, 27s;
+  animation-direction: alternate-reverse, alternate;
 }
 
-.trail-4 {
-  background: radial-gradient(circle, var(--trail-4), transparent 62%);
+@keyframes morph {
+  0% {
+    border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    border-radius: 40% 60% 45% 55% / 60% 40% 60% 40%;
+    transform: rotate(120deg) scale(1.08);
+  }
+  100% {
+    border-radius: 55% 45% 40% 60% / 40% 60% 55% 45%;
+    transform: rotate(240deg) scale(0.95);
+  }
+}
+
+@keyframes hue {
+  to {
+    filter: blur(36px) hue-rotate(70deg);
+  }
 }
 
 .grain {
@@ -209,7 +234,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .blob {
+  .blob,
+  .orb-shape {
     animation: none;
   }
 }
