@@ -35,7 +35,7 @@ export function SpotifyPlayer() {
       </span>
       <span>
         <span className="block text-sm">Listen to Spacepodden</span>
-        <span className="block text-xs text-zinc-500">
+        <span className="block text-xs text-zinc-400">
           Loads the Spotify player, which sets Spotify cookies.
         </span>
       </span>

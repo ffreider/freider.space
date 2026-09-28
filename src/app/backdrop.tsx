@@ -119,7 +119,7 @@ export function Backdrop({ tle }: { tle: Tle }) {
         height: size * dpr,
         phi: view.phi.x,
         theta: view.theta.x,
-        mapSamples: 64000,
+        mapSamples: 200000,
         mapBrightness: 5,
         baseColor: [1, 1, 1],
         markerColor: [1, 1, 1],

@@ -71,7 +71,7 @@ export function FramsatNow({ tle }: { tle: Tle }) {
   const distance = distanceKm(TRONDHEIM.lat, TRONDHEIM.lon, sat.lat, sat.lon);
 
   return (
-    <p className="flex items-start gap-2.5 text-sm text-zinc-400">
+    <p className="flex items-start gap-2.5 text-sm text-zinc-300">
       <span className="relative mt-1.5 size-2 shrink-0">
         <span className="absolute inset-0 rounded-full bg-fuchsia-500 motion-safe:animate-ping" />
         <span className="absolute inset-0 rounded-full bg-fuchsia-500" />

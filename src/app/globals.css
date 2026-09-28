@@ -6,7 +6,7 @@
 :root {
   color-scheme: dark;
   --background: #030304;
-  --foreground: #ededed;
+  --foreground: #f7f7f8;
 }
 
 @theme inline {
@@ -80,16 +80,18 @@ body {
   mask-image: radial-gradient(circle closest-side, black 72%, transparent 81%);
 }
 
-/* Darkens the globe behind the text column so the text stays readable,
-   while the globe stays vivid toward the edges of the screen. */
+/* Darkens and blurs the globe behind the text column so the text stays
+   readable, while the globe stays sharp toward the edges of the screen. */
 .scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
+  background: rgb(3 3 4 / 0.72);
+  backdrop-filter: blur(10px);
+  mask-image: linear-gradient(
     90deg,
     transparent,
-    rgb(3 3 4 / 0.55) max(0px, calc(50% - 22rem)),
-    rgb(3 3 4 / 0.55) min(100%, calc(50% + 22rem)),
+    black max(0px, calc(50% - 22rem)),
+    black min(100%, calc(50% + 22rem)),
     transparent
   );
 }

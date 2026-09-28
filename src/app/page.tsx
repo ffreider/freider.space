@@ -168,7 +168,7 @@ function ParallelChart() {
             className="absolute inset-y-0 border-l border-zinc-100 dark:border-zinc-900"
             style={{ left: `${pct(year)}%` }}
           >
-            <span className="absolute -bottom-6 left-1 font-mono text-[10px] text-zinc-400 dark:text-zinc-600">
+            <span className="absolute -bottom-6 left-1 font-mono text-[10px] text-zinc-500">
               ’{String(year).slice(2)}
             </span>
           </div>
@@ -177,7 +177,7 @@ function ParallelChart() {
           className="absolute inset-y-0 border-l border-dashed border-zinc-300 dark:border-zinc-700"
           style={{ left: `${nowPct}%` }}
         >
-          <span className="absolute -top-6 -translate-x-1/2 font-mono text-[10px] text-zinc-400 dark:text-zinc-500">
+          <span className="absolute -top-6 -translate-x-1/2 font-mono text-[10px] text-zinc-400">
             now
           </span>
         </div>
@@ -227,8 +227,8 @@ function ParallelChart() {
               <span
                 className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap text-[11px] ${
                   ongoing
-                    ? "text-zinc-700 dark:text-zinc-200"
-                    : "text-zinc-400 dark:text-zinc-500"
+                    ? "text-zinc-100"
+                    : "text-zinc-400"
                 } ${labelBefore ? "pr-2.5" : "pl-2.5"}`}
                 style={
                   labelBefore
@@ -256,15 +256,15 @@ function ParallelChart() {
                   } as React.CSSProperties
                 }
               >
-                <p className="font-mono text-[10px] text-zinc-500">
+                <p className="font-mono text-[10px] text-zinc-400">
                   {period(entry)}
                 </p>
                 <p className="mt-0.5 text-sm font-medium">{entry.org}</p>
-                <p className="text-xs text-zinc-600 dark:text-zinc-300">
+                <p className="text-xs text-zinc-200">
                   {entry.role}
                 </p>
                 {entry.description && (
-                  <p className="mt-1.5 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-1.5 text-xs leading-relaxed text-zinc-300">
                     {entry.description}
                   </p>
                 )}
@@ -295,7 +295,7 @@ export default async function Home() {
         <h1 className={`${display.className} mt-8 text-3xl sm:text-4xl`}>
           Freider Fløan
         </h1>
-        <p className="mt-3 text-zinc-500 dark:text-zinc-400">
+        <p className="mt-3 text-zinc-300">
           I like starting things, mostly about space.
         </p>
         <nav className="mt-6 flex gap-6 text-sm">
@@ -314,7 +314,7 @@ export default async function Home() {
       <ol className="mt-32 space-y-12 sm:mt-40">
         {timeline.map((entry) => (
           <li key={entry.org} className="grid gap-x-6 sm:grid-cols-[7rem_1fr]">
-            <p className="font-mono text-xs leading-6 text-zinc-500">
+            <p className="font-mono text-xs leading-6 text-zinc-400">
               {period(entry)}
             </p>
             <div>
@@ -327,11 +327,11 @@ export default async function Home() {
                   entry.org
                 )}
               </h2>
-              <p className="text-sm text-zinc-600 dark:text-zinc-300">
+              <p className="text-sm text-zinc-200">
                 {entry.role}
               </p>
               {entry.description && (
-                <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+                <p className="mt-2 text-sm leading-relaxed text-zinc-300">
                   {entry.description}
                 </p>
               )}
@@ -343,7 +343,7 @@ export default async function Home() {
 
       <section className="mt-32 border-t border-zinc-200 pt-12 text-sm sm:mt-40 dark:border-zinc-800">
         <h2 className="font-medium">Education</h2>
-        <ul className="mt-4 space-y-2 text-zinc-500 dark:text-zinc-400">
+        <ul className="mt-4 space-y-2 text-zinc-300">
           {education.map((degree) => (
             <li key={degree}>{degree}. Finishing soon ish.</li>
           ))}
@@ -352,7 +352,7 @@ export default async function Home() {
 
       <footer className="mt-24 space-y-4">
         <FramsatNow tle={tle} />
-        <p className="text-xs text-zinc-400 dark:text-zinc-600">
+        <p className="text-xs text-zinc-500">
           Privacy: this site sets no cookies. Visits are counted anonymously
           with Vercel Web Analytics. The Spotify player only loads if you
           press play.
