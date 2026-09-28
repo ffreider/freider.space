@@ -48,34 +48,20 @@ body {
   opacity: 0.3;
 }
 
-/* Background: large soft color fields that drift slowly, under a film grain */
+/* Background: a dotted globe (see backdrop.tsx) under a film grain */
 :root {
-  --blob-teal: rgb(20 184 166 / 0.3);
-  --blob-blue: rgb(59 130 246 / 0.24);
-  --blob-magenta: rgb(217 70 239 / 0.22);
-  --blob-violet: rgb(139 92 246 / 0.24);
-  --blob-amber: rgb(251 146 60 / 0.24);
-  --trail-1: rgb(20 184 166 / 0.3);
-  --trail-2: rgb(59 130 246 / 0.24);
-  --trail-3: rgb(168 85 247 / 0.22);
-  --trail-4: rgb(236 72 153 / 0.2);
-  --trail-blend: multiply;
   --grain-opacity: 0.35;
+  --globe-opacity: 0.4;
+  --tint-blend: soft-light;
+  --tint-opacity: 0.4;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --blob-teal: rgb(13 148 136 / 0.26);
-    --blob-blue: rgb(37 99 235 / 0.2);
-    --blob-magenta: rgb(162 28 175 / 0.2);
-    --blob-violet: rgb(109 40 217 / 0.2);
-    --blob-amber: rgb(234 88 12 / 0.12);
-    --trail-1: rgb(45 212 191 / 0.2);
-    --trail-2: rgb(59 130 246 / 0.16);
-    --trail-3: rgb(168 85 247 / 0.15);
-    --trail-4: rgb(236 72 153 / 0.13);
-    --trail-blend: screen;
     --grain-opacity: 0.22;
+    --globe-opacity: 0.5;
+    --tint-blend: color;
+    --tint-opacity: 0.6;
   }
 }
 
@@ -87,142 +73,29 @@ body {
   pointer-events: none;
 }
 
-.blob-wrap {
-  position: absolute;
-  inset: 0;
-  will-change: transform;
-}
-
-.blob {
-  position: absolute;
-  width: 80vmax;
-  height: 80vmax;
-  border-radius: 50%;
-  will-change: transform;
-}
-
-.blob-teal {
-  left: -20vmax;
-  top: 10vh;
-  background: radial-gradient(circle, var(--blob-teal), transparent 65%);
-  animation: drift-a 17s ease-in-out infinite alternate;
-}
-
-.blob-blue {
-  left: 20vw;
-  top: 40vh;
-  background: radial-gradient(circle, var(--blob-blue), transparent 65%);
-  animation: drift-b 23s ease-in-out infinite alternate;
-}
-
-.blob-magenta {
-  right: -30vmax;
-  top: -25vmax;
-  background: radial-gradient(circle, var(--blob-magenta), transparent 65%);
-  animation: drift-c 29s ease-in-out infinite alternate;
-}
-
-.blob-violet {
-  left: 30vw;
-  top: -30vmax;
-  background: radial-gradient(circle, var(--blob-violet), transparent 65%);
-  animation: drift-d 21s ease-in-out infinite alternate;
-}
-
-.blob-amber {
-  left: -25vmax;
-  bottom: -35vmax;
-  background: radial-gradient(circle, var(--blob-amber), transparent 65%);
-  animation: drift-e 26s ease-in-out infinite alternate;
-}
-
-@keyframes drift-a {
-  to {
-    transform: translate(30vw, -18vh) scale(1.25);
-  }
-}
-
-@keyframes drift-b {
-  to {
-    transform: translate(-32vw, -26vh) scale(0.8);
-  }
-}
-
-@keyframes drift-c {
-  to {
-    transform: translate(-26vw, 34vh) scale(1.3);
-  }
-}
-
-@keyframes drift-d {
-  to {
-    transform: translate(28vw, 40vh) scale(1.2);
-  }
-}
-
-@keyframes drift-e {
-  to {
-    transform: translate(40vw, -30vh) scale(0.9);
-  }
-}
-
-/* Soft color forms that drift after the pointer (see backdrop.tsx). The
-   outer element is positioned from JS; the inner one slowly morphs its
-   outline, turns and shifts hue on its own, so it feels alive even at rest. */
-.orb {
+.globe-wrap {
   position: absolute;
   left: 0;
   top: 0;
-  width: 13vmax;
-  height: 13vmax;
-  mix-blend-mode: var(--trail-blend);
-  opacity: 0;
-  transition: opacity 1200ms;
   will-change: transform;
 }
 
-.orb.is-active {
-  opacity: 0.55;
+.globe {
+  display: block;
+  opacity: var(--globe-opacity);
 }
 
-.orb-shape {
+/* Washes the globe's dots in the aurora colors, green in the west through
+   blue to violet and pink in the east. */
+.globe-tint {
   position: absolute;
   inset: 0;
-  filter: blur(24px);
-  animation:
-    morph 14s ease-in-out infinite alternate,
-    hue 22s linear infinite alternate;
-}
-
-.orb-1 .orb-shape {
-  background: radial-gradient(circle at 40% 40%, var(--trail-1), var(--trail-2) 45%, transparent 72%);
-}
-
-.orb-2 .orb-shape {
-  background: radial-gradient(circle at 60% 60%, var(--trail-3), var(--trail-4) 45%, transparent 72%);
-  animation-duration: 18s, 27s;
-  animation-direction: alternate-reverse, alternate;
-}
-
-@keyframes morph {
-  0% {
-    border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
-    transform: rotate(0deg) scale(1);
-  }
-  50% {
-    border-radius: 40% 60% 45% 55% / 60% 40% 60% 40%;
-    transform: rotate(120deg) scale(1.08);
-  }
-  100% {
-    border-radius: 55% 45% 40% 60% / 40% 60% 55% 45%;
-    transform: rotate(240deg) scale(0.95);
-  }
-}
-
-@keyframes hue {
-  to {
-    filter: blur(24px) hue-rotate(70deg);
-  }
+  border-radius: 50%;
+  background: linear-gradient(115deg, #10b981, #06b6d4 30%, #6366f1 55%, #a855f7 75%, #ec4899);
+  mix-blend-mode: var(--tint-blend);
+  opacity: var(--tint-opacity);
+  /* Only over the Earth itself, not its glow */
+  mask-image: radial-gradient(circle closest-side, black 72%, transparent 81%);
 }
 
 .grain {
@@ -233,12 +106,6 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .blob,
-  .orb-shape {
-    animation: none;
-  }
-}
 
 /* Easter egg rocket (see launch.tsx). It points up; the flight rotates it
    toward the top-right while it crosses the screen. */

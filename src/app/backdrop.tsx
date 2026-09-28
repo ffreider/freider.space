@@ -1,155 +1,187 @@
 "use client";
 
+import createGlobe, { type COBEOptions, type Globe } from "cobe";
 import { useEffect, useRef } from "react";
+import { TRONDHEIM } from "./iss";
+import { type IssPosition, useIss } from "./iss-store";
 
-// Large background color fields. `mouse` is px of movement per unit of mouse
-// offset (mouse is normalized to -0.5..0.5); `scroll` is px of travel from the
-// top of the page to the bottom, so the colors never scroll fully off-screen.
-const fields = [
-  { className: "blob blob-teal", mouse: 110, scroll: -300 },
-  { className: "blob blob-blue", mouse: -80, scroll: 200 },
-  { className: "blob blob-magenta", mouse: 150, scroll: -450 },
-  { className: "blob blob-violet", mouse: -130, scroll: 350 },
-  { className: "blob blob-amber", mouse: 70, scroll: -200 },
-];
+// Full-page background: a dotted Earth rising from the bottom of the screen
+// like a horizon seen from orbit. It turns slowly, leans toward the pointer,
+// rises as you scroll, and marks Trondheim and the live ISS position.
 
-// Two soft, shape-shifting color forms that drift lazily after the pointer,
-// the second following the first. They swell a little while moving.
-const trail = [
-  { className: "orb orb-1", stiffness: 0.02, damping: 0.9 },
-  { className: "orb orb-2", stiffness: 0.012, damping: 0.92 },
-];
+const TURN_PER_SECOND = 0.035; // radians; one full turn in about three minutes
+const deg = Math.PI / 180;
+
+// Globe rotation that puts a place at the front of the globe.
+const facing = (lat: number, lon: number) => ({
+  phi: Math.PI - (lon * deg - Math.PI / 2),
+  theta: lat * deg,
+});
+
+const START = facing(TRONDHEIM.lat, TRONDHEIM.lon);
+
+const themes: Record<"light" | "dark", Partial<COBEOptions>> = {
+  dark: {
+    dark: 1,
+    diffuse: 1.4,
+    mapBrightness: 5,
+    baseColor: [0.35, 0.35, 0.45],
+    glowColor: [0.18, 0.2, 0.35],
+    markerColor: [0.93, 0.35, 0.85],
+    arcColor: [0.55, 0.45, 1],
+  },
+  light: {
+    dark: 0,
+    diffuse: 1.2,
+    mapBrightness: 3,
+    baseColor: [1, 1, 1],
+    glowColor: [0.9, 0.9, 1],
+    markerColor: [0.85, 0.2, 0.75],
+    arcColor: [0.45, 0.35, 0.95],
+  },
+};
+
+type Spring = { x: number; v: number };
+
+// One step of a damped spring pulling `s` toward `target`.
+function step(s: Spring, target: number, stiffness = 0.03, damping = 0.88) {
+  s.v = (s.v + (target - s.x) * stiffness) * damping;
+  s.x += s.v;
+}
 
 const scrollProgress = () => {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   return max > 0 ? window.scrollY / max : 0;
 };
 
-type Body = { x: number; y: number; vx: number; vy: number };
-
-// One step of a damped spring pulling `b` toward (tx, ty).
-function step(b: Body, tx: number, ty: number, stiffness: number, damping: number) {
-  b.vx = (b.vx + (tx - b.x) * stiffness) * damping;
-  b.vy = (b.vy + (ty - b.y) * stiffness) * damping;
-  b.x += b.vx;
-  b.y += b.vy;
-  return Math.abs(b.vx) + Math.abs(b.vy) + Math.abs(tx - b.x) + Math.abs(ty - b.y) > 0.05;
+function markersFor(iss: IssPosition | null): Pick<COBEOptions, "markers" | "arcs"> {
+  const home: [number, number] = [TRONDHEIM.lat, TRONDHEIM.lon];
+  if (!iss) return { markers: [{ location: home, size: 0.04 }], arcs: [] };
+  const station: [number, number] = [iss.lat, iss.lon];
+  return {
+    markers: [
+      { location: home, size: 0.04 },
+      { location: station, size: 0.07 },
+    ],
+    arcs: [{ from: home, to: station }],
+  };
 }
 
 export function Backdrop() {
-  const fieldEls = useRef<(HTMLDivElement | null)[]>([]);
-  const trailEls = useRef<(HTMLDivElement | null)[]>([]);
+  const wrap = useRef<HTMLDivElement>(null);
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const globe = useRef<Globe | null>(null);
+  const iss = useIss();
+  const issRef = useRef(iss);
+
+  // New ISS position: move the pink marker and the arc from Trondheim.
+  useEffect(() => {
+    issRef.current = iss;
+    globe.current?.update(markersFor(iss));
+  }, [iss]);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const el = canvas.current;
+    const box = wrap.current;
+    if (!el || !box) return;
 
-    const pointer = { x: 0, y: 0, nx: 0, ny: 0, seen: false };
-    let scroll = scrollProgress();
-    let scrollNow = scroll;
-    const fieldBodies: Body[] = fields.map(() => ({ x: 0, y: 0, vx: 0, vy: 0 }));
-    const trailBodies: Body[] = trail.map(() => ({ x: 0, y: 0, vx: 0, vy: 0 }));
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const theme = () => themes[darkQuery.matches ? "dark" : "light"];
+
+    const pointer = { x: 0, y: 0 };
+    const lean = { x: { x: 0, v: 0 }, y: { x: 0, v: 0 } };
+    const rise: Spring = { x: scrollProgress(), v: 0 };
+    let size = 0;
     let frame = 0;
+    const startTime = performance.now();
 
-    const render = () => {
-      let moving = false;
-
-      scrollNow += (scroll - scrollNow) * 0.08;
-      if (Math.abs(scroll - scrollNow) > 0.0005) moving = true;
-
-      // Background fields: soft springs with a little overshoot.
-      fields.forEach((field, i) => {
-        const b = fieldBodies[i];
-        if (step(b, pointer.nx * field.mouse, pointer.ny * field.mouse, 0.02, 0.9)) moving = true;
-        const el = fieldEls.current[i];
-        if (el) {
-          el.style.transform = `translate3d(${b.x}px, ${b.y + scrollNow * field.scroll}px, 0)`;
-        }
+    const build = () => {
+      globe.current?.destroy();
+      size = Math.round(Math.max(window.innerWidth, window.innerHeight) * 1.15);
+      const dpr = Math.min(window.devicePixelRatio, size > 1400 ? 1.5 : 2);
+      el.style.width = el.style.height = `${size}px`;
+      globe.current = createGlobe(el, {
+        devicePixelRatio: dpr,
+        width: size * dpr,
+        height: size * dpr,
+        phi: START.phi,
+        theta: 0.35,
+        mapSamples: 20000,
+        mapBrightness: 5,
+        baseColor: [1, 1, 1],
+        markerColor: [1, 1, 1],
+        glowColor: [1, 1, 1],
+        diffuse: 1,
+        dark: 1,
+        arcWidth: 0.6,
+        arcHeight: 0.3,
+        markerElevation: 0.02,
+        ...theme(),
+        ...markersFor(issRef.current),
       });
-
-      // Pointer forms: the first follows the pointer, the second follows the
-      // first, so they wander apart while moving and reunite when still.
-      if (pointer.seen) {
-        trail.forEach((t, i) => {
-          const b = trailBodies[i];
-          const lead = i === 0 ? pointer : trailBodies[i - 1];
-          if (step(b, lead.x, lead.y, t.stiffness, t.damping)) moving = true;
-          const swell = 1 + Math.min(Math.hypot(b.vx, b.vy) / 80, 0.15);
-          const el = trailEls.current[i];
-          if (el) {
-            el.style.transform = `translate3d(${b.x}px, ${b.y}px, 0) translate(-50%, -50%) scale(${swell})`;
-          }
-        });
-      }
-
-      frame = moving ? requestAnimationFrame(render) : 0;
     };
 
-    const wake = () => {
-      if (!frame) frame = requestAnimationFrame(render);
+    const place = () => {
+      // The globe's top edge starts 40% down the screen (a horizon) and
+      // rises to just above the top as you scroll to the bottom.
+      const top = window.innerHeight * (0.4 - 0.5 * rise.x);
+      box.style.transform = `translate3d(${(window.innerWidth - size) / 2}px, ${top}px, 0)`;
+    };
+
+    const render = (now: number) => {
+      step(lean.x, pointer.x);
+      step(lean.y, pointer.y);
+      step(rise, scrollProgress(), 0.06, 0.8);
+      place();
+      globe.current?.update({
+        phi: START.phi + ((now - startTime) / 1000) * TURN_PER_SECOND + lean.x.x * 0.4,
+        theta: 0.35 + rise.x * 0.25 + lean.y.x * 0.15,
+      });
+      frame = requestAnimationFrame(render);
     };
 
     const onMove = (e: PointerEvent) => {
-      pointer.x = e.clientX;
-      pointer.y = e.clientY;
-      pointer.nx = e.clientX / window.innerWidth - 0.5;
-      pointer.ny = e.clientY / window.innerHeight - 0.5;
-      if (!pointer.seen) {
-        // Start the trail where the pointer first appears, not in a corner.
-        pointer.seen = true;
-        for (const b of trailBodies) {
-          b.x = e.clientX;
-          b.y = e.clientY;
-        }
-      }
-      trailEls.current.forEach((el) => el?.classList.add("is-active"));
-      wake();
+      pointer.x = e.clientX / window.innerWidth - 0.5;
+      pointer.y = e.clientY / window.innerHeight - 0.5;
     };
-
     const onScroll = () => {
-      scroll = scrollProgress();
-      wake();
+      // Without motion, jump straight to the scrolled position.
+      if (still) {
+        rise.x = scrollProgress();
+        place();
+      }
     };
+    const onResize = () => {
+      build();
+      place();
+    };
+    const onTheme = () => globe.current?.update(theme());
 
-    const onLeave = () =>
-      trailEls.current.forEach((el) => el?.classList.remove("is-active"));
+    build();
+    place();
+    if (!still) frame = requestAnimationFrame(render);
 
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
-    document.documentElement.addEventListener("pointerleave", onLeave);
-    wake();
-
+    window.addEventListener("resize", onResize);
+    darkQuery.addEventListener("change", onTheme);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("scroll", onScroll);
-      document.documentElement.removeEventListener("pointerleave", onLeave);
+      window.removeEventListener("resize", onResize);
+      darkQuery.removeEventListener("change", onTheme);
+      globe.current?.destroy();
     };
   }, []);
 
   return (
     <div aria-hidden className="backdrop">
-      {fields.map((field, i) => (
-        <div
-          key={field.className}
-          ref={(el) => {
-            fieldEls.current[i] = el;
-          }}
-          className="blob-wrap"
-        >
-          <div className={field.className} />
-        </div>
-      ))}
-      {trail.map((t, i) => (
-        <div
-          key={t.className}
-          ref={(el) => {
-            trailEls.current[i] = el;
-          }}
-          className={t.className}
-        >
-          <div className="orb-shape" />
-        </div>
-      ))}
+      <div ref={wrap} className="globe-wrap">
+        <canvas ref={canvas} className="globe" />
+        <div className="globe-tint" />
+      </div>
       <div className="grain" />
     </div>
   );
