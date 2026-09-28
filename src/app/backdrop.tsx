@@ -8,10 +8,12 @@ import {
   geoPath,
   type GeoPermissibleObjects,
 } from "d3-geo";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { twoline2satrec } from "satellite.js";
 import { feature, mesh } from "topojson-client";
 import type { Tle } from "@/lib/framsat-tle";
 import { type SatState, TRONDHEIM, useFramsat } from "./framsat";
+import { groundTrack } from "./framsat-orbit";
 
 // Full-page background: a dotted Earth that follows FramSat-1. Through most
 // of the page it's a horizon rising from the bottom of the screen; when the
@@ -32,7 +34,7 @@ const liftAt = (open: number) => 42 * (1 - open);
 const HOLD_MS = 4000;
 
 // Width reserved for the stats panel beside the globe on wide screens.
-const PANEL_SPACE = 460;
+const PANEL_SPACE = 500;
 
 type Spring = { x: number; v: number };
 
@@ -84,15 +86,19 @@ export function Backdrop({ tle }: { tle: Tle }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const scrim = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLDivElement>(null);
+  const satrec = useMemo(() => twoline2satrec(tle.line1, tle.line2), [tle]);
   const sat = useFramsat(tle);
   const satRef = useRef<SatState | null>(sat);
+  const trackRef = useRef<ReturnType<typeof groundTrack> | null>(null);
   const wakeRef = useRef<() => void>(() => {});
 
-  // The satellite moved (once a second): ease the view after it.
+  // The satellite moved (once a second, or faster when time-travelling):
+  // update its ground track and ease the view after it.
   useEffect(() => {
     satRef.current = sat;
+    trackRef.current = sat ? groundTrack(satrec, new Date(sat.time)) : null;
     wakeRef.current();
-  }, [sat]);
+  }, [sat, satrec]);
 
   useEffect(() => {
     const el = canvas.current;
@@ -212,14 +218,30 @@ export function Backdrop({ tle }: { tle: Tle }) {
       ctx.arc(X, Y, R * 1.12, 0, Math.PI * 2);
       ctx.fill();
 
-      // 4. Trondheim, and the route from there to the satellite, on top.
+      // 4. On top: the ground track (the last and next 50 minutes), then
+      // Trondheim and the route from there to the satellite.
       ctx.globalCompositeOperation = "source-over";
+      const track = trackRef.current;
+      if (track) {
+        ctx.lineWidth = 1.5 * dpr;
+        ctx.strokeStyle = "rgba(244, 114, 182, 0.35)";
+        ctx.beginPath();
+        path({ type: "LineString", coordinates: track.past });
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(244, 114, 182, 0.9)";
+        ctx.setLineDash([2 * dpr, 5 * dpr]);
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        path({ type: "LineString", coordinates: track.future });
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
       const home: [number, number] = [TRONDHEIM.lon, TRONDHEIM.lat];
       const s = satRef.current;
       if (s) {
         const between = geoInterpolate(home, [s.lon, s.lat]);
-        ctx.strokeStyle = "rgba(196, 181, 253, 0.8)";
-        ctx.lineWidth = 1.5 * dpr;
+        ctx.strokeStyle = "rgba(196, 181, 253, 0.45)";
+        ctx.lineWidth = dpr;
         ctx.setLineDash([4 * dpr, 4 * dpr]);
         ctx.beginPath();
         path({
