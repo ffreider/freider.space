@@ -2,7 +2,6 @@ import Image from "next/image";
 import { Unbounded } from "next/font/google";
 import { framsatTle } from "@/lib/framsat-tle";
 import { FramsatSection } from "./framsat";
-import { SpotifyPlayer } from "./spotify";
 
 const display = Unbounded({ subsets: ["latin"], weight: "600" });
 
@@ -306,6 +305,18 @@ export default async function Home() {
               </a>
             ))}
           </nav>
+          <a
+            href="https://trondheim.com/journal/the-extracurricular-that-left-earth"
+            className="mt-8 inline-flex items-center gap-3 rounded-full border border-zinc-800 bg-background/60 px-4 py-2 text-xs text-zinc-200 transition hover:border-zinc-600"
+          >
+            <span className="font-mono text-[10px] uppercase tracking-wide text-fuchsia-300">
+              Featured
+            </span>
+            <span>
+              “The extracurricular that left Earth”
+              <span className="text-zinc-400"> · Trondheim.com ↗</span>
+            </span>
+          </a>
         </header>
 
         <section className="mt-32 sm:mt-40">
@@ -336,8 +347,7 @@ export default async function Home() {
                     {entry.description}
                   </p>
                 )}
-                {entry.org === "Spacepodden" && <SpotifyPlayer />}
-              </div>
+                </div>
             </li>
           ))}
         </ol>
@@ -358,8 +368,7 @@ export default async function Home() {
       <footer className="mx-auto w-full max-w-3xl px-6 pb-12 sm:px-8">
         <p className="text-xs text-zinc-500">
           Privacy: this site sets no cookies. Visits are counted anonymously
-          with Vercel Web Analytics. The Spotify player only loads if you
-          press play.
+          with Vercel Web Analytics.
         </p>
       </footer>
     </>
