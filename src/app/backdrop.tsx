@@ -13,37 +13,53 @@ import { feature, mesh } from "topojson-client";
 import type { Tle } from "@/lib/framsat-tle";
 import { type SatState, TRONDHEIM, useFramsat } from "./framsat";
 
-// Full-page background: a dotted Earth that follows FramSat-1. At the top of
-// the page it's a horizon rising from the bottom of the screen; as you scroll
-// it grows into the whole planet, centred, by the FramSat-1 section at the
-// bottom. Land is a halftone of dots in the aurora colours, with coastlines
-// and faint country borders so the geography stays readable. The satellite
-// gets a crisp label, and the Earth slides past underneath it as it orbits.
+// Full-page background: a dotted Earth that follows FramSat-1. Through most
+// of the page it's a horizon rising from the bottom of the screen; when the
+// FramSat-1 section (#framsat) scrolls in, it opens into the whole planet
+// beside the stats, and you can drag it to spin it. Land is a halftone of
+// dots in the aurora colours with coastlines and faint country borders.
+//
+// It only redraws while something is changing (scrolling, easing toward the
+// satellite, dragging), so an idle page costs almost nothing.
 
-// How far (degrees) the centre of the view sits south of and west of the
-// satellite. As a horizon only the globe's upper part is on screen, so the
-// satellite is held high in the middle; on the whole globe at the bottom of
-// the page it moves to the upper right, clear of the FramSat-1 cards.
-const liftAt = (open: number) => 42 * (1 - open) + 40 * open;
-const shiftAt = (open: number) => 30 * open;
+// How far south of the satellite (degrees) the view is centred. As a horizon
+// only the globe's upper part is on screen, so the satellite is held high;
+// on the whole globe it sits in the middle.
+const liftAt = (open: number) => 42 * (1 - open);
+
+// After a drag, how long the globe stays where you left it before easing
+// back to the satellite.
+const HOLD_MS = 4000;
+
+// Width reserved for the stats panel beside the globe on wide screens.
+const PANEL_SPACE = 460;
 
 type Spring = { x: number; v: number };
 
-// One step of a damped spring pulling `s` toward `target`.
-function step(s: Spring, target: number, stiffness = 0.03, damping = 0.88) {
+// One step of a damped spring pulling `s` toward `target`. Once it's within
+// `rest` of the target and nearly stopped, it snaps there and reports that
+// it's done, so tiny moves (like the satellite's once-a-second drift) don't
+// keep the page animating.
+function step(s: Spring, target: number, stiffness: number, damping: number, rest: number) {
+  if (Math.abs(target - s.x) < rest && Math.abs(s.v) < rest * 0.1) {
+    s.x = target;
+    s.v = 0;
+    return false;
+  }
   s.v = (s.v + (target - s.x) * stiffness) * damping;
   s.x += s.v;
+  return true;
 }
+
+const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+const smooth = (t: number) => {
+  const x = clamp01(t);
+  return x * x * (3 - 2 * x);
+};
 
 const scrollProgress = () => {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   return max > 0 ? window.scrollY / max : 0;
-};
-
-// Eases 0..1 so the globe stays a horizon for a while, then opens up.
-const smooth = (t: number) => {
-  const x = Math.min(1, Math.max(0, t));
-  return x * x * (3 - 2 * x);
 };
 
 // Shortest signed difference between two longitudes, in degrees.
@@ -70,9 +86,12 @@ export function Backdrop({ tle }: { tle: Tle }) {
   const label = useRef<HTMLDivElement>(null);
   const sat = useFramsat(tle);
   const satRef = useRef<SatState | null>(sat);
+  const wakeRef = useRef<() => void>(() => {});
 
+  // The satellite moved (once a second): ease the view after it.
   useEffect(() => {
     satRef.current = sat;
+    wakeRef.current();
   }, [sat]);
 
   useEffect(() => {
@@ -83,14 +102,15 @@ export function Backdrop({ tle }: { tle: Tle }) {
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const pointer = { x: 0, y: 0 };
     const lean = { x: { x: 0, v: 0 }, y: { x: 0, v: 0 } };
-    const rise: Spring = { x: scrollProgress(), v: 0 };
     // The point at the centre of the view, as longitude / latitude.
     const view = {
-      lon: { x: TRONDHEIM.lon - shiftAt(smooth(rise.x)), v: 0 },
-      lat: { x: TRONDHEIM.lat - liftAt(smooth(rise.x)), v: 0 },
+      lon: { x: TRONDHEIM.lon, v: 0 },
+      lat: { x: TRONDHEIM.lat - liftAt(0), v: 0 },
     };
+    const drag = { active: false, x: 0, y: 0, until: 0 };
+    const globe = { cx: 0, cy: 0, r: 0, open: 0 };
     const graticule = geoGraticule10();
-    const projection = geoOrthographic().clipAngle(90).precision(0.5);
+    const projection = geoOrthographic().clipAngle(90).precision(0.7);
     const path = geoPath(projection, ctx);
     let world: World | null = null;
     let dots: CanvasPattern | null = null;
@@ -98,40 +118,41 @@ export function Backdrop({ tle }: { tle: Tle }) {
     let frame = 0;
     let cancelled = false;
 
-    // The world map (110 KB) loads separately so it doesn't hold up the page.
-    import("world-atlas/countries-110m.json").then((mod) => {
-      if (cancelled) return;
-      const topo = mod.default as unknown as Parameters<typeof feature>[0] & {
-        objects: Record<"land" | "countries", Parameters<typeof feature>[1]>;
-      };
-      world = {
-        land: feature(topo, topo.objects.land),
-        borders: mesh(topo, topo.objects.countries as never, (a, b) => a !== b),
-      };
-      if (still) draw();
-    });
+    const stage = () => document.getElementById("framsat");
 
-    const resize = () => {
-      dpr = Math.min(window.devicePixelRatio, 2);
-      el.width = Math.round(window.innerWidth * dpr);
-      el.height = Math.round(window.innerHeight * dpr);
-      dots = dotPattern(ctx, dpr);
+    // Where the globe goes and how big it is, for the current scroll position.
+    const layout = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const rect = stage()?.getBoundingClientRect();
+      // 0 while the FramSat-1 section is below the screen, 1 once it fills it.
+      const open = rect ? smooth(1 - rect.top / vh) : 0;
+
+      // Horizon: a big globe whose top edge rises from 45% to 32% of the
+      // screen height over the page.
+      const horizonR = 0.46 * Math.max(vw, vh);
+      const horizonY = (0.45 - 0.13 * smooth(scrollProgress())) * vh + horizonR;
+
+      // Whole Earth, moving with the section: left of the stats panel on
+      // wide screens, above it on narrow ones.
+      const wide = vw >= 1024;
+      const top = rect?.top ?? vh;
+      const fullR = wide
+        ? Math.min(0.42 * vh, 0.44 * (vw - PANEL_SPACE))
+        : 0.44 * Math.min(vw, vh);
+      const fullX = wide ? (vw - PANEL_SPACE) / 2 + 16 : vw / 2;
+      // On wide screens it stays centred once the section fills the screen,
+      // even while you scroll through the panel.
+      const fullY = wide ? Math.max(top, 0) + vh / 2 : top + fullR + 72;
+
+      globe.open = open;
+      globe.r = horizonR + (fullR - horizonR) * open;
+      globe.cx = vw / 2 + (fullX - vw / 2) * open;
+      globe.cy = horizonY + (fullY - horizonY) * open;
     };
 
     const draw = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const open = smooth(rise.x);
-
-      // Horizon: a big globe whose top edge sits 45% down the screen.
-      // Whole Earth: the globe spans 85% of the screen, centred.
-      const horizonR = 0.46 * Math.max(vw, vh);
-      const fullR = 0.425 * Math.min(vw, vh);
-      const r = horizonR + (fullR - horizonR) * open;
-      const horizonY = 0.45 * vh + horizonR;
-      const cy = horizonY + (vh / 2 - horizonY) * open;
-      const cx = vw / 2;
-
+      const { cx, cy, r, open } = globe;
       projection
         .scale(r * dpr)
         .translate([cx * dpr, cy * dpr])
@@ -151,13 +172,11 @@ export function Backdrop({ tle }: { tle: Tle }) {
       path(graticule);
       ctx.stroke();
       if (world && dots) {
-        ctx.fillStyle = dots;
         ctx.beginPath();
         path(world.land);
+        ctx.fillStyle = dots;
         ctx.fill();
         ctx.strokeStyle = "rgba(255,255,255,0.55)";
-        ctx.beginPath();
-        path(world.land);
         ctx.stroke();
         ctx.strokeStyle = "rgba(255,255,255,0.22)";
         ctx.beginPath();
@@ -193,13 +212,12 @@ export function Backdrop({ tle }: { tle: Tle }) {
       ctx.arc(X, Y, R * 1.12, 0, Math.PI * 2);
       ctx.fill();
 
-      // 4. Trondheim, the satellite, and the path between them on top.
+      // 4. Trondheim, and the route from there to the satellite, on top.
       ctx.globalCompositeOperation = "source-over";
       const home: [number, number] = [TRONDHEIM.lon, TRONDHEIM.lat];
       const s = satRef.current;
       if (s) {
-        const there: [number, number] = [s.lon, s.lat];
-        const between = geoInterpolate(home, there);
+        const between = geoInterpolate(home, [s.lon, s.lat]);
         ctx.strokeStyle = "rgba(196, 181, 253, 0.8)";
         ctx.lineWidth = 1.5 * dpr;
         ctx.setLineDash([4 * dpr, 4 * dpr]);
@@ -220,7 +238,7 @@ export function Backdrop({ tle }: { tle: Tle }) {
         ctx.fill();
       }
 
-      // The satellite's label is HTML, so it stays sharp above the blur.
+      // The satellite's label is HTML, so it stays sharp above everything.
       if (label.current) {
         const visible = s && geoDistance([s.lon, s.lat], centre) < Math.PI / 2;
         label.current.style.opacity = visible ? "1" : "0";
@@ -230,73 +248,126 @@ export function Backdrop({ tle }: { tle: Tle }) {
         }
       }
 
-      // The blur behind the text fades away as the whole Earth comes into view.
-      if (scrim.current) {
-        scrim.current.style.opacity = String(1 - smooth((rise.x - 0.75) / 0.25));
-      }
+      // The darkening behind the text fades out as the whole Earth opens up.
+      if (scrim.current) scrim.current.style.opacity = String(1 - open);
     };
 
+    // Ease the view toward the satellite, unless someone just dragged it.
+    // Returns whether anything is still moving.
     const follow = () => {
+      let moving = false;
+      if (!still) {
+        const leanOn = 1 - globe.open; // no leaning while the globe is draggable
+        moving = step(lean.x, pointer.x * leanOn, 0.03, 0.88, 0.002) || moving;
+        moving = step(lean.y, pointer.y * leanOn, 0.03, 0.88, 0.002) || moving;
+      }
       const s = satRef.current;
-      if (!s) return;
-      const open = smooth(rise.x);
-      const lon = s.lon - shiftAt(open);
-      step(view.lon, view.lon.x + lonDelta(view.lon.x, lon), 0.02, 0.85);
-      step(view.lat, s.lat - liftAt(open), 0.02, 0.85);
+      if (!s || drag.active || performance.now() < drag.until) return moving;
+      const lon = view.lon.x + lonDelta(view.lon.x, s.lon);
+      const lat = s.lat - liftAt(globe.open);
+      if (still) {
+        view.lon.x = lon;
+        view.lat.x = lat;
+        return moving;
+      }
+      moving = step(view.lon, lon, 0.02, 0.85, 0.3) || moving;
+      moving = step(view.lat, lat, 0.02, 0.85, 0.3) || moving;
+      return moving;
     };
 
     const render = () => {
-      step(lean.x, pointer.x);
-      step(lean.y, pointer.y);
-      step(rise, scrollProgress(), 0.06, 0.8);
-      follow();
+      frame = 0;
+      layout();
+      const moving = follow();
       draw();
-      frame = requestAnimationFrame(render);
+      // Keep going while easing, or while waiting to swing back after a drag.
+      if (moving || drag.active || performance.now() < drag.until + 50) wake();
     };
 
+    const wake = () => {
+      if (!frame && !cancelled) frame = requestAnimationFrame(render);
+    };
+    wakeRef.current = wake;
+
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio, 1.5);
+      el.width = Math.round(window.innerWidth * dpr);
+      el.height = Math.round(window.innerHeight * dpr);
+      dots = dotPattern(ctx, dpr);
+      wake();
+    };
+
+    // Dragging the whole Earth at the end of the page spins it. Only with a
+    // mouse or pen, so touch scrolling keeps working on phones.
+    const overGlobe = (e: PointerEvent) =>
+      globe.open > 0.9 &&
+      e.pointerType !== "touch" &&
+      Math.hypot(e.clientX - globe.cx, e.clientY - globe.cy) < globe.r &&
+      !(e.target as Element).closest("a, button, aside, input, textarea");
+
+    const onDown = (e: PointerEvent) => {
+      if (!overGlobe(e)) return;
+      e.preventDefault(); // no text selection while dragging
+      drag.active = true;
+      drag.x = e.clientX;
+      drag.y = e.clientY;
+      document.documentElement.style.cursor = "grabbing";
+      wake();
+    };
     const onMove = (e: PointerEvent) => {
       pointer.x = e.clientX / window.innerWidth - 0.5;
       pointer.y = e.clientY / window.innerHeight - 0.5;
+      if (drag.active) {
+        const degPerPx = 180 / Math.PI / globe.r;
+        view.lon.x -= (e.clientX - drag.x) * degPerPx;
+        view.lat.x = Math.max(-85, Math.min(85, view.lat.x + (e.clientY - drag.y) * degPerPx));
+        view.lon.v = view.lat.v = 0;
+        drag.x = e.clientX;
+        drag.y = e.clientY;
+      } else {
+        document.documentElement.style.cursor = overGlobe(e) ? "grab" : "";
+      }
+      wake();
     };
-    const onResize = () => {
-      resize();
-      draw();
+    const onUp = () => {
+      if (!drag.active) return;
+      drag.active = false;
+      drag.until = performance.now() + HOLD_MS;
+      document.documentElement.style.cursor = "";
+      wake();
     };
+
+    // The world map (110 KB) loads separately so it doesn't hold up the page.
+    import("world-atlas/countries-110m.json").then((mod) => {
+      if (cancelled) return;
+      const topo = mod.default as unknown as Parameters<typeof feature>[0] & {
+        objects: Record<"land" | "countries", Parameters<typeof feature>[1]>;
+      };
+      world = {
+        land: feature(topo, topo.objects.land),
+        borders: mesh(topo, topo.objects.countries as never, (a, b) => a !== b),
+      };
+      wake();
+    });
 
     resize();
-    draw();
-
-    if (still) {
-      // Without motion: jump straight to the satellite and the scrolled
-      // layout, and redraw once a second as the satellite moves.
-      const jump = () => {
-        rise.x = scrollProgress();
-        const s = satRef.current;
-        if (s) {
-          view.lon.x = s.lon - shiftAt(smooth(rise.x));
-          view.lat.x = s.lat - liftAt(smooth(rise.x));
-        }
-        draw();
-      };
-      const timer = setInterval(jump, 1000);
-      window.addEventListener("scroll", jump, { passive: true });
-      window.addEventListener("resize", onResize);
-      return () => {
-        cancelled = true;
-        clearInterval(timer);
-        window.removeEventListener("scroll", jump);
-        window.removeEventListener("resize", onResize);
-      };
-    }
-
-    frame = requestAnimationFrame(render);
+    window.addEventListener("scroll", wake, { passive: true });
+    window.addEventListener("resize", resize);
     window.addEventListener("pointermove", onMove, { passive: true });
-    window.addEventListener("resize", onResize);
+    window.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
     return () => {
       cancelled = true;
       cancelAnimationFrame(frame);
+      wakeRef.current = () => {};
+      document.documentElement.style.cursor = "";
+      window.removeEventListener("scroll", wake);
+      window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
     };
   }, []);
 

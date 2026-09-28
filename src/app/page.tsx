@@ -281,84 +281,87 @@ export default async function Home() {
   const tle = await framsatTle();
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-24 sm:px-8 sm:py-40">
-      <header className="flex flex-col items-center text-center">
-        <Image
-          src="/freider.jpg"
-          alt="Freider Fløan"
-          width={128}
-          height={128}
-          priority
-          data-launch
-          className="size-32 rounded-full object-cover"
-        />
-        <h1 className={`${display.className} mt-8 text-3xl sm:text-4xl`}>
-          Freider Fløan
-        </h1>
-        <p className="mt-3 text-zinc-300">
-          I like starting things, mostly about space.
-        </p>
-        <nav className="mt-6 flex gap-6 text-sm">
-          {links.map((link) => (
-            <a key={link.href} href={link.href} className={linkClass}>
-              {link.label}
-            </a>
-          ))}
-        </nav>
-      </header>
+    <>
+      <main className="mx-auto w-full max-w-3xl px-6 pt-24 sm:px-8 sm:pt-40">
+        <header className="flex flex-col items-center text-center">
+          <Image
+            src="/freider.jpg"
+            alt="Freider Fløan"
+            width={128}
+            height={128}
+            priority
+            data-launch
+            className="size-32 rounded-full object-cover"
+          />
+          <h1 className={`${display.className} mt-8 text-3xl sm:text-4xl`}>
+            Freider Fløan
+          </h1>
+          <p className="mt-3 text-zinc-300">
+            I like starting things, mostly about space.
+          </p>
+          <nav className="mt-6 flex gap-6 text-sm">
+            {links.map((link) => (
+              <a key={link.href} href={link.href} className={linkClass}>
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </header>
 
-      <section className="mt-32 sm:mt-40">
-        <ParallelChart />
-      </section>
+        <section className="mt-32 sm:mt-40">
+          <ParallelChart />
+        </section>
 
-      <ol className="mt-32 space-y-12 sm:mt-40">
-        {timeline.map((entry) => (
-          <li key={entry.org} className="grid gap-x-6 sm:grid-cols-[7rem_1fr]">
-            <p className="font-mono text-xs leading-6 text-zinc-400">
-              {period(entry)}
-            </p>
-            <div>
-              <h2 className="font-medium">
-                {entry.href ? (
-                  <a href={entry.href} className={linkClass}>
-                    {entry.org}
-                  </a>
-                ) : (
-                  entry.org
-                )}
-              </h2>
-              <p className="text-sm text-zinc-200">
-                {entry.role}
+        <ol className="mt-32 space-y-12 sm:mt-40">
+          {timeline.map((entry) => (
+            <li key={entry.org} className="grid gap-x-6 sm:grid-cols-[7rem_1fr]">
+              <p className="font-mono text-xs leading-6 text-zinc-400">
+                {period(entry)}
               </p>
-              {entry.description && (
-                <p className="mt-2 text-sm leading-relaxed text-zinc-300">
-                  {entry.description}
+              <div>
+                <h2 className="font-medium">
+                  {entry.href ? (
+                    <a href={entry.href} className={linkClass}>
+                      {entry.org}
+                    </a>
+                  ) : (
+                    entry.org
+                  )}
+                </h2>
+                <p className="text-sm text-zinc-200">
+                  {entry.role}
                 </p>
-              )}
-              {entry.org === "Spacepodden" && <SpotifyPlayer />}
-            </div>
-          </li>
-        ))}
-      </ol>
-
-      <section className="mt-32 border-t border-zinc-200 pt-12 text-sm sm:mt-40 dark:border-zinc-800">
-        <h2 className="font-medium">Education</h2>
-        <ul className="mt-4 space-y-2 text-zinc-300">
-          {education.map((degree) => (
-            <li key={degree}>{degree}. Finishing soon ish.</li>
+                {entry.description && (
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-300">
+                    {entry.description}
+                  </p>
+                )}
+                {entry.org === "Spacepodden" && <SpotifyPlayer />}
+              </div>
+            </li>
           ))}
-        </ul>
-      </section>
+        </ol>
+
+        <section className="mt-32 border-t border-zinc-200 pt-12 text-sm sm:mt-40 dark:border-zinc-800">
+          <h2 className="font-medium">Education</h2>
+          <ul className="mt-4 space-y-2 text-zinc-300">
+            {education.map((degree) => (
+              <li key={degree}>{degree}. Finishing soon ish.</li>
+            ))}
+          </ul>
+        </section>
+
+      </main>
 
       <FramsatSection tle={tle} />
 
-      <footer className="mt-24 space-y-4">
+      <footer className="mx-auto w-full max-w-3xl px-6 pb-12 sm:px-8">
         <p className="text-xs text-zinc-500">
           Privacy: this site sets no cookies. Visits are counted anonymously
           with Vercel Web Analytics. The Spotify player only loads if you
           press play.
         </p>
       </footer>
-    </main>
+    </>
   );
 }
