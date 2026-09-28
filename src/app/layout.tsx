@@ -15,8 +15,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const description =
-  "Co-founder and President of NORSTEC. Host of Spacepodden. Building for the Norwegian space ecosystem.";
+const description = "I like starting things, mostly about space.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://freider.space"),
