@@ -173,8 +173,8 @@ body {
   position: absolute;
   left: 0;
   top: 0;
-  width: 26vmax;
-  height: 26vmax;
+  width: 13vmax;
+  height: 13vmax;
   mix-blend-mode: var(--trail-blend);
   opacity: 0;
   transition: opacity 1200ms;
@@ -182,13 +182,13 @@ body {
 }
 
 .orb.is-active {
-  opacity: 1;
+  opacity: 0.55;
 }
 
 .orb-shape {
   position: absolute;
   inset: 0;
-  filter: blur(36px);
+  filter: blur(24px);
   animation:
     morph 14s ease-in-out infinite alternate,
     hue 22s linear infinite alternate;
@@ -221,7 +221,7 @@ body {
 
 @keyframes hue {
   to {
-    filter: blur(36px) hue-rotate(70deg);
+    filter: blur(24px) hue-rotate(70deg);
   }
 }
 

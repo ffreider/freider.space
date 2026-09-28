@@ -73,7 +73,7 @@ export function Backdrop() {
           const b = trailBodies[i];
           const lead = i === 0 ? pointer : trailBodies[i - 1];
           if (step(b, lead.x, lead.y, t.stiffness, t.damping)) moving = true;
-          const swell = 1 + Math.min(Math.hypot(b.vx, b.vy) / 60, 0.3);
+          const swell = 1 + Math.min(Math.hypot(b.vx, b.vy) / 80, 0.15);
           const el = trailEls.current[i];
           if (el) {
             el.style.transform = `translate3d(${b.x}px, ${b.y}px, 0) translate(-50%, -50%) scale(${swell})`;
