@@ -12,7 +12,7 @@
   --fg: #16202a;
   --fg-2: #2a3642;
   --fg-3: #56626e;
-  --fg-4: #7e8a95;
+  --fg-4: #5f6b76; /* the faintest text that still passes WCAG AA (4.6:1) */
   --line: #c3cdd5;
   --surface: rgb(231 237 241 / 0.94);
   --accent: #d42a3c;

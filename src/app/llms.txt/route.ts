@@ -33,7 +33,7 @@ Personal website: https://freider.space (English), https://freider.space/no (Nor
 
 ## FramSat-1
 
-FramSat-1 is a student satellite from Orbit NTNU, launched on 5 September 2026 (NORAD catalogue number 98914). The website tracks it live on a globe, computed from its orbital elements with the SGP4 model, and shows upcoming passes over Trondheim and recent receptions by SatNOGS ground stations. https://orbitntnu.com/projects/FramSat-1
+FramSat-1 is a student satellite from Orbit NTNU, launched on 5 September 2026 (NORAD catalogue number 98914). It orbits every 95.8 minutes, 516 to 596 km up, in a polar orbit inclined 97.4°, with a downlink on 435.141 MHz. The website has a live tracker at https://freider.space/framsat (Norwegian: https://freider.space/no/framsat): its position on a globe computed from its orbital elements with the SGP4 model, upcoming passes over Trondheim, Doppler shift, recent receptions by SatNOGS ground stations and the annotated TLE. Project page: https://orbitntnu.com/projects/FramSat-1
 
 ## Press
 

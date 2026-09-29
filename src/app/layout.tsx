@@ -8,10 +8,13 @@ import { LaunchEasterEgg } from "./launch";
 import "./globals.css";
 
 const schibsted = Schibsted_Grotesk({ variable: "--font-schibsted", subsets: ["latin"] });
+// The monospace font is only used below the fold (dates, data), so it isn't
+// preloaded: that keeps it from competing with the photo on first load.
 const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: "400",
+  preload: false,
 });
 
 // What search results show (title and description) is descriptive; link
@@ -32,7 +35,7 @@ export const metadata: Metadata = {
     locale: "en_GB",
   },
   twitter: { card: "summary_large_image", title: "Freider Fløan", description: tagline },
-  alternates: { canonical: "/", languages: { en: "/", nb: "/no" } },
+  alternates: { canonical: "/", languages: { en: "/", nb: "/no", "x-default": "/" } },
   // Ownership checks for search engines' webmaster tools.
   verification: { other: { "msvalidate.01": "5A909B27A73DEDBB10036542303E740A" } },
 };

@@ -1,10 +1,14 @@
 import type { MetadataRoute } from "next";
 
-// Both language versions, each pointing at the other.
+// Each page in both languages, pointing at its other-language version.
 export default function sitemap(): MetadataRoute.Sitemap {
-  const languages = { en: "https://freider.space", nb: "https://freider.space/no" };
+  const site = "https://freider.space";
+  const home = { en: site, nb: `${site}/no` };
+  const framsat = { en: `${site}/framsat`, nb: `${site}/no/framsat` };
   return [
-    { url: languages.en, changeFrequency: "monthly", priority: 1, alternates: { languages } },
-    { url: languages.nb, changeFrequency: "monthly", priority: 0.9, alternates: { languages } },
+    { url: home.en, changeFrequency: "monthly", priority: 1, alternates: { languages: home } },
+    { url: home.nb, changeFrequency: "monthly", priority: 0.9, alternates: { languages: home } },
+    { url: framsat.en, changeFrequency: "daily", priority: 0.8, alternates: { languages: framsat } },
+    { url: framsat.nb, changeFrequency: "daily", priority: 0.7, alternates: { languages: framsat } },
   ];
 }

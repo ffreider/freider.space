@@ -54,6 +54,9 @@ const T = {
   en: {
     introBefore: "A student satellite I worked on at ",
     introAfter: ", launched on 5 September 2026.",
+    facts: (period: string, low: string, high: string, incl: string) =>
+      `It circles the Earth every ${period} minutes, ${low} to ${high} km up, in a polar orbit inclined ${incl}°. NORAD catalogue number 98914, downlink 435.141 MHz.`,
+    fullTracker: "Open the full tracker",
     footnote:
       "Everything here is computed in your browser from FramSat-1’s orbital elements with the SGP4 model. Drag the globe to spin it, or move the slider to travel in time.",
     now: "Live",
@@ -135,6 +138,9 @@ const T = {
   no: {
     introBefore: "En studentsatellitt jeg jobbet med i ",
     introAfter: ", skutt opp 5. september 2026.",
+    facts: (period: string, low: string, high: string, incl: string) =>
+      `Den går én runde rundt jorda på ${period} minutter, ${low} til ${high} km over bakken, i en polar bane med ${incl}° inklinasjon. NORAD-katalognummer 98914, nedlink 435,141 MHz.`,
+    fullTracker: "Åpne hele sporingen",
     footnote:
       "Alt her beregnes i nettleseren din fra baneelementene til FramSat-1 med SGP4-modellen. Dra i jordkloden for å snurre den, eller flytt glidebryteren for å reise i tid.",
     now: "Direkte",
@@ -781,10 +787,14 @@ export function FramsatSection({
   tle,
   receptions,
   lang,
+  standalone = false,
 }: {
   tle: Tle;
   receptions: Reception[];
   lang: Lang;
+  // On its own page (/framsat) the name is the page's main heading, and
+  // there's no link to the full tracker.
+  standalone?: boolean;
 }) {
   const satrec = useMemo(() => twoline2satrec(tle.line1, tle.line2), [tle]);
   const facts = useMemo(() => orbitFacts(satrec, tle.line2), [satrec, tle]);
@@ -794,12 +804,23 @@ export function FramsatSection({
   const [tab, setTab] = useState<TabId>("overview");
   const t: Text = f.t;
 
-  // Upcoming passes, recomputed every 5 simulated minutes.
+  // Upcoming passes, recomputed every 5 simulated minutes. The search is
+  // thousands of orbit calculations, so it runs when the browser is idle
+  // (never while the page is loading), and it only looks for the next pass
+  // until the Passes tab is opened.
   const bucket = tick ? Math.floor(tick.time / 300_000) : null;
-  const passes = useMemo(
-    () => (bucket === null ? [] : upcomingPasses(satrec, new Date(bucket * 300_000), 6)),
-    [satrec, bucket],
-  );
+  const wanted = tab === "passes" ? 6 : 1;
+  const [passes, setPasses] = useState<Pass[]>([]);
+  useEffect(() => {
+    if (bucket === null) return;
+    const run = () => setPasses(upcomingPasses(satrec, new Date(bucket * 300_000), wanted));
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(run, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(run, 300);
+    return () => clearTimeout(id);
+  }, [satrec, bucket, wanted]);
   const ahead = tick ? passes.filter((p) => p.end.getTime() >= tick.time) : [];
 
   return (
@@ -808,7 +829,11 @@ export function FramsatSection({
       className="relative flex min-h-screen w-full flex-col justify-end px-6 pb-16 pt-[calc(88vmin+72px)] sm:px-8 lg:flex-row lg:items-center lg:justify-end lg:py-16 lg:pr-16"
     >
       <aside className="w-full max-w-md border-t-2 border-fg bg-surface px-6 pb-6 pt-5 lg:w-[440px] lg:max-w-none">
-        <h2 className="display text-4xl">FramSat-1</h2>
+        {standalone ? (
+          <h1 className="display text-4xl">FramSat-1</h1>
+        ) : (
+          <h2 className="display text-4xl">FramSat-1</h2>
+        )}
         <p className="mt-2 text-sm leading-relaxed text-fg-2">
           {t.introBefore}
           <a href="https://orbitntnu.com/projects/FramSat-1" className={linkClass}>
@@ -816,6 +841,24 @@ export function FramsatSection({
           </a>
           {t.introAfter}
         </p>
+        {/* Rendered on the server from the TLE, so crawlers that don't run
+            JavaScript still get the facts. */}
+        <p className="mt-2 text-sm leading-relaxed text-fg-3">
+          {t.facts(
+            f.fixed(facts.periodMinutes, 1),
+            f.whole(facts.perigeeKm),
+            f.whole(facts.apogeeKm),
+            f.fixed(facts.inclination, 1),
+          )}
+        </p>
+        {!standalone && (
+          <a
+            href={lang === "no" ? "/no/framsat" : "/framsat"}
+            className={`mt-2 inline-block text-sm text-fg-2 ${linkClass}`}
+          >
+            {t.fullTracker}
+          </a>
+        )}
 
         {tick && <TimeControls tick={tick} speed={speed} f={f} />}
 

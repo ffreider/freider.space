@@ -146,6 +146,7 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
     let dpr = 1;
     let frame = 0;
     let cancelled = false;
+    let placed = false;
 
     const stage = () => document.getElementById("framsat");
 
@@ -316,7 +317,11 @@ export function Backdrop({ tle, stations }: { tle: Tle; stations: Reception[] })
       if (!s || drag.active || performance.now() < drag.until) return moving;
       const lon = view.lon.x + lonDelta(view.lon.x, s.lon);
       const lat = s.lat - liftAt(globe.open);
-      if (still) {
+      // Start pointed at the satellite rather than swinging over to it: an
+      // opening animation would redraw the map for ~100 frames while the
+      // page is still loading.
+      if (still || !placed) {
+        placed = true;
         view.lon.x = lon;
         view.lat.x = lat;
         return moving;

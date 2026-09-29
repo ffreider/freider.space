@@ -131,9 +131,10 @@ const timeline: Entry[] = [
   },
 ];
 
-const TEXT = {
+export const TEXT = {
   en: {
     tagline: "I like starting things, mostly about space.",
+    experience: "Experience",
     bio: "I’m Freider Fløan, a student of electronic systems design and space systems at NTNU in Trondheim, Norway. I co-founded NORSTEC, the Norwegian Space Technology Collective, and lead it as President. I also host the podcast Spacepodden, chair NASA HUNCH Norge and co-founded Meso Manufacturing.",
     otherLanguage: { label: "Norsk", href: "/no", lang: "nb" },
     chartAria: "Timeline of roles running in parallel",
@@ -156,6 +157,7 @@ const TEXT = {
   },
   no: {
     tagline: "Jeg liker å starte ting, mest innen romfart.",
+    experience: "Erfaring",
     bio: "Jeg heter Freider Fløan og studerer elektronisk systemdesign med fordypning i romsystemer ved NTNU i Trondheim. Jeg er medgründer og president i NORSTEC, Norwegian Space Technology Collective. I tillegg er jeg programleder for podkasten Spacepodden, styreleder i NASA HUNCH Norge og medgründer av Meso Manufacturing.",
     otherLanguage: { label: "English", href: "/", lang: "en" },
     chartAria: "Tidslinje over roller som går parallelt",
@@ -398,6 +400,7 @@ export async function Home({ lang }: { lang: Lang }) {
             width={480}
             height={480}
             priority
+            sizes="(min-width: 768px) 360px, 100vw"
             data-launch
             className="hero-photo"
           />
@@ -422,12 +425,13 @@ export async function Home({ lang }: { lang: Lang }) {
           <ParallelChart lang={lang} />
         </section>
 
-        <ol className="mt-32 space-y-12 sm:mt-40">
+        <h2 className="display mt-32 text-lg sm:mt-40">{t.experience}</h2>
+        <ol className="mt-10 space-y-12">
           {timeline.map((entry) => (
             <li key={entry.org.en} className="grid gap-x-6 sm:grid-cols-[7rem_1fr]">
               <p className="font-mono text-xs leading-6 text-fg-3">{period(entry, lang)}</p>
               <div>
-                <h2 className="font-medium">
+                <h3 className="font-medium">
                   {entry.href ? (
                     <a href={entry.href} className={linkClass}>
                       {entry.org[lang]}
@@ -435,7 +439,7 @@ export async function Home({ lang }: { lang: Lang }) {
                   ) : (
                     entry.org[lang]
                   )}
-                </h2>
+                </h3>
                 <p className="text-sm text-fg-2">{entry.role[lang]}</p>
                 {entry.description && (
                   <p className="mt-2 text-sm leading-relaxed text-fg-2">{entry.description[lang]}</p>
@@ -457,6 +461,7 @@ export async function Home({ lang }: { lang: Lang }) {
               alt={t.articleAlt}
               width={1200}
               height={630}
+              sizes="(min-width: 768px) 720px, 100vw"
               className="aspect-[1200/630] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
             />
             <div className="p-6">
