@@ -24,15 +24,11 @@ const same = (text: string): L => ({ en: text, no: text });
 // Newest first. Months are approximate where the exact month isn't known.
 const timeline: Entry[] = [
   {
-    start: [2025, 11],
+    start: [2026, 1],
     org: same("Meso Manufacturing"),
     href: "https://www.mesomanufacturing.com/",
     short: same("Meso"),
-    role: { en: "Co-founder", no: "Medgründer" },
-    description: {
-      en: "Working on large-scale 3D printing of high-performance composite parts.",
-      no: "Jobber med storskala 3D-printing av komposittdeler med høy ytelse.",
-    },
+    role: { en: "Working on a new startup", no: "Jobber med et nytt oppstartsselskap" },
   },
   {
     start: [2025, 8],
@@ -135,7 +131,7 @@ export const TEXT = {
   en: {
     tagline: "I like starting things, mostly about space.",
     experience: "Experience",
-    bio: "I’m Freider Fløan, a student of electronic systems design and space systems at NTNU in Trondheim, Norway. I co-founded NORSTEC, the Norwegian Space Technology Collective, and lead it as President. I also host the podcast Spacepodden, chair NASA HUNCH Norge and co-founded Meso Manufacturing.",
+    bio: "I’m Freider Fløan, a student of electronic systems design and space systems at NTNU in Trondheim, Norway. I co-founded NORSTEC, the Norwegian Space Technology Collective, and lead it as President. I also host the podcast Spacepodden and chair NASA HUNCH Norge, and I’m working on a new startup, Meso Manufacturing.",
     otherLanguage: { label: "Norsk", href: "/no", lang: "nb" },
     chartAria: "Timeline of roles running in parallel",
     now: "now",
@@ -158,7 +154,7 @@ export const TEXT = {
   no: {
     tagline: "Jeg liker å starte ting, mest innen romfart.",
     experience: "Erfaring",
-    bio: "Jeg heter Freider Fløan og studerer elektronisk systemdesign med fordypning i romsystemer ved NTNU i Trondheim. Jeg er medgründer og president i NORSTEC, Norwegian Space Technology Collective. I tillegg er jeg programleder for podkasten Spacepodden, styreleder i NASA HUNCH Norge og medgründer av Meso Manufacturing.",
+    bio: "Jeg heter Freider Fløan og studerer elektronisk systemdesign med fordypning i romsystemer ved NTNU i Trondheim. Jeg er medgründer og president i NORSTEC, Norwegian Space Technology Collective. I tillegg er jeg programleder for podkasten Spacepodden og styreleder i NASA HUNCH Norge, og jeg jobber med et nytt oppstartsselskap, Meso Manufacturing.",
     otherLanguage: { label: "English", href: "/", lang: "en" },
     chartAria: "Tidslinje over roller som går parallelt",
     now: "nå",

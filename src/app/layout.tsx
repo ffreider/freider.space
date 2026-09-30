@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://freider.space"),
   title: "Freider Fløan | Space, NORSTEC and Spacepodden",
   description:
-    "Freider Fløan studies electronic systems design and space systems at NTNU in Trondheim, co-founded and leads NORSTEC, and hosts the Norwegian space podcast Spacepodden.",
+    "Freider Fløan: co-founder and President of NORSTEC, host of the space podcast Spacepodden and space systems student at NTNU. Follow FramSat-1 live.",
   openGraph: {
     title: "Freider Fløan",
     description: tagline,

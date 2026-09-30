@@ -15,7 +15,7 @@ Personal website: https://freider.space (English), https://freider.space/no (Nor
 - NORSTEC Summit, co-founder and chair, since September 2024. Norway's annual space conference, first held in March 2026 in Trondheim. https://norstec.no/summit
 - Spacepodden, host, since October 2024. A weekly Norwegian-language podcast about space. https://open.spotify.com/show/7ofO8qm8tRBk2llQEMK8JB
 - NASA HUNCH Norge, chair of the board, since August 2025. https://nasahunch.no
-- Meso Manufacturing, co-founder, since November 2025. Large-scale 3D printing of high-performance composite parts. https://www.mesomanufacturing.com/
+- Meso Manufacturing, since 2026: working on this new startup. https://www.mesomanufacturing.com/
 - Tekna Romfart, board member, since March 2024.
 
 ## Earlier experience
