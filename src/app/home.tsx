@@ -9,129 +9,162 @@ import type { L, Lang } from "./i18n";
 
 type YearMonth = [year: number, month: number];
 
-type Entry = {
+type Role = {
   start: YearMonth;
+  title: L;
+  note?: L;
+};
+
+type Entry = {
   end?: YearMonth; // omitted = ongoing
   org: L;
   short?: L; // label in the chart, when the full name is too long
   href?: string;
-  role: L;
   description?: L;
+  // Newest first. Each role runs until the next one starts, and the last
+  // until the entry's end.
+  roles: Role[];
 };
 
 const same = (text: string): L => ({ en: text, no: text });
 
-// Newest first. Months are approximate where the exact month isn't known.
+// Newest first, by when the first role started. Months are approximate where
+// the exact month isn't known.
 const timeline: Entry[] = [
   {
-    start: [2026, 1],
     org: same("Meso Manufacturing"),
     href: "https://www.mesomanufacturing.com/",
     short: same("Meso"),
-    role: { en: "Working on a new startup", no: "Jobber med et nytt oppstartsselskap" },
+    roles: [{ start: [2026, 1], title: { en: "Working on a new startup", no: "Jobber med et nytt oppstartsselskap" } }],
   },
   {
-    start: [2025, 8],
     org: same("NASA HUNCH Norge"),
     short: same("NASA HUNCH"),
     href: "https://nasahunch.no",
-    role: { en: "Chair of the board", no: "Styreleder" },
+    roles: [{ start: [2025, 8], title: { en: "Chair of the board", no: "Styreleder" } }],
   },
   {
-    start: [2024, 10],
     org: same("Spacepodden"),
     href: "https://open.spotify.com/show/7ofO8qm8tRBk2llQEMK8JB",
-    role: { en: "Host", no: "Programleder" },
     description: {
       en: "A weekly Norwegian-language podcast about space.",
       no: "En ukentlig norskspråklig podkast om verdensrommet.",
     },
+    roles: [{ start: [2024, 10], title: { en: "Host", no: "Programleder" } }],
   },
   {
-    start: [2024, 9],
     org: same("NORSTEC Summit"),
     short: same("Summit"),
     href: "https://norstec.no/summit",
-    role: { en: "Co-founder and chair", no: "Medgründer og styreleder" },
     description: {
       en: "Norway's annual space conference. First held March 2026 in Trondheim.",
       no: "Norges årlige romfartskonferanse. Arrangert første gang i mars 2026 i Trondheim.",
     },
+    roles: [{ start: [2024, 9], title: { en: "Co-founder and chair", no: "Medgründer og styreleder" } }],
   },
   {
-    start: [2024, 3],
     org: same("Tekna Romfart"),
     href: "https://www.tekna.no/fag-og-nettverk/samferdsel-og-infrastruktur/tekna-romfart/",
-    role: { en: "Board member", no: "Styremedlem" },
+    roles: [{ start: [2024, 3], title: { en: "Board member", no: "Styremedlem" } }],
   },
   {
-    start: [2024, 2],
     org: same("NORSTEC"),
     href: "https://norstec.no",
-    role: { en: "Co-founder and President", no: "Medgründer og president" },
     description: {
       en: "The Norwegian Space Technology Collective, an umbrella organization for 10 student space and rocketry organizations with 550+ members.",
       no: "Norwegian Space Technology Collective, en paraplyorganisasjon for 10 studentorganisasjoner innen romfart og rakett, med over 550 medlemmer.",
     },
+    roles: [
+      { start: [2026, 9], title: { en: "Board member", no: "Styremedlem" } },
+      { start: [2023, 10], title: { en: "Co-founder and President", no: "Medgründer og president" } },
+    ],
   },
   {
-    start: [2023, 10],
     end: [2024, 8],
     org: same("Kongsberg Defence & Aerospace"),
     href: "https://www.kongsberg.com/what-we-do/space/",
     short: same("Kongsberg"),
-    role: { en: "Project liaison, then summer intern", no: "Prosjektkontakt, deretter sommerpraktikant" },
+    roles: [
+      { start: [2024, 6], title: { en: "Summer intern, Oslo", no: "Sommerpraktikant, Oslo" } },
+      {
+        start: [2023, 10],
+        title: { en: "Project liaison", no: "Prosjektkontakt" },
+        note: {
+          en: "Part-time, on a three-year student satellite project.",
+          no: "Deltid, i et treårig studentsatellittprosjekt.",
+        },
+      },
+    ],
   },
   {
-    start: [2023, 6],
     end: [2023, 8],
     org: same("KSAT"),
     href: "https://www.ksat.no/",
-    role: { en: "Summer intern, Tromsø", no: "Sommerpraktikant, Tromsø" },
     description: {
       en: "Satellite communication and orbital mechanics.",
       no: "Satellittkommunikasjon og banemekanikk.",
     },
+    roles: [{ start: [2023, 6], title: { en: "Summer intern, Tromsø", no: "Sommerpraktikant, Tromsø" } }],
   },
   {
-    start: [2022, 6],
     end: [2022, 8],
     org: same("NTNU"),
     short: { en: "NTNU intern", no: "NTNU-praktikant" },
-    role: { en: "Satellite operations intern", no: "Praktikant i satellittoperasjoner" },
+    roles: [{ start: [2022, 6], title: { en: "Satellite operations intern", no: "Praktikant i satellittoperasjoner" } }],
   },
   {
-    start: [2021, 8],
     end: [2026, 5],
     org: same("Orbit NTNU"),
     href: "https://orbitntnu.com/",
-    role: {
-      en: "Program director, project manager and head of finance",
-      no: "Programdirektør, prosjektleder og økonomiansvarlig",
-    },
     description: {
-      en: "Led the student satellite program: SelfieSat, FramSat-1/1.5 and BioSat.",
-      no: "Ledet studentsatellittprogrammet: SelfieSat, FramSat-1/1.5 og BioSat.",
+      en: "The student satellite program behind SelfieSat, FramSat-1/1.5 and BioSat.",
+      no: "Studentsatellittprogrammet bak SelfieSat, FramSat-1/1.5 og BioSat.",
     },
+    roles: [
+      {
+        start: [2025, 9],
+        title: { en: "Financial controller", no: "Økonomiansvarlig" },
+        note: { en: "Finances and launch procurement.", no: "Økonomi og innkjøp av oppskytning." },
+      },
+      {
+        start: [2024, 4],
+        title: { en: "Program director, satellites", no: "Programdirektør for satellitter" },
+        note: {
+          en: "All four satellite projects: SelfieSat, FramSat-1, FramSat-1.5 and BioSat.",
+          no: "Alle fire satellittprosjektene: SelfieSat, FramSat-1, FramSat-1.5 og BioSat.",
+        },
+      },
+      {
+        start: [2022, 5],
+        title: { en: "Project manager, BioSat", no: "Prosjektleder, BioSat" },
+        note: { en: "From phase 0 to phase C.", no: "Fra fase 0 til fase C." },
+      },
+      {
+        start: [2021, 8],
+        title: { en: "Electronics, SubOrbital", no: "Elektronikk, SubOrbital" },
+        note: { en: "Circuit board design.", no: "Kretskortdesign." },
+      },
+    ],
   },
   {
-    start: [2019, 7],
     end: [2020, 6],
     org: { en: "Norwegian Armed Forces", no: "Forsvaret" },
     short: { en: "Military service", no: "Førstegangstjeneste" },
-    role: { en: "Smoke diver and team leader", no: "Røykdykker og lagfører" },
     description: {
       en: "NATO Joint Warfare Centre. Led a team of eight smoke divers.",
       no: "NATOs Joint Warfare Centre. Ledet et lag på åtte røykdykkere.",
     },
+    roles: [{ start: [2019, 7], title: { en: "Smoke diver and team leader", no: "Røykdykker og lagfører" } }],
   },
 ];
+
+const startOf = (entry: Entry) => entry.roles[entry.roles.length - 1].start;
 
 export const TEXT = {
   en: {
     tagline: "I like starting things, mostly about space.",
     experience: "Experience",
-    bio: "I’m Freider Fløan, a student of electronic systems design and space systems at NTNU in Trondheim, Norway. I co-founded NORSTEC, the Norwegian Space Technology Collective, and lead it as President. I also host the podcast Spacepodden and chair NASA HUNCH Norge, and I’m working on a new startup, Meso Manufacturing.",
+    bio: "I’m Freider Fløan, a student of electronic systems design and space systems at NTNU in Trondheim, Norway. I co-founded NORSTEC, the Norwegian Space Technology Collective, led it as President for three years and now sit on its board. I also host the podcast Spacepodden and chair NASA HUNCH Norge, and I’m working on a new startup, Meso Manufacturing.",
     otherLanguage: { label: "Norsk", href: "/no", lang: "nb" },
     chartAria: "Timeline of roles running in parallel",
     now: "now",
@@ -154,7 +187,7 @@ export const TEXT = {
   no: {
     tagline: "Jeg liker å starte ting, mest innen romfart.",
     experience: "Erfaring",
-    bio: "Jeg heter Freider Fløan og studerer elektronisk systemdesign med fordypning i romsystemer ved NTNU i Trondheim. Jeg er medgründer og president i NORSTEC, Norwegian Space Technology Collective. I tillegg er jeg programleder for podkasten Spacepodden og styreleder i NASA HUNCH Norge, og jeg jobber med et nytt oppstartsselskap, Meso Manufacturing.",
+    bio: "Jeg heter Freider Fløan og studerer elektronisk systemdesign med fordypning i romsystemer ved NTNU i Trondheim. Jeg er medgründer av NORSTEC, Norwegian Space Technology Collective, som jeg ledet som president i tre år, og sitter nå i styret. I tillegg er jeg programleder for podkasten Spacepodden og styreleder i NASA HUNCH Norge, og jeg jobber med et nytt oppstartsselskap, Meso Manufacturing.",
     otherLanguage: { label: "English", href: "/", lang: "en" },
     chartAria: "Tidslinje over roller som går parallelt",
     now: "nå",
@@ -194,7 +227,7 @@ function structuredData(lang: Lang) {
       url: site,
       image: `${site}/freider.jpg`,
       description: TEXT[lang].bio,
-      jobTitle: lang === "no" ? "President i NORSTEC" : "President of NORSTEC",
+      jobTitle: lang === "no" ? "Medgründer av NORSTEC" : "Co-founder of NORSTEC",
       nationality: { "@type": "Country", name: "Norway" },
       homeLocation: { "@type": "Place", name: "Trondheim, Norway" },
       affiliation: [
@@ -244,12 +277,28 @@ const now = today.getFullYear() + today.getMonth() / 12;
 // Position on the chart as a percentage of its width.
 const pct = (t: number) => ((t - FIRST_YEAR) / (LAST_YEAR - FIRST_YEAR)) * 100;
 
-const period = ({ start, end }: Entry, lang: Lang) =>
+const period = (start: YearMonth, end: YearMonth | undefined, lang: Lang) =>
   end
     ? start[0] === end[0]
       ? `${start[0]}`
       : `${start[0]}-${end[0]}`
     : `${start[0]}-${TEXT[lang].now}`;
+
+// Each role with the stretch of time it covers, newest first. A role ends
+// where the next one starts.
+function spans(entry: Entry) {
+  return entry.roles.map((role, i) => {
+    const newer = entry.roles[i - 1];
+    return {
+      role,
+      end: newer ? newer.start : entry.end,
+      from: toYears(role.start),
+      to: newer ? toYears(newer.start) : entry.end ? toYears(entry.end) + 1 / 12 : now,
+      current: i === 0 && !entry.end,
+      first: i === entry.roles.length - 1,
+    };
+  });
+}
 
 // The bar colour (--bar, set per design study) is mapped to time across the
 // whole chart, so with a gradient every bar shows the slice that matches the
@@ -266,7 +315,10 @@ function barSlice(left: number, width: number) {
 
 const linkClass = "underline decoration-fg-4 underline-offset-4 hover:decoration-accent";
 
-// Every role as a line on a shared time axis, so overlaps are visible at a glance.
+// Every organization as a line on a shared time axis, so overlaps are visible
+// at a glance. A line with several roles is split into segments, with a tick
+// where one role hands over to the next, and only the current role at full
+// strength.
 function ParallelChart({ lang }: { lang: Lang }) {
   const nowPct = pct(now);
 
@@ -296,10 +348,10 @@ function ParallelChart({ lang }: { lang: Lang }) {
 
       <ol className="chart-rows relative">
         {timeline.map((entry, i) => {
-          const left = pct(toYears(entry.start));
+          const segments = spans(entry);
+          const left = pct(toYears(startOf(entry)));
           const ongoing = !entry.end;
-          const right = ongoing ? nowPct : pct(toYears(entry.end!) + 1 / 12);
-          const width = Math.max(right - left, 0.8);
+          const right = pct(segments[0].to);
           // Put the label on whichever side of the line has more room.
           const labelBefore = left > 100 - right;
 
@@ -309,21 +361,43 @@ function ParallelChart({ lang }: { lang: Lang }) {
               tabIndex={0}
               className="group relative h-8 cursor-default outline-none hover:z-10 focus:z-10"
             >
-              <span
-                className={`absolute top-1/2 h-[3px] -translate-y-1/2 origin-left motion-safe:animate-[draw_1.4s_cubic-bezier(0.2,0.7,0.2,1)_both] ${
-                  ongoing ? "" : "opacity-[var(--bar-past)] transition-opacity group-hover:opacity-100 group-focus:opacity-100"
-                }`}
-                style={{
-                  left: `${left}%`,
-                  width: `${width}%`,
-                  animationDelay: `${(timeline.length - i) * 60}ms`,
-                  ...barSlice(left, width),
-                }}
-              />
-              <span
-                className="absolute top-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-fg-4"
-                style={{ left: `${left}%` }}
-              />
+              {segments.map(({ role, from, to, current, first }) => {
+                const segLeft = pct(from);
+                const segWidth = Math.max(pct(to) - segLeft, 0.8);
+                return (
+                  <span
+                    key={role.title.en}
+                    className={`absolute top-1/2 h-[3px] -translate-y-1/2 origin-left motion-safe:animate-[draw_1.4s_cubic-bezier(0.2,0.7,0.2,1)_both] ${
+                      current
+                        ? ""
+                        : // An earlier role somewhere you still are fades less than a place you've left.
+                          `${ongoing ? "opacity-60" : "opacity-[var(--bar-past)]"} transition-opacity group-hover:opacity-100 group-focus:opacity-100`
+                    }`}
+                    style={{
+                      // A 3px gap before every role but the first marks the handover.
+                      left: first ? `${segLeft}%` : `calc(${segLeft}% + 3px)`,
+                      width: first ? `${segWidth}%` : `calc(${segWidth}% - 3px)`,
+                      animationDelay: `${(timeline.length - i) * 60}ms`,
+                      ...barSlice(segLeft, segWidth),
+                    }}
+                  />
+                );
+              })}
+              {segments.map(({ role, from, first }) =>
+                first ? (
+                  <span
+                    key={role.title.en}
+                    className="absolute top-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-fg-4"
+                    style={{ left: `${pct(from)}%` }}
+                  />
+                ) : (
+                  <span
+                    key={role.title.en}
+                    className="absolute top-1/2 h-2.5 w-px -translate-y-1/2 bg-fg-3"
+                    style={{ left: `calc(${pct(from)}% + 1px)` }}
+                  />
+                ),
+              )}
               {ongoing && (
                 <span
                   className="absolute top-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent"
@@ -352,9 +426,22 @@ function ParallelChart({ lang }: { lang: Lang }) {
                   } as React.CSSProperties
                 }
               >
-                <p className="font-mono text-[10px] text-fg-3">{period(entry, lang)}</p>
+                <p className="font-mono text-[10px] text-fg-3">{period(startOf(entry), entry.end, lang)}</p>
                 <p className="mt-0.5 text-sm font-medium">{entry.org[lang]}</p>
-                <p className="text-xs text-fg-2">{entry.role[lang]}</p>
+                {segments.length === 1 ? (
+                  <p className="text-xs text-fg-2">{entry.roles[0].title[lang]}</p>
+                ) : (
+                  <ul className="mt-1 space-y-0.5">
+                    {segments.map(({ role, end, current }) => (
+                      <li key={role.title.en} className="flex gap-2 text-xs">
+                        <span className="w-[4.5rem] shrink-0 font-mono text-[10px] leading-4 text-fg-3">
+                          {period(role.start, end, lang)}
+                        </span>
+                        <span className={current ? "text-fg" : "text-fg-2"}>{role.title[lang]}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 {entry.description && (
                   <p className="mt-1.5 text-xs leading-relaxed text-fg-2">{entry.description[lang]}</p>
                 )}
@@ -425,7 +512,7 @@ export async function Home({ lang }: { lang: Lang }) {
         <ol className="mt-10 space-y-12">
           {timeline.map((entry) => (
             <li key={entry.org.en} className="grid gap-x-6 sm:grid-cols-[7rem_1fr]">
-              <p className="font-mono text-xs leading-6 text-fg-3">{period(entry, lang)}</p>
+              <p className="font-mono text-xs leading-6 text-fg-3">{period(startOf(entry), entry.end, lang)}</p>
               <div>
                 <h3 className="font-medium">
                   {entry.href ? (
@@ -436,9 +523,28 @@ export async function Home({ lang }: { lang: Lang }) {
                     entry.org[lang]
                   )}
                 </h3>
-                <p className="text-sm text-fg-2">{entry.role[lang]}</p>
+                {entry.roles.length === 1 ? (
+                  <p className="text-sm text-fg-2">{entry.roles[0].title[lang]}</p>
+                ) : (
+                  // Several roles: a small rail, newest on top, the current role marked red.
+                  <ol className="mt-3 space-y-3 border-l border-line">
+                    {spans(entry).map(({ role, end, current }) => (
+                      <li key={role.title.en} className="relative pl-4">
+                        <span
+                          aria-hidden
+                          className={`absolute -left-[3.5px] top-[7px] size-1.5 rounded-full ${current ? "bg-accent" : "bg-fg-4"}`}
+                        />
+                        <p className="text-sm">
+                          <span className={current ? "text-fg" : "text-fg-2"}>{role.title[lang]}</span>
+                          <span className="ml-2 font-mono text-[11px] text-fg-3">{period(role.start, end, lang)}</span>
+                        </p>
+                        {role.note && <p className="text-xs leading-relaxed text-fg-3">{role.note[lang]}</p>}
+                      </li>
+                    ))}
+                  </ol>
+                )}
                 {entry.description && (
-                  <p className="mt-2 text-sm leading-relaxed text-fg-2">{entry.description[lang]}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-fg-2">{entry.description[lang]}</p>
                 )}
               </div>
             </li>

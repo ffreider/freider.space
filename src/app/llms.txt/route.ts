@@ -5,13 +5,13 @@ export const dynamic = "force-static";
 
 const text = `# Freider Fløan
 
-> Freider Fløan (also written Freider Floan) is a Norwegian student of electronic systems design and space systems at NTNU in Trondheim, co-founder and President of NORSTEC, and host of the space podcast Spacepodden.
+> Freider Fløan (also written Freider Floan) is a Norwegian student of electronic systems design and space systems at NTNU in Trondheim, co-founder and board member of NORSTEC, and host of the space podcast Spacepodden.
 
 Personal website: https://freider.space (English), https://freider.space/no (Norwegian)
 
 ## Current roles
 
-- NORSTEC (Norwegian Space Technology Collective), co-founder and President, since February 2024. An umbrella organization for 10 Norwegian student space and rocketry organizations with more than 550 members. https://norstec.no
+- NORSTEC (Norwegian Space Technology Collective), co-founder. President from October 2023 to September 2026, board member since September 2026. An umbrella organization for 10 Norwegian student space and rocketry organizations with more than 550 members. https://norstec.no
 - NORSTEC Summit, co-founder and chair, since September 2024. Norway's annual space conference, first held in March 2026 in Trondheim. https://norstec.no/summit
 - Spacepodden, host, since October 2024. A weekly Norwegian-language podcast about space. https://open.spotify.com/show/7ofO8qm8tRBk2llQEMK8JB
 - NASA HUNCH Norge, chair of the board, since August 2025. https://nasahunch.no
@@ -20,7 +20,7 @@ Personal website: https://freider.space (English), https://freider.space/no (Nor
 
 ## Earlier experience
 
-- Orbit NTNU, 2021 to 2026: program director for the student satellites SelfieSat, FramSat-1/1.5 and BioSat, project manager and head of finance. https://orbitntnu.com/
+- Orbit NTNU, 2021 to 2026, in four roles: SubOrbital electronics team (2021 to 2022), project manager for BioSat (2022 to 2024), program director for the satellites SelfieSat, FramSat-1, FramSat-1.5 and BioSat (2024 to 2025), and financial controller responsible for launch procurement (2025 to 2026). https://orbitntnu.com/
 - Kongsberg Defence & Aerospace: project liaison (2023 to 2024), then summer intern (2024).
 - KSAT (Kongsberg Satellite Services): summer intern in Tromsø, 2023, satellite communication and orbital mechanics.
 - NTNU: satellite operations intern, 2022.

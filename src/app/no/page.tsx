@@ -8,7 +8,7 @@ const tagline = "Jeg liker å starte ting, mest innen romfart.";
 export const metadata: Metadata = {
   title: "Freider Fløan | Romfart, NORSTEC og Spacepodden",
   description:
-    "Freider Fløan: medgründer og president i NORSTEC, programleder for romfartspodkasten Spacepodden og romsystemstudent ved NTNU. Følg FramSat-1 direkte.",
+    "Freider Fløan: medgründer og styremedlem i NORSTEC, programleder for romfartspodkasten Spacepodden og romsystemstudent ved NTNU. Følg FramSat-1 direkte.",
   alternates: { canonical: "/no", languages: { en: "/", nb: "/no", "x-default": "/" } },
   openGraph: {
     title: "Freider Fløan",
