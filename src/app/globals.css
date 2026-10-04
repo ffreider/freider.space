@@ -94,11 +94,76 @@ body {
 }
 .hero-photo {
   grid-area: photo;
+  position: relative;
+}
+.hero-photo img {
+  display: block;
   width: 100%;
   height: auto;
   aspect-ratio: 4 / 5;
   border-radius: var(--radius);
   object-fit: cover;
+}
+
+/* Speech bubble that pops up next to the face a moment after the page loads.
+   It grows out of its tail, overshoots a little, then gives a small wave. */
+.bubble {
+  position: absolute;
+  top: 9%;
+  right: 5%;
+  padding: 0.55em 0.95em 0.6em;
+  border-radius: 1.1em;
+  background: #fff;
+  color: var(--fg);
+  font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 6px 20px rgb(22 32 42 / 0.18);
+  transform-origin: 12% 120%;
+  animation:
+    bubble-in 650ms cubic-bezier(0.34, 1.56, 0.64, 1) 900ms both,
+    bubble-wave 1.2s ease-in-out 1.6s 2;
+}
+/* The tail, pointing down and left toward the face */
+.bubble::after {
+  content: "";
+  position: absolute;
+  left: 14%;
+  bottom: -9px;
+  width: 18px;
+  height: 12px;
+  background: #fff;
+  clip-path: polygon(0 0, 100% 0, 10% 100%);
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-8deg);
+  }
+  60% {
+    opacity: 1;
+  }
+}
+@keyframes bubble-wave {
+  0%,
+  100% {
+    rotate: 0deg;
+  }
+  30% {
+    rotate: 4deg;
+  }
+  60% {
+    rotate: -3deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble {
+    animation: none;
+  }
 }
 .hero-name {
   grid-area: name;
