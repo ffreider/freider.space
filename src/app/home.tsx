@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { framsatTle } from "@/lib/framsat-tle";
 import { recentReceptions } from "@/lib/satnogs";
+import { Bubble } from "./bubble";
 import { FramsatSection } from "./framsat";
 import type { L, Lang } from "./i18n";
 
@@ -163,7 +164,7 @@ const startOf = (entry: Entry) => entry.roles[entry.roles.length - 1].start;
 export const TEXT = {
   en: {
     tagline: "I like starting things, mostly about space.",
-    hello: "hi there!",
+    hello: ["hi there!", "hei from Trondheim!", "FramSat-1 says hi too", "psst, tap me 5×"],
     experience: "Experience",
     bio: "I’m Freider Fløan, a student of electronic systems design and space systems at NTNU in Trondheim, Norway. I co-founded NORSTEC, the Norwegian Space Technology Collective, led it as President for three years and now sit on its board. I also host the podcast Spacepodden and chair NASA HUNCH Norge, and I’m working on a new startup, Meso Manufacturing.",
     otherLanguage: { label: "Norsk", href: "/no", lang: "nb" },
@@ -187,7 +188,7 @@ export const TEXT = {
   },
   no: {
     tagline: "Jeg liker å starte ting, mest innen romfart.",
-    hello: "hei der!",
+    hello: ["hei der!", "hilsen fra Trondheim!", "FramSat-1 hilser også", "psst, trykk 5×"],
     experience: "Erfaring",
     bio: "Jeg heter Freider Fløan og studerer elektronisk systemdesign med fordypning i romsystemer ved NTNU i Trondheim. Jeg er medgründer av NORSTEC, Norwegian Space Technology Collective, som jeg ledet som president i tre år, og sitter nå i styret. I tillegg er jeg programleder for podkasten Spacepodden og styreleder i NASA HUNCH Norge, og jeg jobber med et nytt oppstartsselskap, Meso Manufacturing.",
     otherLanguage: { label: "English", href: "/", lang: "en" },
@@ -488,9 +489,7 @@ export async function Home({ lang }: { lang: Lang }) {
               priority
               sizes="(min-width: 768px) 360px, 100vw"
             />
-            <p aria-hidden className="bubble">
-              {t.hello}
-            </p>
+            <Bubble lines={t.hello} />
           </div>
           <h1 className="hero-name display">
             Freider
