@@ -106,7 +106,7 @@ body {
 }
 
 /* Speech bubble that pops up next to the face a moment after the page loads.
-   Cut from the page itself: the same ice colour, flat, no outline or shadow,
+   In the page's ice colour, flat, no outline or shadow,
    set in the heavy, tight type of the name. Its outline, tail included, is
    one hand-cut polygon with every edge a few pixels off true, like it was
    snipped out with scissors. The tail lives in the extra bottom padding.
@@ -114,8 +114,8 @@ body {
 .bubble {
   --tail: 15px;
   position: absolute;
-  top: -5%;
-  right: -7%;
+  top: 7%;
+  right: 6%;
   padding: 0.32em 0.75em calc(0.42em + var(--tail));
   background: var(--bg);
   color: var(--fg);
@@ -169,14 +169,6 @@ body {
   }
   60% {
     rotate: -2deg;
-  }
-}
-
-/* On phones the photo spans the full width, so the bubble only pokes
-   out into the side margin. */
-@media (max-width: 767px) {
-  .bubble {
-    right: -0.75rem;
   }
 }
 
