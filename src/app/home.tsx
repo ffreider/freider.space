@@ -489,7 +489,6 @@ export async function Home({ lang }: { lang: Lang }) {
               sizes="(min-width: 768px) 360px, 100vw"
             />
             <p aria-hidden className="bubble">
-              <span className="bubble-dot" />
               {t.hello}
             </p>
           </div>
