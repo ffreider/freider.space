@@ -109,14 +109,14 @@ body {
    It grows out of its tail, overshoots a little, then gives a small wave. */
 .bubble {
   position: absolute;
-  top: 9%;
-  right: 5%;
-  padding: 0.55em 0.95em 0.6em;
+  top: -4%;
+  right: -7%;
+  padding: 0.5em 0.95em 0.55em;
   border-radius: 1.1em;
   background: #fff;
   color: var(--fg);
-  font-size: clamp(0.95rem, 2.2vw, 1.1rem);
-  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.75rem);
+  font-weight: 700;
   letter-spacing: -0.01em;
   white-space: nowrap;
   pointer-events: none;
@@ -131,9 +131,9 @@ body {
   content: "";
   position: absolute;
   left: 14%;
-  bottom: -9px;
-  width: 18px;
-  height: 12px;
+  bottom: -13px;
+  width: 26px;
+  height: 17px;
   background: #fff;
   clip-path: polygon(0 0, 100% 0, 10% 100%);
 }
@@ -157,6 +157,14 @@ body {
   }
   60% {
     rotate: -3deg;
+  }
+}
+
+/* On phones the photo spans the full width, so the bubble only pokes
+   out into the side margin. */
+@media (max-width: 767px) {
+  .bubble {
+    right: -0.75rem;
   }
 }
 
