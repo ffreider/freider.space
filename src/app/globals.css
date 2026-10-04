@@ -106,36 +106,40 @@ body {
 }
 
 /* Speech bubble that pops up next to the face a moment after the page loads.
-   It grows out of its tail, overshoots a little, then gives a small wave. */
+   Set like the name (slate, heavy, tight) so it belongs to the hero. The
+   corners are deliberately uneven and the bubble sits a little crooked, so
+   it reads as stuck on by hand. It grows out of its tail, overshoots a
+   little, then gives a small wave. */
 .bubble {
   position: absolute;
-  top: -4%;
+  top: -5%;
   right: -7%;
-  padding: 0.5em 0.95em 0.55em;
-  border-radius: 1.1em;
-  background: #fff;
-  color: var(--fg);
+  padding: 0.38em 0.8em 0.46em 0.75em;
+  border-radius: 14px 5px 17px 3px / 9px 15px 6px 12px;
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none; /* main's readability glow would blur light text */
   font-size: clamp(1.35rem, 3.4vw, 1.75rem);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: 800;
+  letter-spacing: -0.035em;
   white-space: nowrap;
   pointer-events: none;
-  box-shadow: 0 6px 20px rgb(22 32 42 / 0.18);
+  rotate: -3deg;
   transform-origin: 12% 120%;
   animation:
     bubble-in 650ms cubic-bezier(0.34, 1.56, 0.64, 1) 900ms both,
     bubble-wave 1.2s ease-in-out 1.6s 2;
 }
-/* The tail, pointing down and left toward the face */
+/* The tail, slightly bent, pointing down and left toward the face */
 .bubble::after {
   content: "";
   position: absolute;
-  left: 14%;
-  bottom: -13px;
-  width: 26px;
+  left: 13%;
+  bottom: -15px;
+  width: 24px;
   height: 17px;
-  background: #fff;
-  clip-path: polygon(0 0, 100% 0, 10% 100%);
+  background: inherit;
+  clip-path: polygon(0 0, 100% 0, 38% 55%, 6% 100%);
 }
 
 @keyframes bubble-in {
@@ -150,13 +154,13 @@ body {
 @keyframes bubble-wave {
   0%,
   100% {
-    rotate: 0deg;
+    rotate: -3deg;
   }
   30% {
-    rotate: 4deg;
+    rotate: 1deg;
   }
   60% {
-    rotate: -3deg;
+    rotate: -6deg;
   }
 }
 
