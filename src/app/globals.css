@@ -105,18 +105,16 @@ body {
   object-fit: cover;
 }
 
-/* Speech bubble that pops up next to the face a moment after the page loads.
-   In the page's ice colour, flat, no outline or shadow,
-   set in the heavy, tight type of the name. Its outline, tail included, is
-   one hand-cut polygon with every edge a few pixels off true, like it was
-   snipped out with scissors. The tail lives in the extra bottom padding.
-   It grows out of its tail, overshoots a little, then gives a small wave. */
+/* Speech bubble that pops up on the photo a moment after the page loads.
+   In the page's ice colour, flat, no outline or shadow, set in the heavy,
+   tight type of the name. It grows out of its tail, overshoots a little,
+   then gives a small wave. */
 .bubble {
-  --tail: 15px;
   position: absolute;
   top: 7%;
   right: 6%;
-  padding: 0.32em 0.75em calc(0.42em + var(--tail));
+  padding: 0.32em 0.75em 0.42em;
+  border-radius: 10px;
   background: var(--bg);
   color: var(--fg);
   text-shadow: none;
@@ -125,29 +123,21 @@ body {
   letter-spacing: -0.035em;
   white-space: nowrap;
   pointer-events: none;
-  clip-path: polygon(
-    3px 5px,
-    21% 0,
-    46% 4px,
-    71% 1px,
-    calc(100% - 2px) 6px,
-    100% 42%,
-    calc(100% - 5px) 70%,
-    calc(100% - 1px) calc(100% - var(--tail) - 2px),
-    74% calc(100% - var(--tail) + 3px),
-    49% calc(100% - var(--tail) - 3px),
-    29% calc(100% - var(--tail) + 1px),
-    13% 100%,
-    17% calc(100% - var(--tail) - 1px),
-    6% calc(100% - var(--tail) + 2px),
-    1px calc(100% - var(--tail) - 4px),
-    5px 58%,
-    0 30%
-  );
-  transform-origin: 13% 100%;
+  transform-origin: 18% 130%;
   animation:
     bubble-in 650ms cubic-bezier(0.34, 1.56, 0.64, 1) 900ms both,
     bubble-wave 1.2s ease-in-out 1.6s 2;
+}
+/* The tail, pointing down and left toward the face */
+.bubble::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  bottom: -11px;
+  width: 18px;
+  height: 12px;
+  background: inherit;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
 @keyframes bubble-in {
