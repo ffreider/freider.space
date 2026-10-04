@@ -106,8 +106,8 @@ body {
 }
 
 /* Speech bubble that pops up next to the face a moment after the page loads.
-   Set like the name (slate, heavy, tight) so it belongs to the hero. The
-   corners are deliberately uneven and the bubble sits a little crooked, so
+   Light like the page, outlined in the slate of the name and set in the
+   same heavy, tight type, so it belongs to the hero. The corners are deliberately uneven and the bubble sits a little crooked, so
    it reads as stuck on by hand. It grows out of its tail, overshoots a
    little, then gives a small wave. */
 .bubble {
@@ -116,9 +116,10 @@ body {
   right: -7%;
   padding: 0.38em 0.8em 0.46em 0.75em;
   border-radius: 14px 5px 17px 3px / 9px 15px 6px 12px;
-  background: var(--fg);
-  color: var(--bg);
-  text-shadow: none; /* main's readability glow would blur light text */
+  border: 2px solid var(--fg);
+  background: #fff;
+  color: var(--fg);
+  text-shadow: none;
   font-size: clamp(1.35rem, 3.4vw, 1.75rem);
   font-weight: 800;
   letter-spacing: -0.035em;
@@ -135,7 +136,7 @@ body {
   align-items: center;
   gap: 0.38em;
 }
-/* Signal-red dot that blinks like a transmitter while the bubble talks */
+/* Signal-red dot that blinks like a transmitter */
 .bubble-dot {
   flex-shrink: 0;
   width: 0.3em;
@@ -144,33 +145,35 @@ body {
   background: var(--accent);
   animation: bubble-blink 1.1s steps(1) 1.5s infinite;
 }
-/* Each new line drops in */
-.bubble-text {
-  animation: bubble-swap 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-}
 
 @keyframes bubble-blink {
   50% {
     opacity: 0.25;
   }
 }
-@keyframes bubble-swap {
-  from {
-    opacity: 0;
-    transform: translateY(0.35em);
-  }
-}
 
-/* The tail, slightly bent, pointing down and left toward the face */
+/* The tail, slightly bent, pointing down and left toward the face. The
+   slate ::before is its outline; the white ::after sits on top of it, nudged
+   up and in, and covers the bubble's bottom border where they meet. */
+.bubble::before,
 .bubble::after {
   content: "";
   position: absolute;
-  left: 13%;
-  bottom: -15px;
-  width: 24px;
-  height: 17px;
-  background: inherit;
   clip-path: polygon(0 0, 100% 0, 38% 55%, 6% 100%);
+}
+.bubble::before {
+  left: 13%;
+  bottom: -17px;
+  width: 26px;
+  height: 17px;
+  background: var(--fg);
+}
+.bubble::after {
+  left: calc(13% + 3px);
+  bottom: -12px;
+  width: 19px;
+  height: 13px;
+  background: #fff;
 }
 
 @keyframes bubble-in {
@@ -205,8 +208,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .bubble,
-  .bubble-dot,
-  .bubble-text {
+  .bubble-dot {
     animation: none;
   }
 }
