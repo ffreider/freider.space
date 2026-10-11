@@ -50,6 +50,8 @@ body.can-drag main { -webkit-user-select: none; user-select: none; }
 .card h4 .lv::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
 .card .cdesc { margin: 0; font: 400 14px/1.5 var(--f-body); color: var(--ink-2); }
 .card #live { margin: 0; font: 500 15px/1.45 var(--f-body); color: var(--ink); }
+/* today's Sun from GOES-19, on the Sun's card */
+#cardSun { display: block; width: 112px; height: 112px; }
 #cardMap { display: block; width: 100%; aspect-ratio: 2 / 1; height: auto; border: 1px solid var(--rule); }
 .card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; }
 .card dt { font: 400 11px/1.35 var(--f-data); color: var(--ink-3); }
@@ -263,6 +265,7 @@ export const DESCENT_BODY = String.raw`
   <section class="card" id="card">
     <h4 id="cardTitle"></h4>
     <p class="cdesc" id="cardDesc"></p>
+    <img id="cardSun" alt="" width="1024" height="1024" hidden>
     <p id="live" aria-live="polite" hidden></p>
     <canvas id="cardMap" hidden></canvas>
     <div class="views" id="views" hidden><div id="viewBtns" role="group" aria-label="View" style="display:flex;flex-wrap:wrap;gap:4px"></div></div>

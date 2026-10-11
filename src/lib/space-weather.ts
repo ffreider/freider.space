@@ -15,6 +15,11 @@ export type SpaceWeather = {
   xrayNow: string | null; // flare class of the X-ray flux right now, e.g. "C2.1"
   xrayMax: string | null; // the largest in the last 24 hours
   aurora: number | null; // chance of aurora over Trondheim now, %, from the OVATION model
+  // Today's sunspot groups (NOAA's active regions), where they were on the
+  // disk as seen from Earth when observed: heliographic latitude and the
+  // distance west of the central meridian, in degrees, and the area in
+  // millionths of the visible hemisphere.
+  sunspots: { region: number; lat: number; west: number; area: number; observed: string }[];
 };
 
 async function json(path: string) {
@@ -37,13 +42,14 @@ function flareClass(flux: number) {
 const finite = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : null);
 
 export async function spaceWeather(): Promise<SpaceWeather> {
-  const [sun, kp, wind, mag, xrays, ovation] = await Promise.all([
+  const [sun, kp, wind, mag, xrays, ovation, regions] = await Promise.all([
     latestSun(),
     json("/products/noaa-planetary-k-index.json"),
     json("/products/summary/solar-wind-speed.json"),
     json("/products/summary/solar-wind-mag-field.json"),
     json("/json/goes/primary/xrays-1-day.json"),
     json("/json/ovation_aurora_latest.json"),
+    json("/json/solar_regions.json"),
   ]);
 
   const flux = Array.isArray(xrays)
@@ -53,6 +59,18 @@ export async function spaceWeather(): Promise<SpaceWeather> {
     (c: number[]) => c[0] === TRONDHEIM.lon && c[1] === TRONDHEIM.lat,
   );
 
+  // the newest day's regions with spots; positions like "S15E48"
+  const days = Array.isArray(regions) ? regions.map((r) => r?.observed_date).filter(Boolean).sort() : [];
+  const today = days.at(-1);
+  const sunspots = (Array.isArray(regions) ? regions : [])
+    .filter((r) => r?.observed_date === today && finite(r.area) && typeof r.location === "string")
+    .flatMap((r) => {
+      const m = (r.location as string).match(/^([NS])(\d+)([EW])(\d+)$/);
+      if (!m) return [];
+      const lat = (m[1] === "N" ? 1 : -1) * Number(m[2]), west = (m[3] === "W" ? 1 : -1) * Number(m[4]);
+      return [{ region: r.region as number, lat, west, area: r.area as number, observed: `${today}T00:00:00Z` }];
+    });
+
   return {
     sunImageTime: sun?.time ?? null,
     kp: Array.isArray(kp) ? finite(kp.at(-1)?.Kp) : null,
@@ -61,5 +79,6 @@ export async function spaceWeather(): Promise<SpaceWeather> {
     xrayNow: flux.length ? flareClass(flux.at(-1)!) : null,
     xrayMax: flux.length ? flareClass(Math.max(...flux)) : null,
     aurora: here ? finite(here[2]) : null,
+    sunspots,
   };
 }

@@ -1,4 +1,4 @@
-// /sun.webp: today's Sun for the descent's first stop. The newest GOES-19
+// /sun.webp: today's Sun for the thumbnail on the descent's Sun card. The newest GOES-19
 // SUVI image (see src/lib/sun.ts), cropped to 1.55 solar radii around the
 // Sun, which leaves out NOAA's caption, and made a small WebP. If NOAA can't
 // be reached, the copy saved in public/descent/tex is used.
@@ -8,8 +8,7 @@ import { latestSun, SUVI_DISK_RADIUS } from "@/lib/sun";
 
 export const revalidate = 900;
 
-// How far out from the Sun's centre the crop reaches, in solar radii. The
-// shader in public/descent/main.js maps the image with the same number.
+// How far out from the Sun's centre the crop reaches, in solar radii.
 const REACH = 1.55;
 
 export async function GET() {
