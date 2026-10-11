@@ -178,6 +178,12 @@ body.live-lock .hud { opacity: 1; transform: none; pointer-events: auto; cursor:
 .hud h2 { font-size: clamp(30px, 3.6vw, 46px); margin: 0; }
 .hud .why a, .bio a { color: var(--ink); text-decoration-color: var(--fs); }
 .hud .why { font-size: 16px; line-height: 1.55; color: var(--ink-2); max-width: 52ch; }
+/* the sign-off: the last thing on the page */
+.hud .sign { font-size: 16px; line-height: 1.55; color: var(--ink); max-width: 52ch; padding-top: 12px; border-top: 1px solid var(--rule); }
+.hud .sign a { text-decoration-color: var(--fs); }
+/* at the end the panel sits over the footer, so the privacy note moves into it */
+.hud .fine { font-size: 13px; line-height: 1.5; color: var(--ink-3); max-width: 60ch; }
+body.live-lock footer { visibility: hidden; }
 .stats { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 16px; padding: 12px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
 .stats dt { font: 400 11.5px/1.3 var(--f-data); color: var(--ink-3); }
 .stats dd { margin: 2px 0 0; font: 500 15px/1.3 var(--f-data); color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -349,13 +355,6 @@ export const DESCENT_BODY = String.raw`
       <p class="bio" data-h="whyHtml"></p>
     </div>
   </section>
-
-  <section class="band landing" id="trondheim" data-stop="6">
-    <div class="col">
-      <h2 data-t="landing"></h2>
-      <p class="bio" data-h="landingHtml"></p>
-    </div>
-  </section>
 </main>
 <footer><p data-t="privacy"></p></footer>
 
@@ -363,10 +362,12 @@ export const DESCENT_BODY = String.raw`
   <p class="k" data-t="liveTag"></p>
   <h2 data-t="riding"></h2>
   <p class="why" data-h="whyHtml"></p>
+  <p class="sign" data-h="signHtml"></p>
   <div class="hud-actions">
     <button class="primary" id="openTracker" type="button" data-t="openTracker"></button>
     <p class="hint" data-t="lookHint"></p>
   </div>
+  <p class="fine" data-t="privacy"></p>
 </div>
 
 <aside class="drawer" id="drawer" aria-label="FramSat-1 tracker" aria-hidden="true">
