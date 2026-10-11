@@ -712,8 +712,7 @@
   const sceneEl = $("overlay");
   const VW = () => innerWidth, VH = () => sceneEl.clientHeight || innerHeight;
   const portrait = () => VH() > VW();
-  // the part of the screen the text is read in: below the window on phones
-  const readTop = () => (narrow() ? VH() : 0), readH = () => innerHeight - readTop();
+  const readTop = () => 0, readH = () => innerHeight;
 
   // interactive state
   const moonLook = { az: 0, el: 0, taz: 0, tel: 0 };
@@ -849,15 +848,28 @@
   const sections = [...document.querySelectorAll("[data-stop]")];
   let holds = [], lockY = 0;
   function layout() {
+    if (narrow()) return layoutPhone();
     const vh = readH();
     holds = sections.map((s, i) => {
       const top = s.offsetTop, h = s.offsetHeight;
-      if (i === 0) return [0, Math.max(readTop() + vh * 0.8, top + h - vh * 0.45)];   // phones: until the Moon's card has passed
+      if (i === 0) return [0, vh * 0.8];
       if (i === 5) return [top + vh * 0.35, top + h - vh * 0.4];   // FramSat-1: a long hold to ride along
       return [top + vh * 0.55, Math.max(top + vh * 0.55, top + h - vh * 0.45)];
     });
     const s = sections[5];
     lockY = s.offsetTop + s.offsetHeight - innerHeight * 0.75;
+  }
+  // Phones: a stop holds while its view is open, from a little before the
+  // text above has cleared the window until the text below starts to cover
+  // it; the moves between stops happen while the text is over the scene.
+  function layoutPhone() {
+    const H = innerHeight, S = VH(), views = [...document.querySelectorAll(".view")];
+    holds = views.map((v, i) => {
+      const top = v.getBoundingClientRect().top + scrollY, h = v.offsetHeight;
+      const a = top - 0.2 * H + H / 2, b = Math.max(a, top + h - S + 0.2 * H + H / 2);
+      return [i === 0 ? 0 : a, i === 5 ? Infinity : b];
+    });
+    lockY = holds[5][0] + 0.2 * H;
   }
   // Where the page is: inside one stop's hold (i === j, with drift for the
   // slow movement within it), or between two (t, the progress from i to j).
@@ -1469,6 +1481,7 @@
   document.addEventListener("click", e => {
     const b = e.target.closest(".more-btn"); if (!b) return;
     const c = b.closest(".card"); c.dataset.open = c.dataset.open === "1" ? "" : "1"; lastCard = 0;
+    setTimeout(layout, 600);                                  // a taller card moves the stops below it
   });
   function sunText(sn, ms) {
     const s = C.S(); if (!sn || !sn.sh) return "–";

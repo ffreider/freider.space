@@ -234,34 +234,43 @@ input[type="range"] { width: 100%; accent-color: var(--fs); }
 footer { position: relative; z-index: 2; padding: 0 var(--gutter) calc(20px + env(safe-area-inset-bottom, 0px)); color: var(--ink-3); font-size: 13px; line-height: 1.5; }
 footer p { max-width: 60ch; }
 
-.slot { display: none; }
-/* Phones: the scene is a window across the top of the screen and the page
-   scrolls on below it, so text never sits on the pictures. Each stop's card
-   sits in the page at the start of its text (copies made by main.js). */
+.view { display: none; }
+/* Phones: text and scene take turns. The scene is fixed in the top part of
+   the screen; each stop's text is a solid block that slides over it, and
+   after the text comes a "view": a gap that shows the stop's object, with
+   its card (copied in by main.js) below the window. So: text, Moon, text,
+   ASBM, and so on. */
 @media (max-width: 900px) {
-  :root { --scene: 46svh; }
+  :root { --scene: 58svh; }
   body { background: rgb(var(--haze)); }
   #field, #overlay, #cube { height: var(--scene) !important; }
-  #field { z-index: 3; }
-  #overlay { z-index: 4; }
-  #cube { z-index: 5 !important; }
-  /* the window's lower edge: text scrolling up fades out under it */
-  .fade, body.live-lock .fade { opacity: 1; inset: auto 0; top: calc(var(--scene) - 1px); height: 36px; z-index: 5; background: linear-gradient(rgb(var(--haze)), rgba(var(--haze), 0)); }
+  /* the window's lower edge fades into the page */
+  .fade, body.live-lock .fade { opacity: 1; inset: auto 0; top: calc(var(--scene) - 64px); height: 64px; background: linear-gradient(rgba(var(--haze), 0), rgb(var(--haze))); }
   .top { z-index: 7; }
-  .top::before { background: linear-gradient(rgba(0, 0, 0, .75) 30%, rgba(0, 0, 0, 0)); }
-  main { z-index: 1; }
-  .hero { justify-content: flex-start; padding-block: calc(var(--scene) + 28px) 48px; }
+  .top::before { background: linear-gradient(rgba(0, 0, 0, .7) 30%, rgba(0, 0, 0, 0)); }
+  main { z-index: 3; }
+  section { padding-inline: 0; }
+  .hero, .band, .band.long, .arrival { display: block; min-height: 0; padding: 0; }
+  main .col { position: relative; max-width: none; padding: 9svh var(--gutter) 10svh; background: rgb(var(--haze)); }
+  .hero .col { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding-top: calc(70px + env(safe-area-inset-top, 0px)); }
+  /* soft edges where a text block meets the scene */
+  main .col::before, main .col::after { content: ""; position: absolute; left: 0; right: 0; height: 56px; pointer-events: none; }
+  main .col::before { bottom: 100%; background: linear-gradient(rgba(var(--haze), 0), rgb(var(--haze))); }
+  main .col::after { top: 100%; background: linear-gradient(rgb(var(--haze)), rgba(var(--haze), 0)); }
+  .hero .col::before { display: none; }
   .name { font-size: clamp(52px, 15vw, 96px); margin-bottom: 22px; }
   .hint { margin-top: 28px; }
-  .band, .band.long { min-height: 0; padding-block: 10svh 26svh; }
-  .arrival { padding-block: 10svh 0; }
   h2 { font-size: clamp(36px, 10vw, 56px); }
-
+  .view { display: block; min-height: 100svh; padding: calc(var(--scene) + 8px) var(--gutter) 28px; }
+  .view .slot { display: block; }
   .side { display: none; }
-  .slot { display: block; margin-bottom: 36px; }
-  .hero .slot { margin: 36px 0 0; }
-  .slot .card { margin: 0; overflow: visible; background: rgba(238, 242, 245, .045); border: 1px solid var(--rule); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  .hud { width: auto; right: var(--gutter); max-height: calc(100svh - var(--scene) - 36px); }
+  .slot .card { margin: 0; overflow: visible; background: #141d2c; border: 1px solid var(--rule); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  /* the end: the ride's panel is the last block of the page, after FramSat-1's view */
+  .hud, body.live-lock .hud { position: relative; z-index: 3; left: auto; bottom: auto; width: auto; max-height: none; overflow: visible; opacity: 1; transform: none; pointer-events: auto;
+    padding: 6svh var(--gutter) calc(28px + env(safe-area-inset-bottom, 0px)); background: rgb(var(--haze)); }
+  .hud .why, .hud-actions .hint { display: none; }
+  footer, body.live-lock footer { display: none; }
+}
 }
 @media (prefers-reduced-motion: reduce) { .drawer, .hud { transition: none; } .hud .k::before { animation: none; } }
 /* The cover: a black screen that says hi while the scene loads, then opens
@@ -330,30 +339,29 @@ export const DESCENT_BODY = String.raw`
         <a href="https://open.spotify.com/show/7ofO8qm8tRBk2llQEMK8JB" target="_blank" rel="noopener">Spacepodden</a>
       </div>
       <p class="hint" data-t="hint"></p>
-      <div class="slot" data-slot="0"></div>
     </div>
+    <div class="view"><div class="slot" data-slot="0"></div></div>
   </section>
 
   <section class="band" data-stop="1">
     <div class="col">
-      <div class="slot" data-slot="1"></div>
       <h2 data-t="about"></h2>
       <p class="bio" data-t="bio"></p>
     </div>
+    <div class="view"><div class="slot" data-slot="1"></div></div>
   </section>
 
   <section class="band long" data-stop="2">
     <div class="col">
-      <div class="slot" data-slot="2"></div>
       <h2 data-t="experience"></h2>
       <div class="chart-wrap"><figure class="chart" id="chart"></figure></div>
       <ul class="roles" id="roles"></ul>
     </div>
+    <div class="view"><div class="slot" data-slot="2"></div></div>
   </section>
 
   <section class="band" data-stop="3">
     <div class="col">
-      <div class="slot" data-slot="3"></div>
       <p class="meta" data-t="featured" style="margin-bottom:14px"></p>
       <a class="article" href="https://trondheim.com/journal/the-extracurricular-that-left-earth" target="_blank" rel="noopener">
         <img src="/descent/article.jpg" alt="Freider Fløan, photographed for Trondheim.com" width="1000" height="600">
@@ -365,23 +373,24 @@ export const DESCENT_BODY = String.raw`
         <span class="cta" data-t="articleCta"></span>
       </a>
     </div>
+    <div class="view"><div class="slot" data-slot="3"></div></div>
   </section>
 
   <section class="band" data-stop="4">
     <div class="col">
-      <div class="slot" data-slot="4"></div>
       <h2 data-t="education"></h2>
       <ul class="degrees" id="degrees"></ul>
       <p class="finishing" data-t="finishing"></p>
     </div>
+    <div class="view"><div class="slot" data-slot="4"></div></div>
   </section>
 
   <section class="arrival" id="framsat" data-stop="5">
     <div class="col">
-      <div class="slot" data-slot="5"></div>
       <h2 data-t="joining"></h2>
       <p class="bio" data-h="whyHtml"></p>
     </div>
+    <div class="view"><div class="slot" data-slot="5"></div></div>
   </section>
 </main>
 <footer><p data-t="privacy"></p></footer>
