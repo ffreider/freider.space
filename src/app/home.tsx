@@ -180,6 +180,9 @@ export const TEXT = {
     joining: "Joining FramSat-1",
     whyHtml:
       'A student satellite I worked on at <a href="https://orbitntnu.com/projects/FramSat-1" target="_blank" rel="noopener">Orbit NTNU</a>. It launched on 5 September 2026.',
+    landing: "Back in Trondheim",
+    landingHtml:
+      'This is where I live and study, and where Orbit NTNU’s ground station listens for FramSat-1 when it comes over. If you’re starting something in space, or thinking about it, I’d like to hear from you. The easiest way is <a href="https://www.linkedin.com/in/freider/">LinkedIn</a>.',
     privacy: "Privacy: this site sets no cookies. Visits are counted anonymously with Vercel Web Analytics.",
     privacyTracker:
       "Privacy: this site sets no cookies. Visits are counted anonymously with Vercel Web Analytics. Waterfall images load from SatNOGS only if you open one.",
@@ -205,6 +208,9 @@ export const TEXT = {
     joining: "Slår følge med FramSat-1",
     whyHtml:
       'En studentsatellitt jeg jobbet med i <a href="https://orbitntnu.com/projects/FramSat-1" target="_blank" rel="noopener">Orbit NTNU</a>. Den ble skutt opp 5. september 2026.',
+    landing: "Tilbake i Trondheim",
+    landingHtml:
+      'Det er her jeg bor og studerer, og her Orbit NTNUs bakkestasjon lytter etter FramSat-1 når den passerer. Hvis du starter noe innen romfart, eller tenker på det, vil jeg gjerne høre fra deg. Enklest er <a href="https://www.linkedin.com/in/freider/">LinkedIn</a>.',
     privacy: "Personvern: denne siden bruker ingen informasjonskapsler. Besøk telles anonymt med Vercel Web Analytics.",
     privacyTracker:
       "Personvern: denne siden bruker ingen informasjonskapsler. Besøk telles anonymt med Vercel Web Analytics. Vannfallsdiagrammer lastes fra SatNOGS bare hvis du åpner et.",

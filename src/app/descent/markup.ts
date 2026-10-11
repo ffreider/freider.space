@@ -57,6 +57,14 @@ body.can-drag main { -webkit-user-select: none; user-select: none; }
 .card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; }
 .card dt { font: 400 13px/1.35 var(--f-data); color: var(--ink-3); }
 .card dd { margin: 0; font: 500 14px/1.35 var(--f-data); color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+/* the card, short by default: one standout number, a few rows, the rest on request */
+.stat { display: grid; gap: 2px; }
+.stat:empty { display: none; }
+.stat-v { font: 700 30px/1.05 var(--f-display); letter-spacing: -0.02em; color: var(--ink); }
+.stat-k { font: 400 13px/1.3 var(--f-body); color: var(--ink-3); }
+.card dl.more { padding-top: 8px; border-top: 1px solid var(--rule); }
+.more-btn { justify-self: start; font: 500 13.5px/1 var(--f-body); color: var(--ink-2); background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 8px 12px; cursor: pointer; }
+.more-btn:hover { color: var(--ink); border-color: var(--ink-3); }
 .card .foot { margin: 0; font: 400 12.5px/1.45 var(--f-data); color: var(--ink-3); }
 .tip {
   position: fixed; z-index: 7; left: 0; top: 0; max-width: 340px; pointer-events: none; padding: 12px 14px;
@@ -222,7 +230,7 @@ footer p { max-width: 60ch; }
 
 @media (max-width: 900px) {
   .side { left: var(--gutter); width: auto; top: auto; max-height: 34vh; }
-  .route, .card dl, .card .foot { display: none; }
+  .route, .card dl:not(.more), .card .foot { display: none; }
   body.riding .side { display: none; }
   .hud { width: auto; right: var(--gutter); }
   .fade { background: linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.4)); }
@@ -271,7 +279,10 @@ export const DESCENT_BODY = String.raw`
     <p id="live" hidden></p>
     <canvas id="cardMap" hidden></canvas>
     <div class="views" id="views" hidden><div id="viewBtns" role="group" aria-label="View" style="display:flex;flex-wrap:wrap;gap:4px"></div></div>
+    <div class="stat" id="cardStat"></div>
     <dl id="cardRows"></dl>
+    <dl id="cardMoreRows" class="more" hidden></dl>
+    <button class="more-btn" id="cardMore" type="button" aria-expanded="false" aria-controls="cardMoreRows" hidden></button>
     <p class="foot" id="cardFoot"></p>
   </section>
 </aside>
@@ -336,6 +347,13 @@ export const DESCENT_BODY = String.raw`
     <div class="col">
       <h2 data-t="joining"></h2>
       <p class="bio" data-h="whyHtml"></p>
+    </div>
+  </section>
+
+  <section class="band landing" id="trondheim" data-stop="6">
+    <div class="col">
+      <h2 data-t="landing"></h2>
+      <p class="bio" data-h="landingHtml"></p>
     </div>
   </section>
 </main>

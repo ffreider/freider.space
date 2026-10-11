@@ -232,11 +232,12 @@
         ["The Moon", d => `${d} km away right now. Drag to turn it, and hover the names to see what’s there. From here we head inward, past real spacecraft, to FramSat-1.`],
         ["ASBM-1 and ASBM-2", (pe, ap) => `Space Norway’s two satellites for broadband in the Arctic. Their orbits take 16 hours and stretch from ${pe} km up to ${ap} km, so they spend most of their time high above the far north. Each one is on for about 10 hours near the top of its orbit, and the two overlap, which gives everything north of 65° N coverage around the clock. The cone is what the active one can see.`],
         ["The geostationary belt", () => "35,786 km up, one orbit takes as long as Earth takes to turn once, so these satellites stay above the same spot on the ground. Hover any of them. Space Norway’s Thor 5, 6 and 7 are near 1° West."],
-        ["Galileo above Trondheim", () => "Europe’s own navigation system, 23,222 km up in three orbital planes. The lines go to the Galileo satellites a phone in Trondheim could use right now. Your phone works out where it is by timing their signals, which left them about 80 milliseconds ago."],
-        ["The International Space Station", d => `About ${d} km up right now, with people on board. The numbers on the right are live.`],
+        ["Galileo above Trondheim", () => "Over Trondheim, where I live. This is Europe’s own navigation system, 23,222 km up in three orbital planes, and the lines go to the Galileo satellites a phone here could use right now. Your phone works out where it is by timing their signals, which left them about 80 milliseconds ago."],
+        ["The International Space Station", d => `About ${d} km up right now, with people on board. Through NASA HUNCH Norge, which I chair, Norwegian students build hardware for it. These numbers are live.`],
         ["FramSat-1", d => `Orbit NTNU’s 1U CubeSat, about 1 kg, testing a Norwegian sun sensor from Eidsvoll Electronics. It went up on Isar Aerospace’s second Spectrum rocket from Andøya, the first satellite launched into orbit from continental Europe.`],
+        ["Trondheim", () => `Home. Orbit NTNU’s ground station is here, and it listens for FramSat-1 every time it passes over.`],
       ],
-      route: ["Moon", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1"],
+      route: ["Moon", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1", "Trondheim"],
       labels: { moon: "Moon", fs: "FramSat-1 · 1U CubeSat", sensor: "Sun sensor (EIDEL)", gps: "GPS planes", gal: "Galileo planes", apo: "Apogee", peri: "Perigee", trd: "Trondheim", n65: "65° N · round-the-clock coverage", on: "on", off: "off", near: "Near side", far: "Far side", lit: "Sunlit", dark: "Night", kinds: { crater: "Crater", mare: "Mare", basin: "Impact basin", site: "Landing site" }, offFor: m => `switches on in ${fmtMin(m)}`, onFor: m => `on for another ${fmtMin(m)}`, sunAlt: a => a > 0 ? `${Math.round(a)}° above the horizon` : "below the horizon", visNow: "usable now", grav: "Plane", galTip: "Galileo satellite, part of the EU’s navigation system, run by EUSPA. Each carries hydrogen-maser and rubidium clocks and a search-and-rescue transponder that can tell a distress beacon that help is on the way." },
       k: { dist: "Distance", lit: "Illuminated", phase: "Phase", light: "Light time", size: "Size seen from Earth", here: "From here",
         alt: "Altitude", spd: "Speed", pos: "Position", over: "Over", sun: "Sunlight", orbit: "Orbit no.", period: "Period", inc: "Inclination",
@@ -250,7 +251,7 @@
       sunlitNow: "Sunlit", darkNow: "In Earth’s shadow",
       passFmt: (t, el, vis) => `${t}, ${el}° high${vis ? ", visible" : ""}`, noPass2: "None in 24 h",
       phases: ["New moon", "Waxing crescent", "First quarter", "Waxing gibbous", "Full moon", "Waning gibbous", "Last quarter", "Waning crescent"],
-      cardFoot: ["Drag to turn the Moon. Double-click to put it back.", "The coverage figures are Space Norway’s. The 10-hour window is my estimate.", "Hover a satellite for details. Most sit right on the line; a few older ones drift a little north and south.", "Galileo’s hydrogen maser clocks lose about a second every three million years. Norway hosts Galileo ground stations on Svalbard, on Jan Mayen and at Troll in Antarctica.", "Worked out in your browser from the latest orbit data.", "Worked out in your browser from its orbit data."],
+      cardFoot: ["Drag to turn the Moon. Double-click to put it back.", "The coverage figures are Space Norway’s. The 10-hour window is my estimate.", "Hover a satellite for details. Most sit right on the line; a few older ones drift a little north and south.", "Galileo’s hydrogen maser clocks lose about a second every three million years. Norway hosts Galileo ground stations on Svalbard, on Jan Mayen and at Troll in Antarctica.", "Worked out in your browser from the latest orbit data.", "Worked out in your browser from its orbit data.", "Pass times are for Trondheim, from the latest orbit data."],
       moonShown: "positions from a low-precision ephemeris",
     },
     no: {
@@ -265,11 +266,12 @@
         ["Månen", d => `${d} km unna akkurat nå. Dra for å snu den, og hold over navnene for å se hva som er der. Herfra går turen innover, forbi ekte romfartøy, til FramSat-1.`],
         ["ASBM-1 og ASBM-2", (pe, ap) => `Space Norways to satellitter for bredbånd i Arktis. Banene tar 16 timer og strekker seg fra ${pe} km opp til ${ap} km, så de er mesteparten av tiden høyt over nord. Hver av dem er på i rundt 10 timer nær toppen av banen, og de to overlapper, så alt nord for 65° N har dekning hele døgnet. Kjeglen er det den aktive kan se.`],
         ["Det geostasjonære beltet", () => "35 786 km opp tar ett omløp like lang tid som Jorden bruker på å snu seg én gang, så satellittene står over samme sted. Hold over hvilken som helst av dem. Space Norways Thor 5, 6 og 7 står nær 1° vest."],
-        ["Galileo over Trondheim", () => "Europas eget navigasjonssystem, 23 222 km opp i tre baneplan. Linjene går til Galileo-satellittene en mobil i Trondheim kan bruke akkurat nå. Mobilen finner ut hvor den er ved å ta tiden på signalene, som forlot satellittene for rundt 80 millisekunder siden."],
-        ["Den internasjonale romstasjonen", d => `Rundt ${d} km opp akkurat nå, med folk om bord. Tallene til høyre er direkte.`],
+        ["Galileo over Trondheim", () => "Over Trondheim, der jeg bor. Dette er Europas eget navigasjonssystem, 23 222 km opp i tre baneplan, og linjene går til Galileo-satellittene en mobil her kan bruke akkurat nå. Mobilen finner ut hvor den er ved å ta tiden på signalene, som forlot satellittene for rundt 80 millisekunder siden."],
+        ["Den internasjonale romstasjonen", d => `Rundt ${d} km opp akkurat nå, med folk om bord. Gjennom NASA HUNCH Norge, der jeg er styreleder, bygger norske elever utstyr til den. Tallene her er direkte.`],
         ["FramSat-1", d => `Orbit NTNUs 1U-CubeSat på rundt 1 kg, som tester en norsk solsensor fra Eidsvoll Electronics. Den gikk opp med Isar Aerospaces andre Spectrum-rakett fra Andøya, den første satellitten skutt opp i bane fra det kontinentale Europa.`],
+        ["Trondheim", () => `Hjemme. Orbit NTNUs bakkestasjon står her og lytter etter FramSat-1 hver gang den passerer.`],
       ],
-      route: ["Månen", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1"],
+      route: ["Månen", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1", "Trondheim"],
       labels: { moon: "Månen", fs: "FramSat-1 · 1U-CubeSat", sensor: "Solsensor (EIDEL)", gps: "GPS-plan", gal: "Galileo-plan", apo: "Apogeum", peri: "Perigeum", trd: "Trondheim", n65: "65° N · dekning hele døgnet", on: "på", off: "av", near: "Forsiden", far: "Baksiden", lit: "I sollys", dark: "Natt", kinds: { crater: "Krater", mare: "Hav", basin: "Nedslagsbasseng", site: "Landingssted" }, offFor: m => `slås på om ${fmtMin(m)}`, onFor: m => `på i ${fmtMin(m)} til`, sunAlt: a => a > 0 ? `${Math.round(a)}° over horisonten` : "under horisonten", visNow: "brukbar nå", grav: "Plan", galTip: "Galileo-satellitt, del av EUs navigasjonssystem, drevet av EUSPA. Hver har hydrogenmaser- og rubidiumklokker og en søk-og-redning-transponder som kan si fra til en nødpeilesender at hjelp er på vei." },
       k: { dist: "Avstand", lit: "Belyst", phase: "Fase", light: "Lystid", size: "Størrelse sett fra Jorden", here: "Herfra",
         alt: "Høyde", spd: "Fart", pos: "Posisjon", over: "Over", sun: "Sollys", orbit: "Omløp nr.", period: "Omløpstid", inc: "Inklinasjon",
@@ -283,7 +285,7 @@
       sunlitNow: "I sollys", darkNow: "I jordskyggen",
       passFmt: (t, el, vis) => `${t}, ${el}° høyt${vis ? ", synlig" : ""}`, noPass2: "Ingen innen 24 t",
       phases: ["Nymåne", "Voksende månesigd", "Første kvarter", "Voksende måne", "Fullmåne", "Minkende måne", "Siste kvarter", "Minkende månesigd"],
-      cardFoot: ["Dra for å snu Månen. Dobbeltklikk for å sette den tilbake.", "Dekningstallene er Space Norways. Vinduet på 10 timer er mitt anslag.", "Hold over en satellitt for detaljer. De fleste står rett på linjen; noen eldre driver litt nord og sør.", "Galileos hydrogenmaser-klokker driver rundt ett sekund på tre millioner år. Norge har Galileo-bakkestasjoner på Svalbard, Jan Mayen og Troll i Antarktis.", "Regnet ut i nettleseren din fra de nyeste banedataene.", "Regnet ut i nettleseren din fra banedataene."],
+      cardFoot: ["Dra for å snu Månen. Dobbeltklikk for å sette den tilbake.", "Dekningstallene er Space Norways. Vinduet på 10 timer er mitt anslag.", "Hold over en satellitt for detaljer. De fleste står rett på linjen; noen eldre driver litt nord og sør.", "Galileos hydrogenmaser-klokker driver rundt ett sekund på tre millioner år. Norge har Galileo-bakkestasjoner på Svalbard, Jan Mayen og Troll i Antarktis.", "Regnet ut i nettleseren din fra de nyeste banedataene.", "Regnet ut i nettleseren din fra banedataene.", "Passeringstidene gjelder Trondheim, fra de nyeste banedataene."],
       moonShown: "posisjoner fra en forenklet efemeride",
     },
   });
@@ -667,9 +669,9 @@
   function updateDetail(ms) {
     if (!field || !loaded || detail.loading) return;
     const stopNow = curStop;
-    const sat = stopNow === 4 ? "ISS" : stopNow === 5 ? "FRAMSAT-1" : null;
+    const sat = stopNow === 4 ? "ISS" : stopNow === 5 ? "FRAMSAT-1" : stopNow === 6 ? "TRONDHEIM" : null;
     if (!sat) return;
-    const p = subPoint(sat, ms); if (!p) return;
+    const p = sat === "TRONDHEIM" ? { lat: TRD.lat, lon: TRD.lon } : subPoint(sat, ms); if (!p) return;
     const b = detail.box;
     const dLon = b ? Math.abs(((p.lon - b.lon + 540) % 360) - 180) : 1e9;
     if (detail.sat !== sat || !b || dLon > BOX_COLS * TILE_DEG * 0.25 || Math.abs(p.lat - b.lat) > BOX_ROWS * TILE_DEG * 0.25) buildDetail(sat, p);
@@ -710,6 +712,15 @@
   function stop(i, ms, drift) {
     const aspect = innerWidth / innerHeight;
     const sh = narrow() ? 0 : 0.22 * aspect;
+    if (i === 6) {
+      // Down over Trondheim, from about 220 km up and 2° south of the city,
+      // looking north along the coast.
+      const g = gmst(ms);
+      const at = mul(rotZ(ecefUnit(TRD.lat, TRD.lon), g), RE);
+      const pos = mul(rotZ(ecefUnit(TRD.lat - 2.2, TRD.lon - 0.5), g), RE + 220 - drift * 40);
+      const { F, U } = lookAt(pos, at, norm(pos));
+      return { pos, F, U, half: portrait() ? 30 : 24, shift: sh * 0.6, tgt: at };
+    }
     if (i === 0) {
       // Framed around the Sun: the camera looks at the Moon with the Sun just
       // past its top edge (clear of the name and the route list), so the Moon is lit from behind, whatever
@@ -825,10 +836,10 @@
     holds = sections.map((s, i) => {
       const top = s.offsetTop, h = s.offsetHeight;
       if (i === 0) return [0, vh * 0.8];
-      if (i === sections.length - 1) return [top + vh * 0.35, top + h - vh * 0.4];
+      if (i === 5) return [top + vh * 0.35, top + h - vh * 0.4];   // FramSat-1: a long hold to ride along
       return [top + vh * 0.55, Math.max(top + vh * 0.55, top + h - vh * 0.45)];
     });
-    const s = sections[sections.length - 1];
+    const s = sections[5];
     lockY = s.offsetTop + s.offsetHeight - innerHeight * 0.75;
   }
   // Where the page is: inside one stop's hold (i === j, with drift for the
@@ -1413,14 +1424,19 @@
     const s = C.S();
     const moonD = fmtKm(len(moonEci(ms)));
     const iss = sv("ISS", ms), fs = sv("FRAMSAT-1", ms), a1 = sv("ASBM-1", ms), el = elements("ASBM-1");
-    const vals = [[moonD], el ? [fmtKm(el.perigee), fmtKm(el.apogee)] : ["7,700", "44,000"], [], [], [iss ? fmtKm(altOf(iss.r, ms)) : "420"], [fs ? fmtKm(altOf(fs.r, ms)) : "560"]];
+    const vals = [[moonD], el ? [fmtKm(el.perigee), fmtKm(el.apogee)] : ["7,700", "44,000"], [], [], [iss ? fmtKm(altOf(iss.r, ms)) : "420"], [fs ? fmtKm(altOf(fs.r, ms)) : "560"], []];
     s.stops.forEach(([title, fn], i) => { stopDesc[i] = { title, text: fn(...vals[i]) }; });
-    const km = [moonD, a1 ? fmtKm(len(a1.r) - RE) : "", "35,786", "23,222", vals[4][0], vals[5][0]];
+    const km = [moonD, a1 ? fmtKm(altOf(a1.r, ms)) : "", "35,786", "23,222", vals[4][0], vals[5][0]];
     km.forEach((k, i) => { const e = $("rk" + i); if (e) e.textContent = k ? `${k} km` : ""; });
   }
 
   const card = $("card");
-  function rows(pairs) { return pairs.filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join(""); }
+  // A card's numbers as [label, value] pairs: the first is the standout
+  // number, the next three show, the rest wait behind "More numbers".
+  const rows = pairs => pairs.filter(Boolean);
+  const dl = pairs => pairs.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+  let cardOpen = false;
+  $("cardMore").addEventListener("click", () => { cardOpen = !cardOpen; lastCard = 0; });
   function sunText(sn, ms) {
     const s = C.S(); if (!sn || !sn.sh) return "–";
     const m = (sn.sh.t - ms) / 60000;
@@ -1435,7 +1451,7 @@
   }
   function updateCard(stopIdx, ms) {
     const s = C.S(), k = s.k, title = s.route[stopIdx];
-    let body = "", sub2 = "";
+    let body = [], sub2 = "";
     if (stopIdx === 0) {
       const m = moonNumbers(ms);
       sub2 = s.moonShown;
@@ -1451,7 +1467,7 @@
         el && [k.pa, rangeText("ASBM-1", ms)], el && [k.period, fmtMin(el.period)], el && [k.inc, `${fmtN(el.inc, 1)}°`], [k.launched, "12 Aug 2024"]]);
     } else if (stopIdx === 2) {
       const t = satNumbers("THOR 7", ms);
-      body = rows([[k.shown, String(GEO_SATS.length)], [k.alt, "35,786 km"], [k.period, "23 h 56 min"], [k.spd, "3.07 km/s"], t && ["Thor 7", `${fmtN(Math.abs(t.g.lon), 2)}° ${t.g.lon >= 0 ? "E" : s.west}`]]);
+      body = rows([[k.alt, "35,786 km"], [k.period, "23 h 56 min"], t && ["Thor 7", `${fmtN(Math.abs(t.g.lon), 2)}° ${t.g.lon >= 0 ? "E" : s.west}`], [k.shown, String(GEO_SATS.length)], [k.spd, "3.07 km/s"]]);
     } else if (stopIdx === 3) {
       const sky = gpsSky(ms);
       const nearest = sky.vis.length ? sky.vis.reduce((a, b) => a.l.range < b.l.range ? a : b) : null;
@@ -1463,6 +1479,19 @@
         gel && [k.period, fmtMin(gel.period)], [k.incl, "56°"], ["E1 · E5a", "1575.42 · 1176.45 MHz"],
         [C.lang === "en" ? "Free accuracy" : "Gratis nøyaktighet", C.lang === "en" ? "≈ 20 cm with the High Accuracy Service" : "≈ 20 cm med High Accuracy Service"],
         [C.lang === "en" ? "Signal at the ground" : "Signal ved bakken", C.lang === "en" ? "≈ −128 dBm, below the noise" : "≈ −128 dBm, under støyen"]]);
+    } else if (stopIdx === 6) {
+      const up = rotZ(ecefUnit(TRD.lat, TRD.lon), gmst(ms));
+      const sunEl = deg(Math.asin(Math.max(-1, Math.min(1, dot(up, sunEci(ms))))));
+      const en = C.lang === "en";
+      const p = nextPass("FRAMSAT-1", ms);
+      const inMin = p ? (p.aos - ms) / 60000 : 0;
+      body = rows([
+        p ? [en ? `FramSat-1 over Trondheim next, in ${fmtMin(inMin)}, up to ${Math.round(p.maxEl)}°` : `FramSat-1 over Trondheim neste gang, om ${fmtMin(inMin)}, opptil ${Math.round(p.maxEl)}°`, fmtTime(p.aos)]
+          : [en ? "FramSat-1 over Trondheim" : "FramSat-1 over Trondheim", s.noPass2],
+        [en ? "ISS next over" : "ISS neste gang", passText("ISS", ms)],
+        [en ? "Time in Trondheim" : "Klokka i Trondheim", new Date(ms).toLocaleTimeString(s.locale, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Oslo" })],
+        [en ? "Sun" : "Solen", sunEl > 0 ? `${fmtN(sunEl, 1)}° ${en ? "up" : "oppe"}` : (en ? `down, ${fmtN(-sunEl, 1)}° below the horizon` : `nede, ${fmtN(-sunEl, 1)}° under horisonten`)],
+      ]);
     } else if (stopIdx === 5) {
       body = rows(fsRows(ms));
       // the live line from the same numbers as the rows, so they always agree
@@ -1477,17 +1506,26 @@
         const lk = look("ISS", ms);
         const crewDays = Math.floor((ms - Date.UTC(2000, 10, 2)) / 864e5);
         body = rows([
-          [k.alt, `${fmtKm(n.alt)} km`], [k.spd, `${fmtN(n.v, 2)} km/s · ${fmtKm(n.v * 3600)} km/h`], [k.pos, latlon(n.g.lat, n.g.lon)], [k.over, placeName(n.g.lat, n.g.lon)],
+          [k.alt, `${fmtKm(n.alt)} km`], [k.over, placeName(n.g.lat, n.g.lon)], [k.pass, passText("ISS", ms)], [k.aboard, `2 Nov 2000 · ${fmtKm(crewDays)} ${C.lang === "en" ? "days" : "dager"}`],
+          [k.spd, `${fmtN(n.v, 2)} km/s · ${fmtKm(n.v * 3600)} km/h`], [k.pos, latlon(n.g.lat, n.g.lon)],
           [k.sun, sunText(n, ms)], [k.lst, `${String(Math.floor(n.lst)).padStart(2, "0")}:${String(Math.floor((n.lst % 1) * 60)).padStart(2, "0")}`],
           n.orbitNo && [k.orbit, fmtKm(n.orbitNo)], n.el && [k.rate, fmtN(n.el.revPerDay, 2)], n.el && [k.pa, rangeText("ISS", ms)],
-          n.el && [k.inc, `${fmtN(n.el.inc, 2)}°`], lk && [k.trd, `${fmtKm(lk.range)} km`], [k.pass, passText("ISS", ms)], [k.aboard, `2 Nov 2000 · ${fmtKm(crewDays)} ${C.lang === "en" ? "days" : "dager"}`],
+          n.el && [k.inc, `${fmtN(n.el.inc, 2)}°`], lk && [k.trd, `${fmtKm(lk.range)} km`],
           ...extrasRows("ISS", ms)]);
       }
     }
     const d = stopDesc[stopIdx] || { title, text: "" };
     $("cardTitle").innerHTML = `<span>${d.title}</span><span class="lv">${C.lang === "en" ? "Live" : "Direkte"}</span>`;
     if ($("cardDesc").dataset.v !== d.text) { $("cardDesc").textContent = d.text; $("cardDesc").dataset.v = d.text; }
-    $("cardRows").innerHTML = body;
+    const [hero, ...rest] = body, shown = rest.slice(0, 3), extra = rest.slice(3);
+    $("cardStat").innerHTML = hero ? `<span class="stat-v">${hero[1]}</span><span class="stat-k">${hero[0]}</span>` : "";
+    $("cardRows").innerHTML = dl(shown);
+    $("cardMoreRows").innerHTML = dl(extra);
+    $("cardMoreRows").hidden = !cardOpen || !extra.length;
+    const more = $("cardMore"), en = C.lang === "en";
+    more.hidden = !extra.length;
+    more.setAttribute("aria-expanded", String(cardOpen));
+    more.textContent = cardOpen ? (en ? "Fewer numbers" : "Færre tall") : (en ? `More numbers (${extra.length})` : `Flere tall (${extra.length})`);
     $("cardFoot").textContent = `${s.cardFoot[stopIdx] || ""}${sub2 ? ` (${sub2})` : ""}`;
     const showMap = stopIdx >= 4;
     $("cardMap").hidden = !showMap; $("live").hidden = stopIdx !== 5; $("views").hidden = stopIdx !== 5;
@@ -1506,11 +1544,12 @@
     const lk = look("FRAMSAT-1", ms);
     const daysUp = Math.floor((ms - Date.UTC(2026, 8, 5)) / 864e5);
     const cells = [
-      [k.alt, `${fmtKm(n.alt)} km`], [k.spd, `${fmtN(n.v, 2)} km/s`], [k.gspd, `${fmtN(n.gspd, 2)} km/s`],
-      [k.pos, latlon(n.g.lat, n.g.lon)], [k.over, placeName(n.g.lat, n.g.lon)], [k.lst, `${String(Math.floor(n.lst)).padStart(2, "0")}:${String(Math.floor((n.lst % 1) * 60)).padStart(2, "0")}`],
-      [k.sun, sunText(n, ms)], [k.orbit, n.orbitNo ? fmtKm(n.orbitNo) : "–"], [k.days, String(daysUp)],
+      [k.alt, `${fmtKm(n.alt)} km`], [k.over, placeName(n.g.lat, n.g.lon)], [k.pass, passText("FRAMSAT-1", ms)], [k.days, String(daysUp)],
+      [k.spd, `${fmtN(n.v, 2)} km/s`], [k.gspd, `${fmtN(n.gspd, 2)} km/s`],
+      [k.pos, latlon(n.g.lat, n.g.lon)], [k.lst, `${String(Math.floor(n.lst)).padStart(2, "0")}:${String(Math.floor((n.lst % 1) * 60)).padStart(2, "0")}`],
+      [k.sun, sunText(n, ms)], [k.orbit, n.orbitNo ? fmtKm(n.orbitNo) : "–"],
       [k.pa, rangeText("FRAMSAT-1", ms)],
-      [k.trd, lk ? `${fmtKm(lk.range)} km` : "–"], [k.pass, passText("FRAMSAT-1", ms)],
+      [k.trd, lk ? `${fmtKm(lk.range)} km` : "–"],
       ...extrasRows("FRAMSAT-1", ms),
     ];
     return cells;
@@ -1720,7 +1759,7 @@
     const A = stop(a, ms, w.drift), B = b !== a ? stop(b, ms, 0) : A;
     let cam = b !== a ? blend(A, B, t) : A;
     if (A.frame) lastFrame = A.frame; else if (B.frame) lastFrame = B.frame;
-    const weights = [0, 0, 0, 0, 0, 0];
+    const weights = [0, 0, 0, 0, 0, 0, 0];
     weights[a] += 1 - t; weights[b] += t;
     const rideW = (a === 5 || b === 5) ? (a === 5 ? 1 : t) : 0;
     const locked = a === 5 && yS >= lockY;
@@ -1735,9 +1774,9 @@
       // from 0.35 before the maps are in up to full once they are, without dipping to black
       const fade = 0.35 + 0.65 * (loaded ? C.clamp01((now - loadedAt) / 900) : 0);
       field.draw({ uCam: mul(cam.pos, 1 / RE), uF: cam.F, uR: R, uU: U, uTanH: camFull.tanH, uShift: cam.shift,
-        uSun: sun, uGmst: gmst(ms), uFade: smooth(fade), uLoaded: loaded, uNight: Math.max(rideW, weights[4]),
+        uSun: sun, uGmst: gmst(ms), uFade: smooth(fade), uLoaded: loaded, uNight: Math.max(rideW, weights[4], weights[6]),
         uMoon: mul(mf.moon, 1 / RE), uMoonR: RM / RE, uMX: mf.mx, uMY: mf.my, uMZ: mf.mz,
-        uDetailBox: detail.box ? detail.box.uniform : [0, 0, 1, 1], uDetail: detail.fade * Math.min(1, weights[4] + weights[5]) }, dt);
+        uDetailBox: detail.box ? detail.box.uniform : [0, 0, 1, 1], uDetail: detail.fade * Math.min(1, weights[4] + weights[5] + weights[6]) }, dt);
       // Let the renderer lower its resolution only while the view is moving.
       field.setMoving(a !== b || !!dragging || Math.abs(yT - yS) > 2);
       if (detail.ready) detail.fade = Math.min(1, detail.fade + dt / 1.2);
