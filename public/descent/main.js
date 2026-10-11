@@ -485,7 +485,7 @@
       }
       float mu0 = max(dot(nl, uSun), 0.0), mu = max(dot(n, -rd), 0.0);
       col = vec3(1.0, 0.985, 0.96) * alb * (mu0 / (mu0 + mu + 1e-4)) * 4.2;
-      col += vec3(0.30, 0.38, 0.50) * alb * 0.012 * max(dot(n, normalize(-uMoon)), 0.0);
+      col += vec3(0.30, 0.38, 0.50) * alb * 0.03 * max(dot(n, normalize(-uMoon)), 0.0);   // earthshine
     } else if (tE < 1e8) {
       vec3 n = normalize(ro + rd * tE);
       float cg = cos(uGmst), sg = sin(uGmst);
@@ -557,7 +557,7 @@
         float r = length(cross(rd, uSun)) / 0.004653;      // angle from its centre, in solar radii
         if (r < 1.0) col += vec3(1.0, 0.9, 0.76) * (1.0 - 0.6 * (1.0 - sqrt(1.0 - r * r))) * 9.0;
         else col += vec3(1.0, 0.84, 0.64) * (0.5 * pow(1.0 / r, 3.0) + 0.05 * pow(1.0 / r, 1.4));
-        col += vec3(1.0, 0.96, 0.88) * pow(sd, 600.0) * 0.4;
+        col += vec3(1.0, 0.96, 0.88) * pow(sd, 900.0) * 0.3;
       }
     }
     col *= uFade;
@@ -720,19 +720,24 @@
     const aspect = innerWidth / innerHeight;
     const sh = narrow() ? 0 : 0.22 * aspect;
     if (i === 0) {
-      const M = moonEci(ms), away = norm(M), sun = sunEci(ms);
-      let side = sub(sun, mul(away, dot(sun, away)));
-      side = len(side) < 1e-3 ? norm(cross(away, [0, 0, 1])) : norm(side);
-      // A fixed view just beyond the Moon, looking back at Earth. Dragging
-      // turns the Moon itself (spinMoon), not the camera.
-      const off0 = add(mul(away, 7600), mul(side, 2300 + drift * 400));
-      const pos = add(M, off0);
-      const { F, U } = tilt(lookAt(pos, [0, 0, 0], side), rad(-7.5));
+      // Framed around the Sun: the camera looks at the Moon with the Sun just
+      // past its top edge (clear of the name and the route list), so the Moon is lit from behind, whatever
+      // the phase: near new Moon its face is the night side in earthshine
+      // with the Sun's corona flaring round the rim, otherwise a thin bright
+      // crescent along that edge. Dragging turns the Moon itself (spinMoon).
+      const M = moonEci(ms), sun = sunEci(ms), D = 7900 + drift * 400;
+      let U0 = sub(ECL_N, mul(sun, dot(ECL_N, sun)));
+      U0 = len(U0) < 1e-3 ? norm(cross(sun, [1, 0, 0])) : norm(U0);
+      const off = norm(sub(mul(U0, 0.97), mul(cross(sun, U0), 0.26)));   // where the Sun sits from the Moon's centre: up, a touch left
+      const a = Math.asin(RM / D) * 1.04;                              // just past the edge
+      const F = norm(sub(mul(sun, Math.cos(a)), mul(off, Math.sin(a))));
+      const pos = sub(M, mul(F, D));
+      const U = norm(sub(U0, mul(F, dot(U0, F))));
       moonAxes = { U, R: cross(F, U) };
-      // The way out, as a curve with two bends: first back along the
-      // Earth-Moon line, so the Moon shrinks ahead of you with Earth behind
-      // it, then wide around it, so it never rushes past right beside you.
-      const hop = [add(M, add(mul(away, 80000), mul(side, 10000))), add(M, add(mul(away, -60000), mul(side, 140000)))];
+      // The way out: back away from the Moon so it shrinks ahead of you,
+      // then curve in towards Earth. The view turns round on the way (blend).
+      const back = sub(pos, mul(F, 60000));
+      const hop = [back, mul(back, 0.45)];
       return { pos, F, U, half: portrait() ? 30 : 21, shift: sh * 0.8, hop };
     }
     if (i === 1) {
@@ -807,6 +812,13 @@
     const e = t * t * (3 - 2 * t);
     const aim = add(mul(aimOf(A), 1 - e), mul(aimOf(B), e));
     let F = norm(sub(aim, pos));
+    if (A.hop) {
+      // leaving the Moon the view may turn right round (from the Sun to Earth),
+      // which aiming at a sliding point can't do: turn about an explicit axis
+      let axis = cross(A.F, B.F);
+      axis = len(axis) < 1e-3 ? A.U : norm(axis);
+      F = rotAround(A.F, axis, Math.acos(Math.max(-1, Math.min(1, dot(A.F, B.F)))) * e);
+    }
     if (!isFinite(F[0])) F = slerp(A.F, B.F, t);
     let U = slerp(A.U, B.U, t);
     U = sub(U, mul(F, dot(U, F)));
@@ -1284,7 +1296,9 @@
       og.beginPath(); og.arc(x, y, 0.5 + mag * 1.1, 0, Math.PI * 2); og.fill();
     }
     og.globalAlpha = 1;
-    moonFeatures(cam, cam.mf, weights[0], ms);
+    // crater names only while the Moon is big enough to carry them
+    const moonDeg = deg(Math.asin(Math.min(1, RM / len(sub(cam.moonKm, cam.posKm)))));
+    moonFeatures(cam, cam.mf, weights[0] * smooth((moonDeg - 3) / 4), ms);
 
     // ASBM: orbits, coverage cone of whichever is switched on, the 65° N line
     const wA = Math.max(weights[1], 0.12 * (weights[0] + weights[2]));
