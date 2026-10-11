@@ -154,8 +154,43 @@
     ["Buenos Aires", -34.60, -58.38], ["Santiago", -33.45, -70.67], ["Nuuk", 64.18, -51.72], ["Novosibirsk", 55.01, 82.93], ["Yakutsk", 62.03, 129.73],
     ["Ushuaia", -54.80, -68.30], ["McMurdo", -77.85, 166.67], ["Kourou", 5.16, -52.65], ["Baikonur", 45.96, 63.31], ["Cape Canaveral", 28.39, -80.60],
   ];
+  // More places, labelled only where they don't crowd the ones above.
+  const MORE_CITIES = [
+    ["Bergen", 60.39, 5.32], ["Stavanger", 58.97, 5.73], ["Bodø", 67.28, 14.40], ["Kirkenes", 69.73, 30.05], ["Ny-Ålesund", 78.92, 11.93],
+    ["Gothenburg", 57.71, 11.97], ["Aarhus", 56.16, 10.20], ["Tórshavn", 62.01, -6.77], ["Hamburg", 53.55, 9.99], ["Munich", 48.14, 11.58],
+    ["Amsterdam", 52.37, 4.90], ["Brussels", 50.85, 4.35], ["Darmstadt", 49.87, 8.65], ["Zurich", 47.38, 8.54], ["Vienna", 48.21, 16.37],
+    ["Prague", 50.08, 14.44], ["Warsaw", 52.23, 21.01], ["Budapest", 47.50, 19.04], ["Barcelona", 41.39, 2.17], ["Lisbon", 38.72, -9.14],
+    ["Dublin", 53.35, -6.26], ["Edinburgh", 55.95, -3.19], ["Milan", 45.46, 9.19], ["Marseille", 43.30, 5.37], ["Toulouse", 43.60, 1.44],
+    ["Athens", 37.98, 23.73], ["Kyiv", 50.45, 30.52], ["St Petersburg", 59.94, 30.31], ["Riga", 56.95, 24.11], ["Bucharest", 44.43, 26.10],
+    ["Murmansk", 68.97, 33.08], ["Arkhangelsk", 64.54, 40.54], ["Ponta Delgada", 37.74, -25.67], ["Las Palmas", 28.12, -15.44],
+    ["Casablanca", 33.57, -7.59], ["Algiers", 36.75, 3.06], ["Tunis", 36.81, 10.18], ["Dakar", 14.72, -17.47], ["Accra", 5.60, -0.19],
+    ["Kano", 12.00, 8.52], ["Kinshasa", -4.44, 15.27], ["Luanda", -8.84, 13.23], ["Khartoum", 15.50, 32.56], ["Addis Ababa", 9.03, 38.74],
+    ["Dar es Salaam", -6.79, 39.21], ["Antananarivo", -18.88, 47.51], ["Port Louis", -20.16, 57.50],
+    ["Tel Aviv", 32.09, 34.78], ["Baghdad", 33.31, 44.36], ["Riyadh", 24.71, 46.68], ["Tehran", 35.69, 51.39], ["Karachi", 24.86, 67.01],
+    ["Kabul", 34.56, 69.21], ["Tashkent", 41.30, 69.24], ["Almaty", 43.24, 76.89], ["Yekaterinburg", 56.84, 60.61], ["Omsk", 54.99, 73.37],
+    ["Norilsk", 69.35, 88.20], ["Irkutsk", 52.29, 104.30], ["Vladivostok", 43.12, 131.89], ["Ulaanbaatar", 47.89, 106.91], ["Ürümqi", 43.83, 87.62],
+    ["Lhasa", 29.65, 91.17], ["Kathmandu", 27.72, 85.32], ["Kolkata", 22.57, 88.36], ["Dhaka", 23.81, 90.41], ["Chennai", 13.08, 80.27],
+    ["Bengaluru", 12.97, 77.59], ["Colombo", 6.93, 79.86], ["Malé", 4.18, 73.51], ["Yangon", 16.84, 96.17], ["Hanoi", 21.03, 105.85],
+    ["Ho Chi Minh City", 10.82, 106.63], ["Kuala Lumpur", 3.14, 101.69], ["Hong Kong", 22.32, 114.17], ["Guangzhou", 23.13, 113.26],
+    ["Chengdu", 30.57, 104.07], ["Taipei", 25.03, 121.57], ["Osaka", 34.69, 135.50], ["Sapporo", 43.06, 141.35],
+    ["Melbourne", -37.81, 144.96], ["Brisbane", -27.47, 153.03], ["Adelaide", -34.93, 138.60], ["Darwin", -12.46, 130.84],
+    ["Alice Springs", -23.70, 133.88], ["Wellington", -41.29, 174.78], ["Christchurch", -43.53, 172.64], ["Port Moresby", -9.44, 147.18],
+    ["Suva", -18.14, 178.44], ["Nouméa", -22.27, 166.45], ["Papeete", -17.54, -149.57], ["Hanga Roa", -27.15, -109.43],
+    ["Utqiaġvik", 71.29, -156.79], ["Fairbanks", 64.84, -147.72], ["Whitehorse", 60.72, -135.06], ["Yellowknife", 62.45, -114.37],
+    ["Iqaluit", 63.75, -68.52], ["Pituffik", 76.53, -68.70], ["Seattle", 47.61, -122.33], ["San Francisco", 37.77, -122.42],
+    ["Las Vegas", 36.17, -115.14], ["Phoenix", 33.45, -112.07], ["Salt Lake City", 40.76, -111.89], ["Calgary", 51.05, -114.07],
+    ["Winnipeg", 49.90, -97.14], ["Minneapolis", 44.98, -93.27], ["Dallas", 32.78, -96.80], ["New Orleans", 29.95, -90.07],
+    ["Atlanta", 33.75, -84.39], ["Washington", 38.91, -77.04], ["Boston", 42.36, -71.06], ["Toronto", 43.65, -79.38], ["Montreal", 45.50, -73.57],
+    ["Monterrey", 25.69, -100.32], ["Guadalajara", 20.67, -103.35], ["Havana", 23.11, -82.37], ["Santo Domingo", 18.49, -69.93],
+    ["San Juan", 18.47, -66.11], ["Guatemala City", 14.63, -90.51], ["Panama City", 8.98, -79.52], ["Caracas", 10.48, -66.90],
+    ["Quito", -0.18, -78.47], ["Manaus", -3.12, -60.02], ["Recife", -8.05, -34.88], ["Brasília", -15.79, -47.88], ["La Paz", -16.49, -68.12],
+    ["Asunción", -25.26, -57.58], ["Montevideo", -34.90, -56.16], ["Punta Arenas", -53.16, -70.91], ["Stanley", -51.70, -57.85],
+  ];
   const ecefUnit = (lat, lon) => [Math.cos(rad(lat)) * Math.cos(rad(lon)), Math.cos(rad(lat)) * Math.sin(rad(lon)), Math.sin(rad(lat))];
-  const CITY_V = CITIES.map(([n, la, lo]) => [n, ecefUnit(la, lo)]);
+  const ALL_CITIES = [...CITIES, ...MORE_CITIES];
+  // Drawn in this order, so when labels would collide the earlier one wins:
+  // home first, then the main list, then the rest.
+  const CITY_V = ALL_CITIES.map(([n, la, lo], i) => [n, ecefUnit(la, lo), i < CITIES.length]);
   const TRD = { lat: 63.4305, lon: 10.3951, h: 0.05 };
 
   // the graticule as Earth-fixed unit vectors, and the countries for naming
@@ -554,7 +589,7 @@
   }
   const mapUrl = (file, w) => `/descent/tex/${file}-${TAG[w]}.webp`;
   const calm = () => new Promise(res => {
-    const check = () => (flight.from === flight.to && !dragging ? res() : setTimeout(check, 150));
+    const check = () => (Math.abs(yT - yS) < 2 && !dragging ? res() : setTimeout(check, 150));
     check();
   });
   if (field) {
@@ -611,7 +646,7 @@
   }
   function updateDetail(ms) {
     if (!field || !loaded || detail.loading) return;
-    const stopNow = flight.to;
+    const stopNow = curStop;
     const sat = stopNow === 4 ? "ISS" : stopNow === 5 ? "FRAMSAT-1" : null;
     if (!sat) return;
     const p = subPoint(sat, ms); if (!p) return;
@@ -754,65 +789,19 @@
     const s = sections[sections.length - 1];
     lockY = s.offsetTop + s.offsetHeight - innerHeight * 0.75;
   }
-  // How far through its hold the page is, for the slow drift within a stop.
-  const driftOf = (i, y) => C.clamp01((y - holds[i][0]) / Math.max(1, holds[i][1] - holds[i][0]));
-
-  /* ---------- transitions between stops ----------
-     Scrolling doesn't scrub the camera from stop to stop. Scrolling past the
-     middle of the gap between two stops picks the next one, and the camera
-     then flies there over a fixed time with its own easing, so every
-     transition plays the same however fast or unevenly you scroll. Turning
-     back mid-flight reverses it smoothly; jumping several stops (the route
-     list) flies straight there, a little slower. Within a stop, scrolling
-     still drifts the camera. */
-  const FLIGHT_MS = 1500, EXTRA_STOP_MS = 350, MAX_FLIGHT_MS = 2600;
-  const HYSTERESIS = 0.08;                     // of the screen height, so the choice doesn't flicker
-  const easeInOut = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-  const flight = { from: 0, to: 0, t0: 0, dur: 0 };
-  let target = 0;
-  function pickStop(y) {
-    const h = innerHeight * HYSTERESIS;
-    for (let i = 0; i < holds.length - 1; i++) {
-      const mid = (holds[i][1] + holds[i + 1][0]) / 2;
-      if (y < (target <= i ? mid + h : mid - h)) return i;
-    }
-    return holds.length - 1;
-  }
-  const flightProgress = now => flight.dur ? C.clamp01((now - flight.t0) / flight.dur) : 1;
-  function fly(now) {
-    if (flight.from !== flight.to && flightProgress(now) >= 1) flight.from = flight.to;
-    if (target === flight.to) return;
-    if (flight.from === flight.to) {
-      const n = Math.abs(target - flight.from);
-      const dur = C.reduceMotion ? 0 : Math.min(MAX_FLIGHT_MS, FLIGHT_MS + EXTRA_STOP_MS * (n - 1));
-      Object.assign(flight, { from: flight.from, to: target, t0: now, dur });
-    } else if (target === flight.from) {
-      // Turn around where it is: the easing is symmetric, so p becomes 1 - p.
-      const p = flightProgress(now);
-      Object.assign(flight, { from: flight.to, to: flight.from, t0: now - (1 - p) * flight.dur });
-    }
-    // Otherwise a new stop was picked mid-flight: this flight finishes first.
-  }
-  function jumpTo(i) { target = i; Object.assign(flight, { from: i, to: i, t0: 0, dur: 0 }); }
-
-  // When scrolling stops in the gap between two stops, settle onto the one
-  // the camera is at or heading for, so the page never rests halfway.
-  let settleTimer = 0, touching = false;
-  function settle() {
-    if (C.reduceMotion || touching || document.body.classList.contains("tracker-open")) return;
-    const y = scrollY + innerHeight / 2;
-    for (let i = 0; i < holds.length - 1; i++) {
-      const end = holds[i][1], next = holds[i + 1][0];
-      if (y > end && y < next) {
-        const to = target <= i ? end - 2 : next + 2;
-        window.scrollTo({ top: to - innerHeight / 2, behavior: "smooth" });
-        return;
+  // Where the page is: inside one stop's hold (i === j, with drift for the
+  // slow movement within it), or between two (t, the progress from i to j).
+  function where(y) {
+    for (let i = 0; i < holds.length; i++) {
+      const [a, b] = holds[i];
+      if (y <= b || i === holds.length - 1) {
+        if (y >= a || i === 0) return { i, j: i, t: 0, drift: C.clamp01((y - a) / Math.max(1, b - a)) };
+        const pa = holds[i - 1][1];
+        return { i: i - 1, j: i, t: smooth((y - pa) / Math.max(1, a - pa)), drift: 1 };
       }
     }
+    return { i: holds.length - 1, j: holds.length - 1, t: 0, drift: 1 };
   }
-  const scheduleSettle = () => { clearTimeout(settleTimer); settleTimer = setTimeout(settle, 240); };
-  window.addEventListener("touchstart", () => { touching = true; clearTimeout(settleTimer); }, { passive: true });
-  window.addEventListener("touchend", () => { touching = false; scheduleSettle(); }, { passive: true });
 
   /* ---------- overlay ---------- */
   const ov = $("overlay"), og = ov.getContext("2d");
@@ -898,17 +887,21 @@
     draw(GRAT, "rgba(160,200,255,1)", 0.6, 0.14);
     // cities
     og.font = `500 10.5px ${MONO}`;
+    const taken = [];                                    // label boxes already drawn this frame
     for (const [n, v] of CITY_V) {
       const P = [(cg * v[0] - sg * v[1]) * RE, (sg * v[0] + cg * v[1]) * RE, v[2] * RE];
       if (dot(P, c) <= horizon * 1.001) continue;
       const s = project(cam, P); if (!s || s[0] < 0 || s[1] < 0 || s[0] > innerWidth || s[1] > innerHeight) continue;
       const isHome = n === "Trondheim" || n === "Andøya";
+      const box = [s[0] - 4, s[1] - 16, s[0] + 10 + og.measureText(n).width, s[1] + 4];
+      if (!isHome && taken.some(t => box[0] < t[2] && box[2] > t[0] && box[1] < t[3] && box[3] > t[1])) continue;
+      taken.push(box);
       og.globalAlpha = w * (isHome ? 1 : 0.9);
       og.fillStyle = isHome ? "#ffb547" : "#f1f1ee";
       og.beginPath(); og.arc(s[0], s[1], isHome ? 3 : 2, 0, Math.PI * 2); og.fill();
       haloText(n, s[0] + 6, s[1] - 5, isHome ? "#ffb547" : "#f1f1ee", `500 10.5px ${MONO}`);
       if (w > 0.5) {
-        const city = CITIES.find(x => x[0] === n), lk = lookFrom(city[1], city[2], c, ms), en = C.lang === "en";
+        const city = ALL_CITIES.find(x => x[0] === n), lk = lookFrom(city[1], city[2], c, ms), en = C.lang === "en";
         const sunUp = dot(norm(P), sunEci(ms)) > 0;
         hovers.push({ x: s[0], y: s[1], r: 8, html: tipHTML(n, `${fmtN(Math.abs(city[1]), 2)}° ${city[1] >= 0 ? "N" : "S"}, ${fmtN(Math.abs(city[2]), 2)}° ${city[2] >= 0 ? (en ? "E" : "Ø") : C.S().west}`,
           n === "Andøya" ? (en ? "Andøya Spaceport, where FramSat-1 was launched." : "Andøya Spaceport, der FramSat-1 ble skutt opp.") : n === "Trondheim" ? (en ? "Home, and Orbit NTNU’s ground station." : "Hjemme, og Orbit NTNUs bakkestasjon.") : "",
@@ -1636,7 +1629,7 @@
 
   /* ---------- loop ---------- */
   let yS = 0, yT = 0;
-  const onScroll = () => { yT = scrollY + innerHeight / 2; scheduleSettle(); };
+  const onScroll = () => { yT = scrollY + innerHeight / 2; };
   let last = performance.now(), clock = 0, lastText = 0, lastCard = 0;
   const angDiff = (a, b) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
   function frame(now) {
@@ -1647,16 +1640,16 @@
     moonLook.az += (moonLook.taz - moonLook.az) * k; moonLook.el += (moonLook.tel - moonLook.el) * k;
     if (ride.pitch !== null) { ride.yaw += angDiff(ride.yaw, ride.tyaw) * k; ride.pitch += (ride.tpitch - ride.pitch) * k; }
     const ms = Date.now();
-    target = pickStop(yT); fly(now);
-    const a = flight.from, b = flight.to, t = a === b ? 0 : easeInOut(flightProgress(now));
+    const w = where(yS);
+    const a = w.i, b = w.j, t = w.t;
     curStop = t < 0.5 ? a : b;
-    const A = stop(a, ms, driftOf(a, yS)), B = b !== a ? stop(b, ms, driftOf(b, yS)) : A;
+    const A = stop(a, ms, w.drift), B = b !== a ? stop(b, ms, 0) : A;
     let cam = b !== a ? blend(A, B, t) : A;
     if (A.frame) lastFrame = A.frame; else if (B.frame) lastFrame = B.frame;
     const weights = [0, 0, 0, 0, 0, 0];
     weights[a] += 1 - t; weights[b] += t;
-    const rideW = a === b ? (a === 5 ? 1 : 0) : (a === 5 ? 1 - t : 0) + (b === 5 ? t : 0);
-    const locked = a === 5 && b === 5 && yS >= lockY;
+    const rideW = (a === 5 || b === 5) ? (a === 5 ? 1 : t) : 0;
+    const locked = a === 5 && yS >= lockY;
     document.body.classList.toggle("live-lock", locked);
     document.body.classList.toggle("riding", rideW > 0.6);
     const U = norm(sub(cam.U, mul(cam.F, dot(cam.U, cam.F))));
@@ -1689,6 +1682,6 @@
   const renderHtml = () => document.querySelectorAll("[data-h]").forEach(el => { el.innerHTML = C.S()[el.dataset.h]; });
   C.onLang(() => { buildRoute(); stopTexts(Date.now()); lastCard = 0; renderHtml(); });
 
-  C.render(); renderHtml(); layout(); onScroll(); yS = yT; jumpTo(pickStop(yT));
+  C.render(); renderHtml(); layout(); onScroll(); yS = yT;
   requestAnimationFrame(frame);
 })();
