@@ -852,7 +852,7 @@
     const vh = readH();
     holds = sections.map((s, i) => {
       const top = s.offsetTop, h = s.offsetHeight;
-      if (i === 0) return [0, readTop() + vh * 0.8];
+      if (i === 0) return [0, Math.max(readTop() + vh * 0.8, top + h - vh * 0.45)];   // phones: until the Moon's card has passed
       if (i === 5) return [top + vh * 0.35, top + h - vh * 0.4];   // FramSat-1: a long hold to ride along
       return [top + vh * 0.55, Math.max(top + vh * 0.55, top + h - vh * 0.45)];
     });
@@ -1454,21 +1454,22 @@
   // number, the next three show, the rest wait behind "More numbers".
   const rows = pairs => pairs.filter(Boolean);
   const dl = pairs => pairs.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
-  let cardOpen = false;
-  $("cardMore").addEventListener("click", () => { cardOpen = !cardOpen; lastCard = 0; });
-  // Phones: the card is one line at the foot of the scene, and opens as a
-  // sheet from the bottom of the screen.
-  const side = $("side"), sheetBtn = $("cardSheet");
-  function setSheet(open) {
-    side.classList.toggle("open", open);
-    sheetBtn.setAttribute("aria-expanded", String(open));
-    sheetBtn.textContent = open ? C.S().close : (C.lang === "en" ? "Details" : "Detaljer");
-    if (!open) card.scrollTop = 0;
-  }
-  sheetBtn.addEventListener("click", () => setSheet(!side.classList.contains("open")));
-  window.addEventListener("pointerdown", e => { if (side.classList.contains("open") && !side.contains(e.target)) setSheet(false); });
-  window.addEventListener("keydown", e => { if (e.key === "Escape" && side.classList.contains("open")) setSheet(false); });
-  setSheet(false);
+  // Phones: each stop's card sits in the page, at the start of the stop's
+  // text (the .slot elements), so cards and text take turns instead of the
+  // card covering the text. The cards are copies of the side panel's.
+  const slotCards = [...document.querySelectorAll(".slot")].map(slot => {
+    const c = card.cloneNode(true);
+    c.removeAttribute("id");
+    c.querySelectorAll("[id]").forEach(e => e.removeAttribute("id"));
+    c.querySelectorAll("[aria-controls]").forEach(e => e.removeAttribute("aria-controls"));
+    slot.append(c);
+    return [Number(slot.dataset.slot), c];
+  });
+  // "More numbers", on any card
+  document.addEventListener("click", e => {
+    const b = e.target.closest(".more-btn"); if (!b) return;
+    const c = b.closest(".card"); c.dataset.open = c.dataset.open === "1" ? "" : "1"; lastCard = 0;
+  });
   function sunText(sn, ms) {
     const s = C.S(); if (!sn || !sn.sh) return "–";
     const m = (sn.sh.t - ms) / 60000;
@@ -1481,7 +1482,8 @@
     const dm = (p.aos - ms) / 60000;
     return s.passFmt(`${fmtTime(p.aos)} (${dm < 1 ? (C.lang === "en" ? "now" : "nå") : (C.lang === "en" ? "in " : "om ") + fmtMin(dm)})`, Math.round(p.maxEl), p.visible);
   }
-  function updateCard(stopIdx, ms) {
+  function updateCard(stopIdx, ms, root = card) {
+    const q = c => root.querySelector("." + c), open = root.dataset.open === "1";
     const s = C.S(), k = s.k, title = s.route[stopIdx];
     let body = [], sub2 = "";
     if (stopIdx === 0) {
@@ -1517,7 +1519,7 @@
       const n = satNumbers("FRAMSAT-1", ms), later = sv("FRAMSAT-1", ms + 10000);
       if (n && later) {
         const north = geodetic(later.r, ms + 10000).lat >= n.g.lat;
-        $("live").textContent = s.liveNow(fmtKm(n.alt), placeName(n.g.lat, n.g.lon), north ? s.north : s.south, fmtN(n.v, 1));
+        q("c-live").textContent = s.liveNow(fmtKm(n.alt), placeName(n.g.lat, n.g.lon), north ? s.north : s.south, fmtN(n.v, 1));
       }
     } else if (stopIdx === 4) {
       const n = satNumbers("ISS", ms);
@@ -1534,22 +1536,22 @@
       }
     }
     const d = stopDesc[stopIdx] || { title, text: "" };
-    $("cardTitle").innerHTML = `<span>${d.title}</span><span class="lv">${C.lang === "en" ? "Live" : "Direkte"}</span>`;
-    if ($("cardDesc").dataset.v !== d.text) { $("cardDesc").textContent = d.text; $("cardDesc").dataset.v = d.text; }
+    q("c-title").innerHTML = `<span>${d.title}</span><span class="lv">${C.lang === "en" ? "Live" : "Direkte"}</span>`;
+    if (q("c-desc").dataset.v !== d.text) { q("c-desc").textContent = d.text; q("c-desc").dataset.v = d.text; }
     const [hero, ...rest] = body, shown = rest.slice(0, 3), extra = rest.slice(3);
-    $("cardStat").innerHTML = hero ? `<span class="stat-v">${hero[1]}</span><span class="stat-k">${hero[0]}</span>` : "";
-    $("cardRows").innerHTML = dl(shown);
-    $("cardMoreRows").innerHTML = dl(extra);
-    $("cardMoreRows").hidden = !cardOpen || !extra.length;
-    const more = $("cardMore"), en = C.lang === "en";
+    q("c-stat").innerHTML = hero ? `<span class="stat-v">${hero[1]}</span><span class="stat-k">${hero[0]}</span>` : "";
+    q("c-rows").innerHTML = dl(shown);
+    q("c-more-rows").innerHTML = dl(extra);
+    q("c-more-rows").hidden = !open || !extra.length;
+    const more = q("more-btn"), en = C.lang === "en";
     more.hidden = !extra.length;
-    more.setAttribute("aria-expanded", String(cardOpen));
-    more.textContent = cardOpen ? (en ? "Fewer numbers" : "Færre tall") : (en ? `More numbers (${extra.length})` : `Flere tall (${extra.length})`);
-    $("cardFoot").textContent = `${s.cardFoot[stopIdx] || ""}${sub2 ? ` (${sub2})` : ""}`;
+    more.setAttribute("aria-expanded", String(open));
+    more.textContent = open ? (en ? "Fewer numbers" : "Færre tall") : (en ? `More numbers (${extra.length})` : `Flere tall (${extra.length})`);
+    q("foot").textContent = `${s.cardFoot[stopIdx] || ""}${sub2 ? ` (${sub2})` : ""}`;
     const showMap = stopIdx >= 4;
-    $("cardMap").hidden = !showMap; $("live").hidden = stopIdx !== 5; $("views").hidden = stopIdx !== 5;
-    card.dataset.view = stopIdx;
-    if (showMap) drawMini(stopIdx === 4 ? "ISS" : "FRAMSAT-1", ms);
+    q("c-map").hidden = !showMap; q("c-live").hidden = stopIdx !== 5; q("views").hidden = stopIdx !== 5;
+    root.dataset.view = stopIdx;
+    if (showMap) drawMini(stopIdx === 4 ? "ISS" : "FRAMSAT-1", ms, q("c-map"));
   }
   function extrasRows(name, ms) {
     const k = C.S().k, x = orbitExtras(name, ms), en = C.lang === "en";
@@ -1575,7 +1577,6 @@
   }
 
   /* ---------- small world map for the low stops ---------- */
-  const mini = $("cardMap"), mg = mini.getContext("2d");
   let miniBase = null;
   function miniLand(W, H) {
     if (miniBase && miniBase.width === W) return miniBase;
@@ -1593,7 +1594,8 @@
     for (let la = -60; la <= 60; la += 30) { const y = (90 - la) / 180 * H; g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
     miniBase = c; return c;
   }
-  function drawMini(name, ms) {
+  function drawMini(name, ms, mini) {
+    const mg = mini.getContext("2d");
     const dpr = Math.min(devicePixelRatio || 1, 2), W = Math.round(mini.clientWidth * dpr) || 600, H = Math.round(W / 2);
     if (mini.width !== W) { mini.width = W; mini.height = H; }
     mg.setTransform(1, 0, 0, 1, 0, 0);
@@ -1642,13 +1644,13 @@
     }
   }
   function buildViews() {
-    const s = C.S(), v = $("viewBtns");
-    v.replaceChildren(...s.views.map((nm, i) => {
+    const s = C.S();
+    document.querySelectorAll(".view-btns").forEach(v => v.replaceChildren(...s.views.map((nm, i) => {
       const b = document.createElement("button"); b.type = "button"; b.textContent = nm;
       b.setAttribute("aria-pressed", String(i === ride.preset));
       b.addEventListener("click", () => setView(i));
       return b;
-    }));
+    })));
   }
   let lastFrame = null;
   function setView(i) {
@@ -1663,7 +1665,7 @@
       const back = dot(sun, fr.fwd), sd = -dot(sun, fr.side), u = -dot(sun, fr.up);
       ride.tyaw = Math.atan2(sd, back); ride.tpitch = Math.max(0.15, Math.min(1.45, Math.asin(Math.max(-1, Math.min(1, u)))));
     }
-    [...$("viewBtns").children].forEach((b, k) => b.setAttribute("aria-pressed", String(k === i)));
+    document.querySelectorAll(".view-btns").forEach(v => [...v.children].forEach((b, k) => b.setAttribute("aria-pressed", String(k === i))));
   }
 
   /* ---------- tracker drawer ---------- */
@@ -1707,7 +1709,7 @@
     } else {
       ride.tyaw = dragging.yaw + dx * k;
       ride.tpitch = Math.max(0.12, Math.min(1.45, dragging.pitch + dy * k));
-      if (ride.preset !== -1) { ride.preset = -1; [...$("viewBtns").children].forEach(b => b.setAttribute("aria-pressed", "false")); }
+      if (ride.preset !== -1) { ride.preset = -1; document.querySelectorAll(".view-btns button").forEach(b => b.setAttribute("aria-pressed", "false")); }
     }
   });
   const endDrag = () => { dragging = null; document.body.classList.remove("looking"); };
@@ -1810,7 +1812,11 @@
       }
     });
     if (now - lastText > 1000) { lastText = now; stopTexts(ms); updateDetail(ms); }
-    if (now - lastCard > 500) { lastCard = now; updateCard(curStop, ms); }
+    if (now - lastCard > 500) {
+      lastCard = now;
+      if (!narrow()) updateCard(curStop, ms);
+      else for (const [i, c] of slotCards) { const r = c.getBoundingClientRect(); if (r.bottom > -200 && r.top < innerHeight + 400) updateCard(i, ms, c); }
+    }
     globe.frame(now);
     requestAnimationFrame(frame);
   }
@@ -1821,7 +1827,9 @@
   const renderHtml = () => document.querySelectorAll("[data-h]").forEach(el => { el.innerHTML = C.S()[el.dataset.h]; });
   C.onLang(() => { buildRoute(); stopTexts(Date.now()); lastCard = 0; renderHtml(); });
 
-  C.render(); renderHtml(); layout(); onScroll(); yS = yT;
+  C.render(); renderHtml();
+  slotCards.forEach(([i, c]) => updateCard(i, Date.now(), c));   // filled before layout, so the page doesn't jump later
+  layout(); onScroll(); yS = yT;
   // a timeline wider than a phone starts at its recent end
   const chartWrap = document.querySelector(".chart-wrap");
   if (chartWrap) chartWrap.scrollLeft = chartWrap.scrollWidth;

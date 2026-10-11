@@ -52,8 +52,8 @@ body.can-drag main { -webkit-user-select: none; user-select: none; }
 .card h4 .lv { color: var(--fs); display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
 .card h4 .lv::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .card .cdesc { margin: 0; font: 400 14px/1.5 var(--f-body); color: var(--ink-2); }
-.card #live { margin: 0; font: 500 15px/1.45 var(--f-body); color: var(--ink); }
-#cardMap { display: block; width: 100%; aspect-ratio: 2 / 1; height: auto; border-radius: 8px; }
+.card .c-live { margin: 0; font: 500 15px/1.45 var(--f-body); color: var(--ink); }
+.c-map { display: block; width: 100%; aspect-ratio: 2 / 1; height: auto; border-radius: 8px; }
 .card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; }
 .card dt { font: 400 13px/1.35 var(--f-data); color: var(--ink-3); }
 .card dd { margin: 0; font: 500 14px/1.35 var(--f-data); color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
@@ -234,10 +234,10 @@ input[type="range"] { width: 100%; accent-color: var(--fs); }
 footer { position: relative; z-index: 2; padding: 0 var(--gutter) calc(20px + env(safe-area-inset-bottom, 0px)); color: var(--ink-3); font-size: 13px; line-height: 1.5; }
 footer p { max-width: 60ch; }
 
-.sheet-btn { display: none; }
+.slot { display: none; }
 /* Phones: the scene is a window across the top of the screen and the page
-   scrolls on below it, so text never sits on the pictures. The card shrinks
-   to one line at the window's foot and opens as a sheet. */
+   scrolls on below it, so text never sits on the pictures. Each stop's card
+   sits in the page at the start of its text (copies made by main.js). */
 @media (max-width: 900px) {
   :root { --scene: 46svh; }
   body { background: rgb(var(--haze)); }
@@ -257,26 +257,10 @@ footer p { max-width: 60ch; }
   .arrival { padding-block: 10svh 0; }
   h2 { font-size: clamp(36px, 10vw, 56px); }
 
-  .side { left: var(--gutter); right: var(--gutter); width: auto; top: auto; bottom: calc(100svh - var(--scene) + 12px); z-index: 6; }
-  .route { display: none; }
-  body.riding .side { display: none; }
-  .card { position: relative; margin: 0; padding: 11px 14px; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 14px; background: rgba(var(--haze), .78); }
-  .card > * { grid-column: 1 / -1; }
-  .card h4 { grid-column: 1; font-size: 15px; justify-content: flex-start; }
-  .card h4 > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .card .stat { grid-column: 2; }
-  .side:not(.open) .card > :not(h4):not(.stat):not(.sheet-btn) { display: none !important; }
-  .side:not(.open) .stat-k { display: none; }
-  .side:not(.open) .stat-v { font-size: 17px; letter-spacing: -0.01em; }
-  /* the whole one-line card is the button that opens it */
-  .side:not(.open) .sheet-btn { display: block; position: absolute; inset: 0; opacity: 0; cursor: pointer; border: 0; border-radius: 12px; }
-  .side:not(.open) .sheet-btn:focus-visible { opacity: 1; background: none; color: transparent; outline: 1px solid var(--ink); }
-  .side.open { left: 0; right: 0; bottom: 0; z-index: 9; }
-  .side.open .card { max-height: 74svh; padding: 18px var(--gutter) calc(18px + env(safe-area-inset-bottom, 0px)); gap: 12px 14px; border-radius: 16px 16px 0 0; background: rgba(var(--haze), .97); box-shadow: 0 -12px 40px rgba(0, 0, 0, .5); }
-  .side.open .card h4 { font-size: 17px; }
-  .side.open .card .stat { grid-column: 1 / -1; }
-  .side.open .sheet-btn { display: block; order: 99; justify-self: start; font: 500 14px/1 var(--f-body); color: var(--ink); background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 10px 16px; cursor: pointer; }
-
+  .side { display: none; }
+  .slot { display: block; margin-bottom: 36px; }
+  .hero .slot { margin: 36px 0 0; }
+  .slot .card { margin: 0; overflow: visible; background: rgba(238, 242, 245, .045); border: 1px solid var(--rule); -webkit-backdrop-filter: none; backdrop-filter: none; }
   .hud { width: auto; right: var(--gutter); max-height: calc(100svh - var(--scene) - 36px); }
 }
 @media (prefers-reduced-motion: reduce) { .drawer, .hud { transition: none; } .hud .k::before { animation: none; } }
@@ -318,17 +302,16 @@ export const DESCENT_BODY = String.raw`
 <aside class="side" id="side" aria-label="What you are passing">
   <ol class="route" id="route" aria-label="Stops"></ol>
   <section class="card" id="card">
-    <h4 id="cardTitle"></h4>
-    <p class="cdesc" id="cardDesc"></p>
-    <p id="live" hidden></p>
-    <canvas id="cardMap" hidden></canvas>
-    <div class="views" id="views" hidden><div id="viewBtns" role="group" aria-label="View" style="display:flex;flex-wrap:wrap;gap:4px"></div></div>
-    <div class="stat" id="cardStat"></div>
-    <dl id="cardRows"></dl>
-    <dl id="cardMoreRows" class="more" hidden></dl>
-    <button class="more-btn" id="cardMore" type="button" aria-expanded="false" aria-controls="cardMoreRows" hidden></button>
-    <p class="foot" id="cardFoot"></p>
-    <button class="sheet-btn" id="cardSheet" type="button" aria-expanded="false" aria-controls="card"></button>
+    <h4 class="c-title"></h4>
+    <p class="cdesc c-desc"></p>
+    <p class="c-live" hidden></p>
+    <canvas class="c-map" hidden></canvas>
+    <div class="views" hidden><div class="view-btns" role="group" aria-label="View" style="display:flex;flex-wrap:wrap;gap:4px"></div></div>
+    <div class="stat c-stat"></div>
+    <dl class="c-rows"></dl>
+    <dl class="more c-more-rows" id="cardMoreRows" hidden></dl>
+    <button class="more-btn" type="button" aria-expanded="false" aria-controls="cardMoreRows" hidden></button>
+    <p class="foot"></p>
   </section>
 </aside>
 <div class="tip" id="tip" role="status"></div>
@@ -347,11 +330,13 @@ export const DESCENT_BODY = String.raw`
         <a href="https://open.spotify.com/show/7ofO8qm8tRBk2llQEMK8JB" target="_blank" rel="noopener">Spacepodden</a>
       </div>
       <p class="hint" data-t="hint"></p>
+      <div class="slot" data-slot="0"></div>
     </div>
   </section>
 
   <section class="band" data-stop="1">
     <div class="col">
+      <div class="slot" data-slot="1"></div>
       <h2 data-t="about"></h2>
       <p class="bio" data-t="bio"></p>
     </div>
@@ -359,6 +344,7 @@ export const DESCENT_BODY = String.raw`
 
   <section class="band long" data-stop="2">
     <div class="col">
+      <div class="slot" data-slot="2"></div>
       <h2 data-t="experience"></h2>
       <div class="chart-wrap"><figure class="chart" id="chart"></figure></div>
       <ul class="roles" id="roles"></ul>
@@ -367,6 +353,7 @@ export const DESCENT_BODY = String.raw`
 
   <section class="band" data-stop="3">
     <div class="col">
+      <div class="slot" data-slot="3"></div>
       <p class="meta" data-t="featured" style="margin-bottom:14px"></p>
       <a class="article" href="https://trondheim.com/journal/the-extracurricular-that-left-earth" target="_blank" rel="noopener">
         <img src="/descent/article.jpg" alt="Freider Fløan, photographed for Trondheim.com" width="1000" height="600">
@@ -382,6 +369,7 @@ export const DESCENT_BODY = String.raw`
 
   <section class="band" data-stop="4">
     <div class="col">
+      <div class="slot" data-slot="4"></div>
       <h2 data-t="education"></h2>
       <ul class="degrees" id="degrees"></ul>
       <p class="finishing" data-t="finishing"></p>
@@ -390,6 +378,7 @@ export const DESCENT_BODY = String.raw`
 
   <section class="arrival" id="framsat" data-stop="5">
     <div class="col">
+      <div class="slot" data-slot="5"></div>
       <h2 data-t="joining"></h2>
       <p class="bio" data-h="whyHtml"></p>
     </div>
