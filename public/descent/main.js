@@ -1,7 +1,6 @@
 (() => {
   "use strict";
   const C = window.Core;
-  const STYLE = document.getElementById("descent").dataset.style;   // "polar" or "station", see markup.ts
   const $ = id => document.getElementById(id);
 
   /* ---------- vectors ---------- */
@@ -248,7 +247,7 @@
   const latlon = (la, lo) => `${fmtN(Math.abs(la), 1)}° ${la >= 0 ? "N" : "S"}, ${fmtN(Math.abs(lo), 1)}° ${lo >= 0 ? "E" : C.S().west}`;
   C.extend({
     en: {
-      whyShort: "A student satellite I worked on at Orbit NTNU, launched on 5 September 2026. The first satellite ever launched into orbit from continental Europe.",
+      whyShort: "A student satellite I worked on at Orbit NTNU. It launched on 5 September 2026, the first satellite to reach orbit from continental Europe.",
       liveTag: "FramSat-1, right now",
       riding: "Riding with FramSat-1",
       openTracker: "Open full tracker", close: "Close",
@@ -256,12 +255,12 @@
       moreTracker: "Sky plot, receptions and the annotated TLE:",
       views: ["Behind", "Above", "In front", "Facing the Sun"],
       stops: [
-        ["The Moon", d => `${d} km from Earth right now. Drag to turn it and hover the names. The descent starts here and falls inward past real spacecraft.`],
-        ["ASBM-1 and ASBM-2", (pe, ap) => `Space Norway’s Arctic broadband satellites. Their 16-hour orbits swing from ${pe} km up to ${ap} km and linger at the top, high over the Arctic. Each is switched on for about 10 hours around the top of its orbit, and the two overlap, so everything north of 65° N has coverage around the clock. The cone shows what the active one sees.`],
-        ["The geostationary belt", () => "35,786 km up, where an orbit takes exactly one day, so a satellite hangs still over one spot. Hover any of them. Space Norway’s Thor 5, 6 and 7 sit near 1° West."],
-        ["Galileo above Trondheim", () => "Europe’s own navigation system, 23,222 km up in three orbital planes. The lines show the Galileo satellites a phone in Trondheim could use right now, placed from their latest TLEs. Your position comes from timing their signals, which left them about 80 milliseconds ago."],
-        ["The International Space Station", d => `About ${d} km up right now. Live numbers on the right.`],
-        ["FramSat-1", d => `Orbit NTNU’s 1U CubeSat, about 1 kg, testing a Norwegian sun sensor from Eidsvoll Electronics. It flew on Isar Aerospace’s second Spectrum rocket from Andøya and was the first satellite ever launched into orbit from continental Europe. ${d} km up right now.`],
+        ["The Moon", d => `${d} km away right now. Drag to turn it, and hover the names to see what’s there. From here we head inward, past real spacecraft, to FramSat-1.`],
+        ["ASBM-1 and ASBM-2", (pe, ap) => `Space Norway’s two satellites for broadband in the Arctic. Their orbits take 16 hours and stretch from ${pe} km up to ${ap} km, so they spend most of their time high above the far north. Each one is on for about 10 hours near the top of its orbit, and the two overlap, which gives everything north of 65° N coverage around the clock. The cone is what the active one can see.`],
+        ["The geostationary belt", () => "35,786 km up, one orbit takes as long as Earth takes to turn once, so these satellites stay above the same spot on the ground. Hover any of them. Space Norway’s Thor 5, 6 and 7 are near 1° West."],
+        ["Galileo above Trondheim", () => "Europe’s own navigation system, 23,222 km up in three orbital planes. The lines go to the Galileo satellites a phone in Trondheim could use right now. Your phone works out where it is by timing their signals, which left them about 80 milliseconds ago."],
+        ["The International Space Station", d => `About ${d} km up right now, with people on board. The numbers on the right are live.`],
+        ["FramSat-1", d => `Orbit NTNU’s 1U CubeSat, about 1 kg, testing a Norwegian sun sensor from Eidsvoll Electronics. It went up on Isar Aerospace’s second Spectrum rocket from Andøya, the first satellite launched into orbit from continental Europe. ${d} km up right now.`],
       ],
       route: ["Moon", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1"],
       labels: { moon: "Moon", fs: "FramSat-1 · 1U CubeSat", sensor: "Sun sensor (EIDEL)", gps: "GPS planes", gal: "Galileo planes", apo: "Apogee", peri: "Perigee", trd: "Trondheim", n65: "65° N · round-the-clock coverage", on: "on", off: "off", near: "Near side", far: "Far side", lit: "Sunlit", dark: "Night", kinds: { crater: "Crater", mare: "Mare", basin: "Impact basin", site: "Landing site" }, offFor: m => `switches on in ${fmtMin(m)}`, onFor: m => `on for another ${fmtMin(m)}`, sunAlt: a => a > 0 ? `${Math.round(a)}° above the horizon` : "below the horizon", visNow: "usable now", grav: "Plane", galTip: "Galileo satellite, part of the EU’s navigation system, run by EUSPA. Each carries hydrogen-maser and rubidium clocks and a search-and-rescue transponder that can tell a distress beacon that help is on the way." },
@@ -277,7 +276,7 @@
       sunlitNow: "Sunlit", darkNow: "In Earth’s shadow",
       passFmt: (t, el, vis) => `${t}, ${el}° high${vis ? ", visible" : ""}`, noPass2: "None in 24 h",
       phases: ["New moon", "Waxing crescent", "First quarter", "Waxing gibbous", "Full moon", "Waning gibbous", "Last quarter", "Waning crescent"],
-      cardFoot: ["Drag to turn the Moon, double-click to reset. Hover the names.", "Coverage per Space Norway: north of 65° N, 24/7. The 10-hour active window is approximate.", "Hover any satellite for details. Most sit on the line; a few older ones are allowed to drift north and south.", "Galileo’s hydrogen-maser clocks drift about one second in three million years. Norway hosts Galileo ground stations on Svalbard, on Jan Mayen and at Troll in Antarctica.", "Computed live in your browser from the latest TLE.", "Computed live in your browser from its TLE."],
+      cardFoot: ["Drag to turn the Moon. Double-click to put it back.", "The coverage figures are Space Norway’s. The 10-hour window is my estimate.", "Hover a satellite for details. Most sit right on the line; a few older ones drift a little north and south.", "Galileo’s hydrogen maser clocks lose about a second every three million years. Norway hosts Galileo ground stations on Svalbard, on Jan Mayen and at Troll in Antarctica.", "Worked out in your browser from the latest orbit data.", "Worked out in your browser from its orbit data."],
       moonShown: "positions from a low-precision ephemeris",
     },
     no: {
@@ -289,12 +288,12 @@
       moreTracker: "Himmelkart, mottak og forklart TLE:",
       views: ["Bak", "Over", "Foran", "Mot Solen"],
       stops: [
-        ["Månen", d => `${d} km fra Jorden akkurat nå. Dra for å snu den og hold over navnene. Turen starter her og faller innover forbi ekte romfartøy.`],
-        ["ASBM-1 og ASBM-2", (pe, ap) => `Space Norways bredbåndssatellitter for Arktis. Banene på 16 timer svinger fra ${pe} km opp til ${ap} km og blir hengende på toppen, høyt over Arktis. Hver er slått på i rundt 10 timer rundt toppen av banen, og de overlapper, så alt nord for 65° N har dekning hele døgnet. Kjeglen viser hva den aktive ser.`],
-        ["Det geostasjonære beltet", () => "35 786 km opp, der ett omløp tar nøyaktig ett døgn, så satellitten henger stille over ett punkt. Hold over hvilken som helst av dem. Space Norways Thor 5, 6 og 7 står nær 1° vest."],
-        ["Galileo over Trondheim", () => "Europas eget navigasjonssystem, 23 222 km opp i tre baneplan. Linjene viser Galileo-satellittene en mobil i Trondheim kan bruke akkurat nå, plassert fra nyeste TLE. Posisjonen din regnes ut ved å måle tiden signalene bruker, rundt 80 millisekunder."],
-        ["Den internasjonale romstasjonen", d => `Rundt ${d} km opp akkurat nå. Direkte tall til høyre.`],
-        ["FramSat-1", d => `Orbit NTNUs 1U-CubeSat på rundt 1 kg, som tester en norsk solsensor fra Eidsvoll Electronics. Den fløy med Isar Aerospaces andre Spectrum-rakett fra Andøya og var den første satellitten noensinne skutt opp i bane fra det kontinentale Europa. ${d} km opp akkurat nå.`],
+        ["Månen", d => `${d} km unna akkurat nå. Dra for å snu den, og hold over navnene for å se hva som er der. Herfra går turen innover, forbi ekte romfartøy, til FramSat-1.`],
+        ["ASBM-1 og ASBM-2", (pe, ap) => `Space Norways to satellitter for bredbånd i Arktis. Banene tar 16 timer og strekker seg fra ${pe} km opp til ${ap} km, så de er mesteparten av tiden høyt over nord. Hver av dem er på i rundt 10 timer nær toppen av banen, og de to overlapper, så alt nord for 65° N har dekning hele døgnet. Kjeglen er det den aktive kan se.`],
+        ["Det geostasjonære beltet", () => "35 786 km opp tar ett omløp like lang tid som Jorden bruker på å snu seg én gang, så satellittene står over samme sted. Hold over hvilken som helst av dem. Space Norways Thor 5, 6 og 7 står nær 1° vest."],
+        ["Galileo over Trondheim", () => "Europas eget navigasjonssystem, 23 222 km opp i tre baneplan. Linjene går til Galileo-satellittene en mobil i Trondheim kan bruke akkurat nå. Mobilen finner ut hvor den er ved å ta tiden på signalene, som forlot satellittene for rundt 80 millisekunder siden."],
+        ["Den internasjonale romstasjonen", d => `Rundt ${d} km opp akkurat nå, med folk om bord. Tallene til høyre er direkte.`],
+        ["FramSat-1", d => `Orbit NTNUs 1U-CubeSat på rundt 1 kg, som tester en norsk solsensor fra Eidsvoll Electronics. Den gikk opp med Isar Aerospaces andre Spectrum-rakett fra Andøya, den første satellitten skutt opp i bane fra det kontinentale Europa. ${d} km opp akkurat nå.`],
       ],
       route: ["Månen", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1"],
       labels: { moon: "Månen", fs: "FramSat-1 · 1U-CubeSat", sensor: "Solsensor (EIDEL)", gps: "GPS-plan", gal: "Galileo-plan", apo: "Apogeum", peri: "Perigeum", trd: "Trondheim", n65: "65° N · dekning hele døgnet", on: "på", off: "av", near: "Forsiden", far: "Baksiden", lit: "I sollys", dark: "Natt", kinds: { crater: "Krater", mare: "Hav", basin: "Nedslagsbasseng", site: "Landingssted" }, offFor: m => `slås på om ${fmtMin(m)}`, onFor: m => `på i ${fmtMin(m)} til`, sunAlt: a => a > 0 ? `${Math.round(a)}° over horisonten` : "under horisonten", visNow: "brukbar nå", grav: "Plan", galTip: "Galileo-satellitt, del av EUs navigasjonssystem, drevet av EUSPA. Hver har hydrogenmaser- og rubidiumklokker og en søk-og-redning-transponder som kan si fra til en nødpeilesender at hjelp er på vei." },
@@ -310,7 +309,7 @@
       sunlitNow: "I sollys", darkNow: "I jordskyggen",
       passFmt: (t, el, vis) => `${t}, ${el}° høyt${vis ? ", synlig" : ""}`, noPass2: "Ingen innen 24 t",
       phases: ["Nymåne", "Voksende månesigd", "Første kvarter", "Voksende måne", "Fullmåne", "Minkende måne", "Siste kvarter", "Minkende månesigd"],
-      cardFoot: ["Dra for å snu Månen, dobbeltklikk for å nullstille. Hold over navnene.", "Dekning ifølge Space Norway: nord for 65° N, hele døgnet. Det aktive vinduet på 10 timer er omtrentlig.", "Hold over en satellitt for detaljer. De fleste ligger på linjen; noen eldre får drive nord og sør.", "Galileos hydrogenmaser-klokker driver rundt ett sekund på tre millioner år. Norge har Galileo-bakkestasjoner på Svalbard, Jan Mayen og Troll i Antarktis.", "Regnet ut direkte i nettleseren fra nyeste TLE.", "Regnet ut direkte i nettleseren fra TLE-en."],
+      cardFoot: ["Dra for å snu Månen. Dobbeltklikk for å sette den tilbake.", "Dekningstallene er Space Norways. Vinduet på 10 timer er mitt anslag.", "Hold over en satellitt for detaljer. De fleste står rett på linjen; noen eldre driver litt nord og sør.", "Galileos hydrogenmaser-klokker driver rundt ett sekund på tre millioner år. Norge har Galileo-bakkestasjoner på Svalbard, Jan Mayen og Troll i Antarktis.", "Regnet ut i nettleseren din fra de nyeste banedataene.", "Regnet ut i nettleseren din fra banedataene."],
       moonShown: "posisjoner fra en forenklet efemeride",
     },
   });
@@ -1489,10 +1488,7 @@
       }
     }
     const d = stopDesc[stopIdx] || { title, text: "" };
-    // polar night: "The Moon, right now" and a sodium dot; ground station: "01 / The Moon" and "live"
-    $("cardTitle").innerHTML = STYLE === "station"
-      ? `<span>${String(stopIdx + 1).padStart(2, "0")} / ${d.title}</span><span class="lv">${C.lang === "en" ? "Live" : "Direkte"}</span>`
-      : `<span>${d.title}, ${C.lang === "en" ? "right now" : "akkurat nå"}</span><span class="lv" aria-hidden="true"></span>`;
+    $("cardTitle").innerHTML = `<span>${d.title}</span><span class="lv">${C.lang === "en" ? "Live" : "Direkte"}</span>`;
     if ($("cardDesc").dataset.v !== d.text) { $("cardDesc").textContent = d.text; $("cardDesc").dataset.v = d.text; }
     $("cardRows").innerHTML = body;
     $("cardFoot").textContent = `${s.cardFoot[stopIdx] || ""}${sub2 ? ` (${sub2})` : ""}`;
@@ -1684,20 +1680,6 @@
     document.body.classList.toggle("can-drag", !hit && draggable() && !!mouse && !(mouse.target && blocked(mouse.target)));
   }
 
-  /* ---------- the Ø ----------
-     FramSat-1's dot on the Ø's ring (markup.ts), at its argument of latitude:
-     how far round its orbit it is from where it last crossed the equator
-     going north, which sits at the end of the ring's long axis. */
-  const oeSat = $("oeSat");
-  function placeOrbitDot(ms) {
-    const s = sv("FRAMSAT-1", ms); if (!oeSat || !s) return;
-    const h = norm(cross(s.r, s.v)), node = norm(cross([0, 0, 1], h));
-    const u = Math.atan2(dot(norm(s.r), cross(h, node)), dot(norm(s.r), node));
-    const x = 34 * Math.cos(u), y = -29 * Math.sin(u), a = rad(29.6);       // the ring in markup.ts, rotate(29.6)
-    oeSat.setAttribute("cx", (x * Math.cos(a) - y * Math.sin(a)).toFixed(2));
-    oeSat.setAttribute("cy", (x * Math.sin(a) + y * Math.cos(a)).toFixed(2));
-  }
-
   /* ---------- loop ---------- */
   let yS = 0, yT = 0;
   const onScroll = () => { yT = scrollY + innerHeight / 2; };
@@ -1742,7 +1724,7 @@
     drawOverlay(camFull, weights, ms, clock, rideW);
     updateHover();
     [...route.children].forEach((li, i) => li.classList.toggle("on", i === curStop));
-    if (now - lastText > 1000) { lastText = now; stopTexts(ms); updateDetail(ms); placeOrbitDot(ms); }
+    if (now - lastText > 1000) { lastText = now; stopTexts(ms); updateDetail(ms); }
     if (now - lastCard > 500) { lastCard = now; updateCard(curStop, ms); }
     globe.frame(now);
     requestAnimationFrame(frame);
@@ -1754,6 +1736,6 @@
   const renderHtml = () => document.querySelectorAll("[data-h]").forEach(el => { el.innerHTML = C.S()[el.dataset.h]; });
   C.onLang(() => { buildRoute(); stopTexts(Date.now()); lastCard = 0; renderHtml(); });
 
-  C.render(); renderHtml(); layout(); onScroll(); yS = yT; placeOrbitDot(Date.now());
+  C.render(); renderHtml(); layout(); onScroll(); yS = yT;
   requestAnimationFrame(frame);
 })();

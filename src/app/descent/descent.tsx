@@ -24,8 +24,8 @@ const period = (start: YearMonth, end: YearMonth | undefined, lang: Lang) =>
   end
     ? start[0] === end[0]
       ? `${start[0]}`
-      : `${start[0]}–${end[0]}`
-    : `${start[0]}–${NOW_WORD[lang]}`;
+      : `${start[0]}-${end[0]}`
+    : `${start[0]}-${NOW_WORD[lang]}`;
 
 // The list under Experience, as core.js's renderRoles builds it.
 function rolesHtml(timeline: Entry[], lang: Lang) {
@@ -97,8 +97,7 @@ export async function Descent({
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: DESCENT_CSS }} />
-      {/* data-style is set by a script in the markup before the first paint, hence the warning off */}
-      <div id="descent" data-lang={lang} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: fill(text[lang], timeline, lang) }} />
+      <div id="descent" data-lang={lang} dangerouslySetInnerHTML={{ __html: fill(text[lang], timeline, lang) }} />
       <script type="application/json" id="tleData" dangerouslySetInnerHTML={{ __html: json(tles) }} />
       <script type="application/json" id="timelineData" dangerouslySetInnerHTML={{ __html: json(timeline) }} />
       <script type="application/json" id="textData" dangerouslySetInnerHTML={{ __html: json(text) }} />

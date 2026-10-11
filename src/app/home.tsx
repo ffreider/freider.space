@@ -161,7 +161,7 @@ export const timeline: Entry[] = [
 export const TEXT = {
   en: {
     tagline: "I like starting things, mostly about space.",
-    hint: "Scroll slowly. Everything you pass is placed from its latest orbital elements, in real time. Hover things to learn more.",
+    hint: "Everything on the way down is where it actually is right now, worked out from the latest orbit data. Hover anything to see what it is.",
     about: "About",
     bio: "I’m Freider Fløan, a student of electronic systems design and space systems at NTNU in Trondheim, Norway. I co-founded NORSTEC, the Norwegian Space Technology Collective, led it as President for three years and now sit on its board. I also host the podcast Spacepodden and chair NASA HUNCH Norge, and I’m working on a new startup, Meso Manufacturing.",
     experience: "Experience",
@@ -179,14 +179,14 @@ export const TEXT = {
     finishing: "Working on it... Finishing soon ish.",
     joining: "Joining FramSat-1",
     whyHtml:
-      'A student satellite I worked on at <a href="https://orbitntnu.com/projects/FramSat-1" target="_blank" rel="noopener">Orbit NTNU</a>, launched on 5 September 2026.',
+      'A student satellite I worked on at <a href="https://orbitntnu.com/projects/FramSat-1" target="_blank" rel="noopener">Orbit NTNU</a>. It launched on 5 September 2026.',
     privacy: "Privacy: this site sets no cookies. Visits are counted anonymously with Vercel Web Analytics.",
     privacyTracker:
       "Privacy: this site sets no cookies. Visits are counted anonymously with Vercel Web Analytics. Waterfall images load from SatNOGS only if you open one.",
   },
   no: {
     tagline: "Jeg liker å starte ting, mest innen romfart.",
-    hint: "Scroll rolig. Alt du passerer er plassert fra de nyeste banedataene, i sanntid. Hold over ting for å lære mer.",
+    hint: "Alt på veien ned er der det faktisk er akkurat nå, regnet ut fra de nyeste banedataene. Hold over noe for å se hva det er.",
     about: "Om meg",
     bio: "Jeg heter Freider Fløan og studerer elektronisk systemdesign med fordypning i romsystemer ved NTNU i Trondheim. Jeg er medgründer av NORSTEC, Norwegian Space Technology Collective, som jeg ledet som president i tre år, og sitter nå i styret. I tillegg er jeg programleder for podkasten Spacepodden og styreleder i NASA HUNCH Norge, og jeg jobber med et nytt oppstartsselskap, Meso Manufacturing.",
     experience: "Erfaring",
@@ -204,7 +204,7 @@ export const TEXT = {
     finishing: "Jobber med saken... Ferdig snart, sånn ca.",
     joining: "Slår følge med FramSat-1",
     whyHtml:
-      'En studentsatellitt jeg jobbet med i <a href="https://orbitntnu.com/projects/FramSat-1" target="_blank" rel="noopener">Orbit NTNU</a>, skutt opp 5. september 2026.',
+      'En studentsatellitt jeg jobbet med i <a href="https://orbitntnu.com/projects/FramSat-1" target="_blank" rel="noopener">Orbit NTNU</a>. Den ble skutt opp 5. september 2026.',
     privacy: "Personvern: denne siden bruker ingen informasjonskapsler. Besøk telles anonymt med Vercel Web Analytics.",
     privacyTracker:
       "Personvern: denne siden bruker ingen informasjonskapsler. Besøk telles anonymt med Vercel Web Analytics. Vannfallsdiagrammer lastes fra SatNOGS bare hvis du åpner et.",

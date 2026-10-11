@@ -119,7 +119,7 @@ window.Core = (() => {
         current: i === 0 && !e.end, first: i === e.roles.length - 1 };
     });
   }
-  const period = (start, end) => end ? (start[0] === end[0] ? `${start[0]}` : `${start[0]}–${end[0]}`) : `${start[0]}–${S().nowWord}`;
+  const period = (start, end) => end ? (start[0] === end[0] ? `${start[0]}` : `${start[0]}-${end[0]}`) : `${start[0]}-${S().nowWord}`;
   let barGradient = gradient(t => inferno(t), 0.3, 0.98);
   function slice(left, width) {
     const size = 100 / width * 100;

@@ -42,3 +42,6 @@ next-env.d.ts
 
 # NASA source maps for the descent textures (scripts/descent-textures.py)
 /.textures-src/
+
+# design critique snapshots (impeccable)
+/.impeccable/
