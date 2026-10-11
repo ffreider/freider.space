@@ -50,8 +50,6 @@ body.can-drag main { -webkit-user-select: none; user-select: none; }
 .card h4 .lv::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
 .card .cdesc { margin: 0; font: 400 14px/1.5 var(--f-body); color: var(--ink-2); }
 .card #live { margin: 0; font: 500 15px/1.45 var(--f-body); color: var(--ink); }
-/* today's Sun from GOES-19, on the Sun's card */
-#cardSun { display: block; width: 112px; height: 112px; }
 #cardMap { display: block; width: 100%; aspect-ratio: 2 / 1; height: auto; border: 1px solid var(--rule); }
 .card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; }
 .card dt { font: 400 11px/1.35 var(--f-data); color: var(--ink-3); }
@@ -108,7 +106,6 @@ p { margin: 0; }
 
 .band { min-height: 140vh; display: flex; flex-direction: column; justify-content: center; padding-block: 25vh; }
 .band.long { min-height: 0; padding-block: 35vh 45vh; }
-.moon-band { min-height: 110vh; padding-block: 0; }
 .bio { font-size: clamp(19px, 1.8vw, 22px); line-height: 1.55; }
 
 .chart-wrap { overflow-x: auto; margin: 0 -4px 10px; padding: 26px 4px 30px; }
@@ -265,7 +262,6 @@ export const DESCENT_BODY = String.raw`
   <section class="card" id="card">
     <h4 id="cardTitle"></h4>
     <p class="cdesc" id="cardDesc"></p>
-    <img id="cardSun" alt="" width="1024" height="1024" hidden>
     <p id="live" aria-live="polite" hidden></p>
     <canvas id="cardMap" hidden></canvas>
     <div class="views" id="views" hidden><div id="viewBtns" role="group" aria-label="View" style="display:flex;flex-wrap:wrap;gap:4px"></div></div>
@@ -292,17 +288,14 @@ export const DESCENT_BODY = String.raw`
     </div>
   </section>
 
-  <!-- the Moon: no text, room to look at it and turn it -->
-  <section class="band moon-band" data-stop="1" aria-hidden="true"></section>
-
-  <section class="band" data-stop="2">
+  <section class="band" data-stop="1">
     <div class="col">
       <h2 data-t="about"></h2>
       <p class="bio" data-t="bio"></p>
     </div>
   </section>
 
-  <section class="band long" data-stop="3">
+  <section class="band long" data-stop="2">
     <div class="col">
       <h2 data-t="experience"></h2>
       <div class="chart-wrap"><figure class="chart" id="chart"></figure></div>
@@ -310,7 +303,7 @@ export const DESCENT_BODY = String.raw`
     </div>
   </section>
 
-  <section class="band" data-stop="4">
+  <section class="band" data-stop="3">
     <div class="col">
       <p class="meta" data-t="featured" style="margin-bottom:14px"></p>
       <a class="article" href="https://trondheim.com/journal/the-extracurricular-that-left-earth" target="_blank" rel="noopener">
@@ -325,7 +318,7 @@ export const DESCENT_BODY = String.raw`
     </div>
   </section>
 
-  <section class="band" data-stop="5">
+  <section class="band" data-stop="4">
     <div class="col">
       <h2 data-t="education"></h2>
       <ul class="degrees" id="degrees"></ul>
@@ -333,7 +326,7 @@ export const DESCENT_BODY = String.raw`
     </div>
   </section>
 
-  <section class="arrival" id="framsat" data-stop="6">
+  <section class="arrival" id="framsat" data-stop="5">
     <div class="col">
       <h2 data-t="joining"></h2>
       <p class="bio" data-h="whyHtml"></p>

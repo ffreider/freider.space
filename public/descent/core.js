@@ -619,7 +619,6 @@ window.Core = (() => {
         const v = vals[k], loc = U[k];
         if (loc == null) continue;
         if (v instanceof Float32Array) gl.uniform1fv(loc, v);
-        else if (v && v.vec4 instanceof Float32Array) gl.uniform4fv(loc, v.vec4);   // { vec4 }: an array of vec4
         else if (Array.isArray(v)) v.length === 2 ? gl.uniform2f(loc, v[0], v[1]) : v.length === 4 ? gl.uniform4f(loc, v[0], v[1], v[2], v[3]) : gl.uniform3f(loc, v[0], v[1], v[2]);
         else if (typeof v === "object" && v && "i" in v) gl.uniform1i(loc, v.i);
         else gl.uniform1f(loc, v);

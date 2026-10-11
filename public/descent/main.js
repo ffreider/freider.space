@@ -32,39 +32,6 @@
     const L = rad(q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g));
     return norm([Math.cos(L), Math.cos(OBL) * Math.sin(L), Math.sin(OBL) * Math.sin(L)]);
   }
-  // The Sun's position (km, from Earth) and the axes of the GOES image of it:
-  // N towards Earth, Y solar north (taken as ecliptic north, within about 26°),
-  // X to the right as seen from Earth.
-  const RS = 696340, AU = 149597870.7;
-  function sunPos(ms) {
-    const g = rad(357.529 + 0.98560028 * days(ms));
-    return mul(sunEci(ms), AU * (1.00014 - 0.01671 * Math.cos(g) - 0.00014 * Math.cos(2 * g)));
-  }
-  function sunAxes(ms) {
-    const toSun = sunEci(ms), N = mul(toSun, -1);
-    const Y = norm(sub(ECL_N, mul(N, dot(ECL_N, N))));
-    return { N, Y, X: cross(toSun, Y) };
-  }
-  // The Sun as drawn: its axes turned by dragging (about its up axis, then
-  // its right axis, as seen from Earth), and today's sunspot groups turned on
-  // to now with the Sun's rotation (faster at the equator) from where NOAA saw
-  // them. A group's area (millionths of the hemisphere) gives its size,
-  // enlarged so it reads from far away.
-  const SPOTS = (() => { try { return JSON.parse($("weatherData").textContent).sunspots || []; } catch (_) { return []; } })();
-  function drawnSun(ms) {
-    const ax = sunAxes(ms);
-    const turn = v => rotAround(rotAround(v, ax.Y, sunLook.az), ax.X, sunLook.el);
-    const X = turn(ax.X), Y = turn(ax.Y), N = turn(ax.N);
-    const spots = new Float32Array(16 * 4);
-    SPOTS.slice(0, 16).forEach((sp, i) => {
-      const lat = rad(sp.lat), s2 = Math.sin(lat) ** 2;
-      const days = (ms - Date.parse(sp.observed)) / 864e5;
-      const west = rad(sp.west + (14.713 - 2.396 * s2 - 1.787 * s2 * s2 - 0.9856) * days);   // synodic, degrees a day
-      const v = add(add(mul(X, Math.cos(lat) * Math.sin(west)), mul(Y, Math.sin(lat))), mul(N, Math.cos(lat) * Math.cos(west)));
-      spots.set([...v, Math.max(0.012, Math.sqrt(2 * sp.area * 1e-6) * 1.8)], i * 4);
-    });
-    return { X, Y, N, spots };
-  }
   function moonEci(ms) {
     const d = days(ms);
     const L = rad(218.316 + 13.176396 * d), M = rad(134.963 + 13.064993 * d), F = rad(93.272 + 13.229350 * d);
@@ -288,15 +255,14 @@
       moreTracker: "Sky plot, receptions and the annotated TLE:",
       views: ["Behind", "Above", "In front", "Facing the Sun"],
       stops: [
-        ["The Moon", d => `${d} km from Earth right now. Drag to turn it and hover the names. From here the descent falls inward past real spacecraft.`],
+        ["The Moon", d => `${d} km from Earth right now. Drag to turn it and hover the names. The descent starts here and falls inward past real spacecraft.`],
         ["ASBM-1 and ASBM-2", (pe, ap) => `Space Norway’s Arctic broadband satellites. Their 16-hour orbits swing from ${pe} km up to ${ap} km and linger at the top, high over the Arctic. Each is switched on for about 10 hours around the top of its orbit, and the two overlap, so everything north of 65° N has coverage around the clock. The cone shows what the active one sees.`],
         ["The geostationary belt", () => "35,786 km up, where an orbit takes exactly one day, so a satellite hangs still over one spot. Hover any of them. Space Norway’s Thor 5, 6 and 7 sit near 1° West."],
         ["Galileo above Trondheim", () => "Europe’s own navigation system, 23,222 km up in three orbital planes. The lines show the Galileo satellites a phone in Trondheim could use right now, placed from their latest TLEs. Your position comes from timing their signals, which left them about 80 milliseconds ago."],
         ["The International Space Station", d => `About ${d} km up right now. Live numbers on the right.`],
         ["FramSat-1", d => `Orbit NTNU’s 1U CubeSat, about 1 kg, testing a Norwegian sun sensor from Eidsvoll Electronics. It flew on Isar Aerospace’s second Spectrum rocket from Andøya and was the first satellite ever launched into orbit from continental Europe. ${d} km up right now.`],
-        ["The Sun", d => `${d} million km away right now. Its churning surface is drawn, but the sunspots are today’s, where NOAA saw them, turning with the Sun. Drag to turn it. The small picture is how the GOES-19 weather satellite sees it in ultraviolet right now. The descent starts here and falls 150 million km to the Moon.`],
       ],
-      route: ["Moon", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1", "Sun"],
+      route: ["Moon", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1"],
       labels: { moon: "Moon", fs: "FramSat-1 · 1U CubeSat", sensor: "Sun sensor (EIDEL)", gps: "GPS planes", gal: "Galileo planes", apo: "Apogee", peri: "Perigee", trd: "Trondheim", n65: "65° N · round-the-clock coverage", on: "on", off: "off", near: "Near side", far: "Far side", lit: "Sunlit", dark: "Night", kinds: { crater: "Crater", mare: "Mare", basin: "Impact basin", site: "Landing site" }, offFor: m => `switches on in ${fmtMin(m)}`, onFor: m => `on for another ${fmtMin(m)}`, sunAlt: a => a > 0 ? `${Math.round(a)}° above the horizon` : "below the horizon", visNow: "usable now", grav: "Plane", galTip: "Galileo satellite, part of the EU’s navigation system, run by EUSPA. Each carries hydrogen-maser and rubidium clocks and a search-and-rescue transponder that can tell a distress beacon that help is on the way." },
       k: { dist: "Distance", lit: "Illuminated", phase: "Phase", light: "Light time", size: "Size seen from Earth", here: "From here",
         alt: "Altitude", spd: "Speed", pos: "Position", over: "Over", sun: "Sunlight", orbit: "Orbit no.", period: "Period", inc: "Inclination",
@@ -305,13 +271,12 @@
         beta: "Sun angle to orbit (β)", shadowPct: "Time in shadow per orbit", sink: "Sinking from air drag", horizon: "Distance to horizon", seen: "Earth visible from here",
         fromTrd: "Seen from Trondheim", delay: "Signal delay", incl: "Inclination", swing: "Daily north–south swing", active: "Payload", cover: "Coverage",
         visible: "Usable from Trondheim", dop: "Geometry (PDOP)", nearest: "Nearest", side: "Side", sunNow: "Sun there now", type: "Type",
-        payloads: "Payloads", ground: "Control", dist: "Distance",
-        image: "Image above", spots: "Sunspot groups", xray: "X-ray flares", wind: "Solar wind", bz: "Magnetic field (Bz)", kp: "Kp index", aurora: "Aurora over Trondheim" },
+        payloads: "Payloads", ground: "Control", dist: "Distance" },
       sunlit: m => `Sunlit · shadow in ${fmtMin(m)}`, dark: m => `In Earth’s shadow · sunrise in ${fmtMin(m)}`,
       sunlitNow: "Sunlit", darkNow: "In Earth’s shadow",
       passFmt: (t, el, vis) => `${t}, ${el}° high${vis ? ", visible" : ""}`, noPass2: "None in 24 h",
       phases: ["New moon", "Waxing crescent", "First quarter", "Waxing gibbous", "Full moon", "Waning gibbous", "Last quarter", "Waning crescent"],
-      cardFoot: ["Drag to turn the Moon, double-click to reset. Hover the names.", "Coverage per Space Norway: north of 65° N, 24/7. The 10-hour active window is approximate.", "Hover any satellite for details. Most sit on the line; a few older ones are allowed to drift north and south.", "Galileo’s hydrogen-maser clocks drift about one second in three million years. Norway hosts Galileo ground stations on Svalbard, on Jan Mayen and at Troll in Antarctica.", "Computed live in your browser from the latest TLE.", "Computed live in your browser from its TLE.", "Drag to turn the Sun, double-click to reset. Sunspots: NOAA’s active regions today. Image: NOAA GOES-19 SUVI, 304 Å. Space weather: NOAA SWPC, every 15 minutes."],
+      cardFoot: ["Drag to turn the Moon, double-click to reset. Hover the names.", "Coverage per Space Norway: north of 65° N, 24/7. The 10-hour active window is approximate.", "Hover any satellite for details. Most sit on the line; a few older ones are allowed to drift north and south.", "Galileo’s hydrogen-maser clocks drift about one second in three million years. Norway hosts Galileo ground stations on Svalbard, on Jan Mayen and at Troll in Antarctica.", "Computed live in your browser from the latest TLE.", "Computed live in your browser from its TLE."],
       moonShown: "positions from a low-precision ephemeris",
     },
     no: {
@@ -323,15 +288,14 @@
       moreTracker: "Himmelkart, mottak og forklart TLE:",
       views: ["Bak", "Over", "Foran", "Mot Solen"],
       stops: [
-        ["Månen", d => `${d} km fra Jorden akkurat nå. Dra for å snu den og hold over navnene. Herfra faller turen innover forbi ekte romfartøy.`],
+        ["Månen", d => `${d} km fra Jorden akkurat nå. Dra for å snu den og hold over navnene. Turen starter her og faller innover forbi ekte romfartøy.`],
         ["ASBM-1 og ASBM-2", (pe, ap) => `Space Norways bredbåndssatellitter for Arktis. Banene på 16 timer svinger fra ${pe} km opp til ${ap} km og blir hengende på toppen, høyt over Arktis. Hver er slått på i rundt 10 timer rundt toppen av banen, og de overlapper, så alt nord for 65° N har dekning hele døgnet. Kjeglen viser hva den aktive ser.`],
         ["Det geostasjonære beltet", () => "35 786 km opp, der ett omløp tar nøyaktig ett døgn, så satellitten henger stille over ett punkt. Hold over hvilken som helst av dem. Space Norways Thor 5, 6 og 7 står nær 1° vest."],
         ["Galileo over Trondheim", () => "Europas eget navigasjonssystem, 23 222 km opp i tre baneplan. Linjene viser Galileo-satellittene en mobil i Trondheim kan bruke akkurat nå, plassert fra nyeste TLE. Posisjonen din regnes ut ved å måle tiden signalene bruker, rundt 80 millisekunder."],
         ["Den internasjonale romstasjonen", d => `Rundt ${d} km opp akkurat nå. Direkte tall til høyre.`],
         ["FramSat-1", d => `Orbit NTNUs 1U-CubeSat på rundt 1 kg, som tester en norsk solsensor fra Eidsvoll Electronics. Den fløy med Isar Aerospaces andre Spectrum-rakett fra Andøya og var den første satellitten noensinne skutt opp i bane fra det kontinentale Europa. ${d} km opp akkurat nå.`],
-        ["Solen", d => `${d} millioner km unna akkurat nå. Overflaten er tegnet, men solflekkene er dagens, der NOAA så dem, og de roterer med Solen. Dra for å snu den. Det lille bildet viser hvordan værsatellitten GOES-19 ser den i ultrafiolett lys akkurat nå. Turen starter her og faller 150 millioner km ned til Månen.`],
       ],
-      route: ["Månen", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1", "Solen"],
+      route: ["Månen", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1"],
       labels: { moon: "Månen", fs: "FramSat-1 · 1U-CubeSat", sensor: "Solsensor (EIDEL)", gps: "GPS-plan", gal: "Galileo-plan", apo: "Apogeum", peri: "Perigeum", trd: "Trondheim", n65: "65° N · dekning hele døgnet", on: "på", off: "av", near: "Forsiden", far: "Baksiden", lit: "I sollys", dark: "Natt", kinds: { crater: "Krater", mare: "Hav", basin: "Nedslagsbasseng", site: "Landingssted" }, offFor: m => `slås på om ${fmtMin(m)}`, onFor: m => `på i ${fmtMin(m)} til`, sunAlt: a => a > 0 ? `${Math.round(a)}° over horisonten` : "under horisonten", visNow: "brukbar nå", grav: "Plan", galTip: "Galileo-satellitt, del av EUs navigasjonssystem, drevet av EUSPA. Hver har hydrogenmaser- og rubidiumklokker og en søk-og-redning-transponder som kan si fra til en nødpeilesender at hjelp er på vei." },
       k: { dist: "Avstand", lit: "Belyst", phase: "Fase", light: "Lystid", size: "Størrelse sett fra Jorden", here: "Herfra",
         alt: "Høyde", spd: "Fart", pos: "Posisjon", over: "Over", sun: "Sollys", orbit: "Omløp nr.", period: "Omløpstid", inc: "Inklinasjon",
@@ -340,13 +304,12 @@
         beta: "Solvinkel mot banen (β)", shadowPct: "Tid i skygge per omløp", sink: "Synker av luftmotstand", horizon: "Avstand til horisonten", seen: "Synlig del av Jorden",
         fromTrd: "Sett fra Trondheim", delay: "Signalforsinkelse", incl: "Inklinasjon", swing: "Daglig svingning nord–sør", active: "Nyttelast", cover: "Dekning",
         visible: "Brukbare fra Trondheim", dop: "Geometri (PDOP)", nearest: "Nærmeste", side: "Side", sunNow: "Solen der nå", type: "Type",
-        payloads: "Nyttelaster", ground: "Styring", dist: "Avstand",
-        image: "Bildet over", spots: "Solflekkgrupper", xray: "Røntgenutbrudd", wind: "Solvind", bz: "Magnetfelt (Bz)", kp: "Kp-indeks", aurora: "Nordlys over Trondheim" },
+        payloads: "Nyttelaster", ground: "Styring", dist: "Avstand" },
       sunlit: m => `I sollys · skygge om ${fmtMin(m)}`, dark: m => `I jordskyggen · soloppgang om ${fmtMin(m)}`,
       sunlitNow: "I sollys", darkNow: "I jordskyggen",
       passFmt: (t, el, vis) => `${t}, ${el}° høyt${vis ? ", synlig" : ""}`, noPass2: "Ingen innen 24 t",
       phases: ["Nymåne", "Voksende månesigd", "Første kvarter", "Voksende måne", "Fullmåne", "Minkende måne", "Siste kvarter", "Minkende månesigd"],
-      cardFoot: ["Dra for å snu Månen, dobbeltklikk for å nullstille. Hold over navnene.", "Dekning ifølge Space Norway: nord for 65° N, hele døgnet. Det aktive vinduet på 10 timer er omtrentlig.", "Hold over en satellitt for detaljer. De fleste ligger på linjen; noen eldre får drive nord og sør.", "Galileos hydrogenmaser-klokker driver rundt ett sekund på tre millioner år. Norge har Galileo-bakkestasjoner på Svalbard, Jan Mayen og Troll i Antarktis.", "Regnet ut direkte i nettleseren fra nyeste TLE.", "Regnet ut direkte i nettleseren fra TLE-en.", "Dra for å snu Solen, dobbeltklikk for å nullstille. Solflekker: NOAAs aktive områder i dag. Bilde: NOAA GOES-19 SUVI, 304 Å. Romvær: NOAA SWPC, hvert kvarter."],
+      cardFoot: ["Dra for å snu Månen, dobbeltklikk for å nullstille. Hold over navnene.", "Dekning ifølge Space Norway: nord for 65° N, hele døgnet. Det aktive vinduet på 10 timer er omtrentlig.", "Hold over en satellitt for detaljer. De fleste ligger på linjen; noen eldre får drive nord og sør.", "Galileos hydrogenmaser-klokker driver rundt ett sekund på tre millioner år. Norge har Galileo-bakkestasjoner på Svalbard, Jan Mayen og Troll i Antarktis.", "Regnet ut direkte i nettleseren fra nyeste TLE.", "Regnet ut direkte i nettleseren fra TLE-en."],
       moonShown: "posisjoner fra en forenklet efemeride",
     },
   });
@@ -485,39 +448,6 @@
   uniform vec3 uCam; uniform vec3 uF; uniform vec3 uR; uniform vec3 uU; uniform float uTanH; uniform float uShift;
   uniform vec3 uSun; uniform float uGmst; uniform float uFade; uniform float uLoaded; uniform float uNight;
   uniform vec3 uMoon; uniform float uMoonR; uniform vec3 uMX; uniform vec3 uMY; uniform vec3 uMZ;
-  // The Sun: centre relative to the camera, radius, its axes (X right and Y
-  // north as seen from Earth, N towards Earth, turned when dragged), how near
-  // it is (0 far, 1 close), the time, and today's sunspot groups (direction
-  // and angular radius; radius 0 for unused slots).
-  uniform vec3 uSunRel; uniform float uSunR; uniform vec3 uSunX; uniform vec3 uSunY; uniform vec3 uSunN; uniform float uSunNear;
-  uniform float uTime; uniform vec4 uSpots[16];
-  float hash13(vec3 p){ p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
-  float noise3(vec3 p){ vec3 i = floor(p), f = fract(p); vec3 u = f * f * (3.0 - 2.0 * f);
-    return mix(mix(mix(hash13(i), hash13(i + vec3(1, 0, 0)), u.x), mix(hash13(i + vec3(0, 1, 0)), hash13(i + vec3(1, 1, 0)), u.x), u.y),
-               mix(mix(hash13(i + vec3(0, 0, 1)), hash13(i + vec3(1, 0, 1)), u.x), mix(hash13(i + vec3(0, 1, 1)), hash13(i + vec3(1, 1, 1)), u.x), u.y), u.z); }
-  float fbm3(vec3 p){ float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { s += a * noise3(p); p = p * 2.02 + vec3(1.7, 9.2, 3.3); a *= 0.5; } return s / 0.96875; }
-  // The Sun's face in visible light. Its surface has no map, so it's drawn:
-  // slowly churning granulation over larger cells, sunspots (dark umbra in a
-  // lighter, ragged penumbra) where today's are, bright faculae around them
-  // near the edge, and limb darkening, dimmer and redder towards the edge.
-  vec3 sunSurface(vec3 n, float mu) {
-    vec3 q = vec3(dot(n, uSunX), dot(n, uSunY), dot(n, uSunN));
-    float t = uTime * 0.015;
-    float I = 0.7 + 0.42 * fbm3(q * 34.0 + vec3(t, -t, 0.7 * t)) + 0.1 * noise3(q * 110.0 + 2.0 * t) + 0.08 * fbm3(q * 7.0 - 0.3 * t);
-    float dark = 0.0, fac = 0.0;
-    for (int i = 0; i < 16; i++) {
-      vec4 sp = uSpots[i];
-      if (sp.w <= 0.0) continue;
-      float a = acos(clamp(dot(n, sp.xyz), -1.0, 1.0)) / sp.w;
-      float jag = 0.8 + 0.4 * noise3(q * 90.0 + float(i) * 7.0);
-      float umbra = 1.0 - smoothstep(0.28, 0.45, a / jag), pen = 1.0 - smoothstep(0.6, 1.0, a / jag);
-      dark = max(dark, umbra * 0.82 + (pen - umbra) * 0.42);
-      fac += smoothstep(1.0, 1.4, a) * (1.0 - smoothstep(1.4, 3.2, a));
-    }
-    I *= (1.0 - dark) * (1.0 + 0.3 * fac * (1.0 - mu));
-    I *= 1.0 - 0.72 * (1.0 - mu) - 0.1 * (1.0 - mu * mu);
-    return mix(vec3(0.85, 0.2, 0.03), vec3(1.0, 0.6, 0.2), pow(mu, 0.6)) * I;   // linear light: a warm yellow-orange on screen
-  }
   uniform sampler2D tDay; uniform sampler2D tNight; uniform sampler2D tWater; uniform sampler2D tClouds; uniform sampler2D tMoon;
   uniform sampler2D tMoonE; uniform sampler2D tMoonN;      // the Moon's relief: east and north tilt of the surface
   uniform sampler2D tDetail; uniform vec4 uDetailBox; uniform float uDetail;  // close-up imagery: west, north, width, height (rad)
@@ -536,14 +466,11 @@
     vec3 rd = normalize(uF + uR * (ndc.x - uShift) * uTanH + uU * ndc.y * uTanH);
     vec3 ro = uCam;
     vec3 col = vec3(0.0);
-    // out by the Sun, Earth and the Moon are far below a pixel, and the ray
-    // tests below lose their precision at that distance
-    bool farOut = dot(ro, ro) > 4.0e6;
     float b = dot(ro, rd), c = dot(ro, ro) - 1.0, h = b * b - c;
-    float tE = (!farOut && h > 0.0 && -b > 0.0) ? -b - sqrt(h) : 1e9;
+    float tE = (h > 0.0 && -b > 0.0) ? -b - sqrt(h) : 1e9;
     vec3 oc = ro - uMoon;
     float bm = dot(oc, rd), hm = bm * bm - (dot(oc, oc) - uMoonR * uMoonR);
-    float tM = (!farOut && hm > 0.0 && -bm > 0.0) ? -bm - sqrt(hm) : 1e9;
+    float tM = (hm > 0.0 && -bm > 0.0) ? -bm - sqrt(hm) : 1e9;
     if (tM < tE) {
       vec3 n = normalize(oc + rd * tM);
       float lon = atan(dot(n, uMY), dot(n, uMX)), lat = asin(clamp(dot(n, uMZ), -1.0, 1.0));
@@ -620,31 +547,17 @@
       col += sky * (exp(-alt / 0.0075) * 0.75 + exp(-alt / 0.025) * 0.08);
       col += vec3(0.20, 0.85, 0.35) * exp(-pow((alt - 0.0149) / 0.003, 2.0)) * 0.08 * smoothstep(0.1, -0.2, l);
     }
-    float sunAng = max(dot(rd, uSun), 0.0);
-    if (tE > 1e8 && tM > 1e8) col += (1.0 - uSunNear) * vec3(1.0, 0.96, 0.88) * pow(sunAng, 600.0) * 0.4;
-    // The Sun, as a ball like the Earth and the Moon. The ray test goes by
-    // the ray's closest point to the centre, which stays precise from 150
-    // million km. Outside the disk: the red chromosphere at the rim,
-    // prominences, and the corona with streamers.
+    // The Sun, where it really is: a limb-darkened disk at its true size
+    // (about 0.53 degrees, so a few pixels across), a corona and a soft bloom.
+    // Drawn only where Earth and the Moon don't cover it, so eclipses come out
+    // right. It's far enough to count as infinitely far from every stop.
     if (tE > 1e8 && tM > 1e8) {
-      vec3 os = -uSunRel;
-      float bs = dot(os, rd);
-      if (bs < 0.0) {
-        vec3 cpt = os - rd * bs;
-        float d2 = dot(cpt, cpt), R2 = uSunR * uSunR, dm = sqrt(d2) / uSunR;
-        if (d2 < R2) {
-          vec3 n = normalize(cpt - rd * sqrt(R2 - d2));
-          col += sunSurface(n, max(dot(n, -rd), 0.0)) * 1.9;
-        } else {
-          vec3 pd = cpt / sqrt(d2);
-          float ang = atan(dot(pd, uSunY), dot(pd, uSunX));
-          vec3 ring = vec3(cos(ang), sin(ang), 0.0);
-          float prom = smoothstep(0.6, 0.8, fbm3(ring * 5.0 + vec3(0.0, 0.0, uTime * 0.004))) * exp(-(dm - 1.0) * 28.0);
-          float streamer = 0.6 + 0.8 * fbm3(ring * 2.6 + vec3(0.0, 0.0, dm * 0.35));
-          col += vec3(1.0, 0.32, 0.2) * (exp(-(dm - 1.0) * 150.0) * 0.9 + prom * 0.7)
-               + vec3(1.0, 0.8, 0.6) * 0.24 * pow(1.0 / dm, 5.0) * streamer
-               + vec3(1.0, 0.6, 0.32) * 0.025 * pow(1.0 / dm, 2.0);
-        }
+      float sd = dot(rd, uSun);
+      if (sd > 0.0) {
+        float r = length(cross(rd, uSun)) / 0.004653;      // angle from its centre, in solar radii
+        if (r < 1.0) col += vec3(1.0, 0.9, 0.76) * (1.0 - 0.6 * (1.0 - sqrt(1.0 - r * r))) * 9.0;
+        else col += vec3(1.0, 0.84, 0.64) * (0.5 * pow(1.0 / r, 3.0) + 0.05 * pow(1.0 / r, 1.4));
+        col += vec3(1.0, 0.96, 0.88) * pow(sd, 600.0) * 0.4;
       }
     }
     col *= uFade;
@@ -656,7 +569,7 @@
   const canvas = $("field");
   const field = C.createField(canvas, FRAG,
     ["uCam", "uF", "uR", "uU", "uTanH", "uShift", "uSun", "uGmst", "uFade", "uLoaded", "uNight", "uMoon", "uMoonR", "uMX", "uMY", "uMZ",
-     "uDetailBox", "uDetail", "uSunRel", "uSunR", "uSunX", "uSunY", "uSunN", "uSunNear", "uTime", "uSpots"]);
+     "uDetailBox", "uDetail"]);
   let loaded = 0, loadedAt = 0;
 
   /* ---------- maps, sharper in steps ----------
@@ -714,11 +627,10 @@
       loaded = 1; loadedAt = performance.now();
       requestAnimationFrame(() => requestAnimationFrame(openCover));   // after a frame with the maps
       if (sharpest <= 2048) return;
-      const moonFirst = curStop === 0 || curStop === 6;
+      const moonFirst = curStop === 0;
       const order = [...MAPS].sort((a, b) => (a[1].startsWith("moon") === moonFirst ? -1 : 1) - (b[1].startsWith("moon") === moonFirst ? -1 : 1));
       for (const [name, file, unit, channels, largest] of order) {
         const w = Math.min(sharpest, largest);
-        if (w <= 2048) continue;                                    // already as sharp as it gets
         const img = await image(mapUrl(file, w)).catch(() => null);
         if (!img) continue;
         await calm();
@@ -787,7 +699,6 @@
   // interactive state
   const moonLook = { az: 0, el: 0, taz: 0, tel: 0 };
   let moonAxes = null;                 // the hero view's up and right, to turn the Moon around
-  const sunLook = { az: 0, el: 0, taz: 0, tel: 0 };   // the Sun, turned by dragging the same way
   // The Moon turned by dragging, like spinning a globe: around the view's up
   // axis for left and right, around its right axis for up and down. The
   // sunlight stays where it is.
@@ -808,13 +719,6 @@
   function stop(i, ms, drift) {
     const aspect = innerWidth / innerHeight;
     const sh = narrow() ? 0 : 0.22 * aspect;
-    if (i === 6) {
-      // The Sun, from 5.5 solar radii on the side facing Earth, upright like
-      // the GOES image. fall marks the flight from here (see blend).
-      const S = sunPos(ms), ax = sunAxes(ms);
-      const pos = add(S, mul(ax.N, RS * (5.5 + drift * 0.5)));
-      return { pos, F: mul(ax.N, -1), U: ax.Y, half: portrait() ? 30 : 21, shift: sh * 0.8, tgt: S, fall: S };
-    }
     if (i === 0) {
       const M = moonEci(ms), away = norm(M), sun = sunEci(ms);
       let side = sub(sun, mul(away, dot(sun, away)));
@@ -829,7 +733,7 @@
       // Earth-Moon line, so the Moon shrinks ahead of you with Earth behind
       // it, then wide around it, so it never rushes past right beside you.
       const hop = [add(M, add(mul(away, 80000), mul(side, 10000))), add(M, add(mul(away, -60000), mul(side, 140000)))];
-      return { pos, F, U, half: portrait() ? 30 : 21, shift: sh * 0.8, hop, subject: M };
+      return { pos, F, U, half: portrait() ? 30 : 21, shift: sh * 0.8, hop };
     }
     if (i === 1) {
       // face-on to the ASBM orbital plane so the true shape shows, apogee (the Arctic) at the top
@@ -886,28 +790,7 @@
   }
 
   const aimOf = c => c.tgt || add(c.pos, mul(c.F, Math.min(len(c.pos) * 0.9, 400000)));
-  // From the Sun to the Moon, 150 million km: a straight fall, paced so the
-  // distance from the Sun grows by an even factor over the first half and the
-  // distance to the Moon shrinks by one over the second, so neither end rushes.
-  // The view turns from the Sun to the Moon halfway, when both are small.
-  function fall(A, B, t) {
-    const way = sub(B.pos, A.pos), L = len(way);
-    const d0 = len(sub(A.pos, A.fall)), e1 = Math.max(1000, len(sub(B.pos, B.subject || B.pos)));
-    const x = t < 0.5 ? d0 * Math.pow((L / 2 + d0) / d0, 2 * t) - d0 : L - (e1 * Math.pow((L / 2 + e1) / e1, 2 * (1 - t)) - e1);
-    const pos = add(A.pos, mul(way, x / L));
-    // turn about an explicit axis: near new Moon the two views point almost
-    // opposite ways, where a plain slerp has no defined path
-    const e = t * t * (3 - 2 * t);
-    let axis = cross(A.F, B.F);
-    axis = len(axis) < 1e-3 ? A.U : norm(axis);
-    const turn = Math.acos(Math.max(-1, Math.min(1, dot(A.F, B.F)))) * e;
-    const F = rotAround(A.F, axis, turn);
-    const Ut = slerp(rotAround(A.U, axis, turn), B.U, e);
-    const U = norm(sub(Ut, mul(F, dot(Ut, F))));
-    return { pos, F, U, half: lerp(A.half, B.half, t), shift: lerp(A.shift, B.shift, t) };
-  }
   function blend(A, B, t) {
-    if (A.fall) return fall(A, B, t);
     const ra = len(A.pos), rb = len(B.pos);
     const r = Math.exp(lerp(Math.log(ra), Math.log(rb), t));
     const dir = slerp(norm(A.pos), norm(B.pos), t);
@@ -932,10 +815,6 @@
   }
 
   /* ---------- scroll ---------- */
-  // The page's sections in order, and which stop each one shows. Stops keep
-  // their ids (0 is the Moon ... 5 FramSat-1); the Sun, added later, is 6 and
-  // comes first.
-  const ORDER = [6, 0, 1, 2, 3, 4, 5];
   const sections = [...document.querySelectorAll("[data-stop]")];
   let holds = [], lockY = 0;
   function layout() {
@@ -1399,7 +1278,7 @@
       const x = (nx / aspect + 1) / 2 * innerWidth, y = (1 - ny) / 2 * innerHeight;
       if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
       const far = add(cam.posKm, mul(d, 2e6));
-      if (hidden(cam, far) || hidden(cam, far, cam.moonKm, RM) || hidden(cam, add(cam.posKm, mul(d, 1e10)), cam.sunKm, RS * 1.3)) continue;
+      if (hidden(cam, far) || hidden(cam, far, cam.moonKm, RM)) continue;
       og.globalAlpha = Math.min(1, mag * starDim * (0.85 + 0.15 * Math.sin(t * 0.8 + tw * 40)));
       og.fillStyle = tw > 0.85 ? "#cfe0ff" : tw < 0.1 ? "#ffe2c4" : "#ffffff";
       og.beginPath(); og.arc(x, y, 0.5 + mag * 1.1, 0, Math.PI * 2); og.fill();
@@ -1512,11 +1391,10 @@
   const route = $("route");
   function buildRoute() {
     const s = C.S();
-    // in page order; each button scrolls to its section
-    route.replaceChildren(...ORDER.map((id, i) => {
-      const li = document.createElement("li"); if (id === 5) li.className = "fs";
+    route.replaceChildren(...s.route.map((nm, i) => {
+      const li = document.createElement("li"); if (i === 5) li.className = "fs";
       const b = document.createElement("button"); b.type = "button";
-      b.innerHTML = `<span class="pip"></span><span class="txt"><span class="nm">${s.route[id]}</span><span class="km" id="rk${id}"></span></span>`;
+      b.innerHTML = `<span class="pip"></span><span class="txt"><span class="nm">${nm}</span><span class="km" id="rk${i}"></span></span>`;
       b.addEventListener("click", () => {
         const [a, bb] = holds[i]; const y = (a + Math.min(bb, a + innerHeight * 0.4)) / 2;
         window.scrollTo({ top: Math.max(0, y - innerHeight / 2), behavior: C.reduceMotion ? "auto" : "smooth" });
@@ -1530,10 +1408,9 @@
     const s = C.S();
     const moonD = fmtKm(len(moonEci(ms)));
     const iss = sv("ISS", ms), fs = sv("FRAMSAT-1", ms), a1 = sv("ASBM-1", ms), el = elements("ASBM-1");
-    const sunM = fmtN(len(sunPos(ms)) / 1e6, 1);
-    const vals = [[moonD], el ? [fmtKm(el.perigee), fmtKm(el.apogee)] : ["7,700", "44,000"], [], [], [iss ? fmtKm(len(iss.r) - RE) : "420"], [fs ? fmtKm(len(fs.r) - RE) : "560"], [sunM]];
+    const vals = [[moonD], el ? [fmtKm(el.perigee), fmtKm(el.apogee)] : ["7,700", "44,000"], [], [], [iss ? fmtKm(len(iss.r) - RE) : "420"], [fs ? fmtKm(len(fs.r) - RE) : "560"]];
     s.stops.forEach(([title, fn], i) => { stopDesc[i] = { title, text: fn(...vals[i]) }; });
-    const km = [moonD, a1 ? fmtKm(len(a1.r) - RE) : "", "35,786", "23,222", vals[4][0], vals[5][0], `${sunM} ${C.lang === "en" ? "M" : "mill."}`];
+    const km = [moonD, a1 ? fmtKm(len(a1.r) - RE) : "", "35,786", "23,222", vals[4][0], vals[5][0]];
     km.forEach((k, i) => { const e = $("rk" + i); if (e) e.textContent = k ? `${k} km` : ""; });
   }
 
@@ -1554,9 +1431,7 @@
   function updateCard(stopIdx, ms) {
     const s = C.S(), k = s.k, title = s.route[stopIdx];
     let body = "", sub2 = "";
-    if (stopIdx === 6) {
-      body = rows(sunRows(ms));
-    } else if (stopIdx === 0) {
+    if (stopIdx === 0) {
       const m = moonNumbers(ms);
       sub2 = s.moonShown;
       body = rows([[k.dist, `${fmtKm(m.d)} km`], [k.lit, `${Math.round(m.lit * 100)} %`], [k.phase, s.phases[m.idx]], [k.light, `${fmtN(m.light, 3)} s`], [k.size, `${fmtN(m.size, 3)}°`]]);
@@ -1599,41 +1474,14 @@
       }
     }
     const d = stopDesc[stopIdx] || { title, text: "" };
-    $("cardTitle").innerHTML = `<span>${String(ORDER.indexOf(stopIdx) + 1).padStart(2, "0")} · ${d.title}</span><span class="lv">${C.lang === "en" ? "live" : "direkte"}</span>`;
+    $("cardTitle").innerHTML = `<span>${String(stopIdx + 1).padStart(2, "0")} · ${d.title}</span><span class="lv">${C.lang === "en" ? "live" : "direkte"}</span>`;
     if ($("cardDesc").dataset.v !== d.text) { $("cardDesc").textContent = d.text; $("cardDesc").dataset.v = d.text; }
     $("cardRows").innerHTML = body;
     $("cardFoot").textContent = `${s.cardFoot[stopIdx] || ""}${sub2 ? ` · ${sub2}` : ""}`;
-    const showMap = stopIdx === 4 || stopIdx === 5;
-    const thumb = $("cardSun");
-    thumb.hidden = stopIdx !== 6;
-    if (stopIdx === 6 && !thumb.getAttribute("src")) {
-      thumb.src = "/sun.webp";
-      thumb.alt = C.lang === "en" ? "The Sun today, from GOES-19 in extreme ultraviolet" : "Solen i dag, fra GOES-19 i ekstremt ultrafiolett lys";
-    }
+    const showMap = stopIdx >= 4;
     $("cardMap").hidden = !showMap; $("live").hidden = stopIdx !== 5; $("views").hidden = stopIdx !== 5;
     card.dataset.view = stopIdx;
     if (showMap) drawMini(stopIdx === 4 ? "ISS" : "FRAMSAT-1", ms);
-  }
-  // The Sun right now: the space weather comes from the server (src/lib/space-weather.ts).
-  const WEATHER = JSON.parse(($("weatherData") || { textContent: "{}" }).textContent);
-  function sunRows(ms) {
-    const s = C.S(), k = s.k, en = C.lang === "en", W = WEATHER;
-    const d = len(sunPos(ms)), light = d / 299792.458;
-    const ago = W.sunImageTime ? (ms - Date.parse(W.sunImageTime)) / 60000 : null;
-    const kpWord = kp => kp >= 5 ? (en ? `storm, G${Math.min(5, Math.floor(kp) - 4)}` : `storm, G${Math.min(5, Math.floor(kp) - 4)}`) : kp >= 4 ? (en ? "active" : "aktivt") : (en ? "quiet" : "rolig");
-    const trdSunUp = dot(norm(rotZ(ecefUnit(TRD.lat, TRD.lon), gmst(ms))), sunEci(ms)) > -0.1;
-    return [
-      [k.dist, `${fmtN(d / 1e6, 2)} ${en ? "million km" : "millioner km"}`],
-      [k.light, `${Math.floor(light / 60)} min ${Math.round(light % 60)} s`],
-      [k.size, `${fmtN(2 * deg(Math.asin(RS / d)), 2)}°`],
-      SPOTS.length > 0 && [k.spots, `${SPOTS.length} · ${en ? "largest" : "størst"} AR ${SPOTS.reduce((a, b) => (b.area > a.area ? b : a)).region}`],
-      ago !== null && [k.image, `GOES-19 · ${fmtTime(Date.parse(W.sunImageTime))} (${ago < 1 ? (en ? "just now" : "nå nettopp") : (en ? `${fmtMin(ago)} ago` : `for ${fmtMin(ago)} siden`)})`],
-      W.xrayNow && [k.xray, `${W.xrayNow} · ${en ? "largest in 24 h" : "størst siste døgn"} ${W.xrayMax}`],
-      W.windSpeed !== null && [k.wind, `${fmtKm(W.windSpeed)} km/s`],
-      W.bz !== null && [k.bz, `${W.bz > 0 ? "+" : ""}${W.bz} nT · ${W.bz < 0 ? (en ? "south" : "sørover") : (en ? "north" : "nordover")}`],
-      W.kp !== null && [k.kp, `${fmtN(W.kp, 1)} · ${kpWord(W.kp)}`],
-      W.aurora !== null && [k.aurora, `${W.aurora} %${trdSunUp ? (en ? " · daylight now" : " · dagslys nå") : ""}`],
-    ];
   }
   function extrasRows(name, ms) {
     const k = C.S().k, x = orbitExtras(name, ms), en = C.lang === "en";
@@ -1772,23 +1620,21 @@
 
   /* ---------- pointer: drag to look, hover to learn ---------- */
   let curStop = 0, dragging = null, mouse = null;
-  const draggable = () => curStop === 0 || curStop === 5 || curStop === 6;
+  const draggable = () => curStop === 0 || curStop === 5;
   const blocked = el => el.closest("a, button, input, .hud, .drawer, .top, .side, .col p, .col h1, .col h2, .col h3, .col li, .who");
   window.addEventListener("pointerdown", e => {
     if (!draggable() || document.body.classList.contains("tracker-open") || blocked(e.target)) return;
     if (e.pointerType === "touch" && curStop !== 5) return;
-    const look = curStop === 6 ? sunLook : moonLook;
-    dragging = { x: e.clientX, y: e.clientY, az: look.taz, el: look.tel, yaw: ride.tyaw, pitch: ride.tpitch };
+    dragging = { x: e.clientX, y: e.clientY, az: moonLook.taz, el: moonLook.tel, yaw: ride.tyaw, pitch: ride.tpitch };
     document.body.classList.add("looking");
   });
   window.addEventListener("pointermove", e => {
     if (e.pointerType === "mouse") mouse = { x: e.clientX, y: e.clientY, target: e.target };
     if (!dragging) return;
     const dx = e.clientX - dragging.x, dy = e.clientY - dragging.y, k = 2.2 / innerHeight;
-    if (curStop === 0 || curStop === 6) {
-      const look = curStop === 6 ? sunLook : moonLook;
-      look.taz = dragging.az + dx * k * 1.3;
-      look.tel = Math.max(-1.35, Math.min(1.35, dragging.el + dy * k * 1.3));
+    if (curStop === 0) {
+      moonLook.taz = dragging.az + dx * k * 1.3;
+      moonLook.tel = Math.max(-1.35, Math.min(1.35, dragging.el + dy * k * 1.3));
     } else {
       ride.tyaw = dragging.yaw + dx * k;
       ride.tpitch = Math.max(0.12, Math.min(1.45, dragging.pitch + dy * k));
@@ -1797,9 +1643,8 @@
   });
   const endDrag = () => { dragging = null; document.body.classList.remove("looking"); };
   window.addEventListener("dblclick", e => {
-    if ((curStop !== 0 && curStop !== 6) || blocked(e.target)) return;
-    const look = curStop === 6 ? sunLook : moonLook;
-    look.taz = Math.round(look.az / (2 * Math.PI)) * 2 * Math.PI; look.tel = 0;
+    if (curStop !== 0 || blocked(e.target)) return;
+    moonLook.taz = Math.round(moonLook.az / (2 * Math.PI)) * 2 * Math.PI; moonLook.tel = 0;
   });
   window.addEventListener("pointerup", endDrag); window.addEventListener("pointercancel", endDrag);
   document.addEventListener("pointerleave", () => { mouse = null; });
@@ -1832,16 +1677,15 @@
     const k = C.reduceMotion ? 1 : 1 - Math.exp(-dt * 5);
     yS += (yT - yS) * k; if (Math.abs(yT - yS) < 0.3) yS = yT;
     moonLook.az += (moonLook.taz - moonLook.az) * k; moonLook.el += (moonLook.tel - moonLook.el) * k;
-    sunLook.az += (sunLook.taz - sunLook.az) * k; sunLook.el += (sunLook.tel - sunLook.el) * k;
     if (ride.pitch !== null) { ride.yaw += angDiff(ride.yaw, ride.tyaw) * k; ride.pitch += (ride.tpitch - ride.pitch) * k; }
     const ms = Date.now();
     const w = where(yS);
-    const a = ORDER[w.i], b = ORDER[w.j], t = w.t;
+    const a = w.i, b = w.j, t = w.t;
     curStop = t < 0.5 ? a : b;
     const A = stop(a, ms, w.drift), B = b !== a ? stop(b, ms, 0) : A;
     let cam = b !== a ? blend(A, B, t) : A;
     if (A.frame) lastFrame = A.frame; else if (B.frame) lastFrame = B.frame;
-    const weights = [0, 0, 0, 0, 0, 0, 0];
+    const weights = [0, 0, 0, 0, 0, 0];
     weights[a] += 1 - t; weights[b] += t;
     const rideW = (a === 5 || b === 5) ? (a === 5 ? 1 : t) : 0;
     const locked = a === 5 && yS >= lockY;
@@ -1850,8 +1694,7 @@
     const U = norm(sub(cam.U, mul(cam.F, dot(cam.U, cam.F))));
     const R = cross(cam.F, U);
     const sun = sunEci(ms), mf = spinMoon(moonFrame(ms));
-    const S = sunPos(ms), sunDrawn = drawnSun(ms);
-    const camFull = { posKm: cam.pos, F: cam.F, U, R, tanH: Math.tan(rad(cam.half)), shift: cam.shift, sun, moonKm: mf.moon, mf, sunKm: S,
+    const camFull = { posKm: cam.pos, F: cam.F, U, R, tanH: Math.tan(rad(cam.half)), shift: cam.shift, sun, moonKm: mf.moon, mf,
       mode: rideW > 0.98 ? "ride" : "", cube: smooth((rideW - 0.35) / 0.5), sat: cam.sat };
     if (field) {
       // from 0.35 before the maps are in up to full once they are, without dipping to black
@@ -1859,9 +1702,6 @@
       field.draw({ uCam: mul(cam.pos, 1 / RE), uF: cam.F, uR: R, uU: U, uTanH: camFull.tanH, uShift: cam.shift,
         uSun: sun, uGmst: gmst(ms), uFade: smooth(fade), uLoaded: loaded, uNight: Math.max(rideW, weights[4]),
         uMoon: mul(mf.moon, 1 / RE), uMoonR: RM / RE, uMX: mf.mx, uMY: mf.my, uMZ: mf.mz,
-        uSunRel: mul(sub(S, cam.pos), 1 / RE), uSunR: RS / RE, uSunX: sunDrawn.X, uSunY: sunDrawn.Y, uSunN: sunDrawn.N,
-        uTime: clock, uSpots: { vec4: sunDrawn.spots },
-        uSunNear: smooth((60e6 - len(sub(S, cam.pos))) / 40e6),
         uDetailBox: detail.box ? detail.box.uniform : [0, 0, 1, 1], uDetail: detail.fade * Math.min(1, weights[4] + weights[5]) }, dt);
       // Let the renderer lower its resolution only while the view is moving.
       field.setMoving(a !== b || !!dragging || Math.abs(yT - yS) > 2);
@@ -1869,7 +1709,7 @@
     }
     drawOverlay(camFull, weights, ms, clock, rideW);
     updateHover();
-    [...route.children].forEach((li, i) => li.classList.toggle("on", ORDER[i] === curStop));
+    [...route.children].forEach((li, i) => li.classList.toggle("on", i === curStop));
     if (now - lastText > 1000) { lastText = now; stopTexts(ms); updateDetail(ms); }
     if (now - lastCard > 500) { lastCard = now; updateCard(curStop, ms); }
     globe.frame(now);
