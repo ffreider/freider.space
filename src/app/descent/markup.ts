@@ -243,9 +243,168 @@ footer { position: relative; z-index: 2; padding: 0 var(--gutter) calc(14px + en
 }
 /* globals.css gives the light pages' text a glow; not wanted here */
 main, footer { text-shadow: none; }
+/* ===================== Style studies =====================
+   Two looks for everything but the descent itself, picked by data-style on
+   #descent (set from ?style= before the first paint, see the top of the
+   markup). The rules above are the shared layout. */
+
+/* ---------- Polar night (the default) ----------
+   A Trondheim winter night: polar-night blue instead of black, cool snow
+   white, frost grey, ice for lines, sodium streetlight orange for links and
+   FramSat-1, aurora green once, on the Ø. Schibsted Grotesk (made for the
+   Norwegian media group Schibsted) for names and interface, Newsreader for
+   reading, sentence case throughout, no monospace outside the descent. */
+#descent[data-style="polar"] {
+  --night: #0a1220; --snow: #e9eef2; --frost: #8fa3b5; --ice: #24364a; --sodium: #f2a541; --aurora: #6fe3b4;
+  --ink: var(--snow); --ink-2: rgba(233, 238, 242, 0.8); --ink-3: var(--frost); --ink-4: rgba(143, 163, 181, 0.62);
+  --rule: rgba(143, 163, 181, 0.22); --fs: var(--sodium);
+  --f-read: var(--font-newsreader), Georgia, serif;
+  --panel: rgba(10, 18, 32, 0.66);
+}
+#descent[data-style="polar"] a { text-decoration-color: rgba(242, 165, 65, 0.55); text-underline-offset: 5px; text-decoration-thickness: 1px; }
+#descent[data-style="polar"] a:hover { text-decoration-color: var(--sodium); }
+#descent[data-style="polar"] .fade { background: linear-gradient(90deg, rgba(10, 18, 32, 0.88) 0%, rgba(10, 18, 32, 0.6) 30%, rgba(10, 18, 32, 0) 58%); }
+#descent[data-style="polar"] .mark { font: 600 15px/1 var(--f-body); letter-spacing: -0.01em; color: var(--ink); }
+#descent[data-style="polar"] .chip { font: 500 14px/1 var(--f-body); letter-spacing: 0; text-transform: none; color: var(--ink-2); background: var(--panel); border-color: var(--ice); border-radius: 999px; padding: 9px 14px; }
+#descent[data-style="polar"] .route .nm { font: 500 14px/1.25 var(--f-body); letter-spacing: 0; }
+#descent[data-style="polar"] .route .km { font: 400 13px/1.3 var(--f-body); font-variant-numeric: tabular-nums; }
+#descent[data-style="polar"] .route button { padding: 5px 0; }
+#descent[data-style="polar"] .card { background: var(--panel); border: 1px solid var(--ice); border-radius: 14px; padding: 16px 18px 18px; gap: 12px; }
+#descent[data-style="polar"] .card h4 { font: 600 17px/1.25 var(--f-body); letter-spacing: -0.01em; text-transform: none; }
+#descent[data-style="polar"] .card h4 .lv { font-size: 0; }
+#descent[data-style="polar"] .card h4 .lv::before { width: 8px; height: 8px; margin-top: 6px; }
+#descent[data-style="polar"] .card .cdesc { font: 400 16px/1.5 var(--f-read); color: var(--ink-2); }
+#descent[data-style="polar"] .card #live { font: 500 17px/1.4 var(--f-read); }
+#descent[data-style="polar"] .card dl { gap: 6px 16px; }
+#descent[data-style="polar"] .card dt { font: 400 13px/1.35 var(--f-body); color: var(--ink-3); }
+#descent[data-style="polar"] .card dd { font: 500 13px/1.35 var(--f-body); font-variant-numeric: tabular-nums; }
+#descent[data-style="polar"] .card .foot { font: 400 13px/1.45 var(--f-read); font-style: italic; color: var(--ink-3); }
+#descent[data-style="polar"] #cardMap { border-color: var(--ice); border-radius: 8px; }
+#descent[data-style="polar"] .tip { background: rgba(10, 18, 32, 0.9); border-color: var(--ice); border-radius: 10px; font: 400 13px/1.45 var(--f-body); }
+#descent[data-style="polar"] .tip b { font: 600 15px/1.3 var(--f-body); }
+#descent[data-style="polar"] .tip p { font: 400 15px/1.45 var(--f-read); }
+#descent[data-style="polar"] h2 { letter-spacing: -0.035em; }
+#descent[data-style="polar"] .tagline { font: 400 clamp(22px, 2.2vw, 28px)/1.3 var(--f-read); max-width: 24ch; }
+#descent[data-style="polar"] .links { font: 500 16px/1 var(--f-body); letter-spacing: 0; text-transform: none; gap: 24px; }
+#descent[data-style="polar"] .hint { font: 400 16px/1.5 var(--f-read); color: var(--ink-3); letter-spacing: 0; max-width: 38ch; }
+#descent[data-style="polar"] .bio { font: 400 clamp(20px, 1.9vw, 23px)/1.6 var(--f-read); }
+#descent[data-style="polar"] .chart .yr span, #descent[data-style="polar"] .lab { font: 400 12px/1 var(--f-body); font-variant-numeric: tabular-nums; }
+#descent[data-style="polar"] .chart .nowline span { font: 600 12px/1 var(--f-body); text-transform: none; letter-spacing: 0; color: var(--sodium); }
+#descent[data-style="polar"] .org strong { font-size: 20px; letter-spacing: -0.01em; }
+#descent[data-style="polar"] .when { font: 400 14px/1.4 var(--f-body); font-variant-numeric: tabular-nums; }
+#descent[data-style="polar"] .desc { font: 400 17px/1.5 var(--f-read); }
+#descent[data-style="polar"] .role-one, #descent[data-style="polar"] .sub li { font: 400 17.5px/1.45 var(--f-read); }
+#descent[data-style="polar"] .sub .note { font: 400 15.5px/1.45 var(--f-read); font-style: italic; }
+#descent[data-style="polar"] .article { background: var(--panel); border-color: var(--ice); border-radius: 14px; overflow: hidden; }
+#descent[data-style="polar"] .article .src { font: 500 14px/1 var(--f-body); letter-spacing: 0; text-transform: none; color: var(--ink-3); }
+#descent[data-style="polar"] .article .meta { font: 400 14px/1.5 var(--f-body); }
+#descent[data-style="polar"] .article p:not(.src):not(.meta):not(.byline) { font: 400 18px/1.5 var(--f-read); }
+#descent[data-style="polar"] .article .byline { font: 400 15px/1.45 var(--f-read); font-style: italic; }
+#descent[data-style="polar"] .article .cta { font: 600 16px/1 var(--f-body); letter-spacing: 0; text-transform: none; color: var(--sodium); }
+#descent[data-style="polar"] .meta { font-family: var(--f-body); }
+#descent[data-style="polar"] .degrees li { font: 400 21px/1.4 var(--f-read); }
+#descent[data-style="polar"] .finishing { font: 400 18px/1.5 var(--f-read); font-style: italic; }
+#descent[data-style="polar"] .hud .k { font: 600 15px/1.3 var(--f-body); letter-spacing: 0; text-transform: none; }
+#descent[data-style="polar"] .hud .why { font: 400 18px/1.55 var(--f-read); }
+#descent[data-style="polar"] .views button, #descent[data-style="polar"] .btn { font: 500 13.5px/1 var(--f-body); letter-spacing: 0; text-transform: none; border-color: var(--ice); border-radius: 999px; padding: 9px 13px; background: var(--panel); }
+#descent[data-style="polar"] .views button[aria-pressed="true"] { color: var(--night); background: var(--snow); }
+#descent[data-style="polar"] .primary { font: 600 15px/1 var(--f-body); letter-spacing: 0; text-transform: none; color: var(--night); border-radius: 999px; padding: 14px 20px; }
+#descent[data-style="polar"] .stats dt, #descent[data-style="polar"] .tele dt { font: 400 12.5px/1.3 var(--f-body); letter-spacing: 0; text-transform: none; }
+#descent[data-style="polar"] .stats dd, #descent[data-style="polar"] .tele dd, #descent[data-style="polar"] .clock, #descent[data-style="polar"] .hud-row { font-family: var(--f-body); font-variant-numeric: tabular-nums; }
+#descent[data-style="polar"] .scale, #descent[data-style="polar"] .facts { font: 400 12.5px/1.5 var(--f-body); }
+#descent[data-style="polar"] .pass, #descent[data-style="polar"] .note { font-family: var(--f-read); }
+#descent[data-style="polar"] .fs-foot a { font: 600 15px/1 var(--f-body); letter-spacing: 0; text-transform: none; }
+#descent[data-style="polar"] .drawer { background: rgba(10, 18, 32, 0.95); border-left-color: var(--ice); }
+#descent[data-style="polar"] footer { font: 400 13.5px/1.4 var(--f-read); font-style: italic; color: var(--ink-4); }
+#descent[data-style="polar"] .door { background: var(--night); }
+
+/* The Ø of Fløan as a live orbit: a ring (aurora green) crossed by the
+   slash at 97.4°, FramSat-1's inclination, and a sodium dot for FramSat-1
+   at its real place in its orbit (main.js moves it). The letter itself stays
+   in the text, invisible, so it's still read, copied and indexed as ø. */
+.oe { position: relative; display: inline-block; }
+.oe-s { display: none; }
+#descent[data-style="polar"] .oe-t { color: transparent; }
+#descent[data-style="polar"] .oe-s { display: block; position: absolute; left: -0.02em; right: -0.02em; bottom: 0.02em; width: auto; aspect-ratio: 1; overflow: visible; }
+.oe-ring { fill: none; stroke: var(--aurora, #6fe3b4); stroke-width: 12; }
+.oe-slash { stroke: var(--ink); stroke-width: 12; stroke-linecap: butt; }
+.oe-sat { fill: var(--sodium, #f2a541); }
+
+/* ---------- Ground station (?style=station) ----------
+   The interface as Orbit NTNU's own mission paperwork: each section a sheet
+   with a title block (document number, title, revision), condensed technical
+   capitals for document headings only, plain Barlow for reading, steel on a
+   console blue, one signal red for anything live. */
+#descent[data-style="station"] {
+  --console: #0c131a; --steel: #cdd6dd; --steel-2: #8e9ba6; --line: #3a4652; --signal: #ff5b3a;
+  --ink: var(--steel); --ink-2: rgba(205, 214, 221, 0.82); --ink-3: var(--steel-2); --ink-4: rgba(142, 155, 166, 0.6);
+  --rule: var(--line); --fs: var(--signal);
+  --f-display: var(--font-barlow-cond), "Arial Narrow", sans-serif;
+  --f-body: var(--font-barlow), "Helvetica Neue", Arial, sans-serif;
+  --f-read: var(--font-barlow), "Helvetica Neue", Arial, sans-serif;
+  --panel: rgba(12, 19, 26, 0.84);
+  counter-reset: doc;
+}
+#descent[data-style="station"] .fade { background: linear-gradient(90deg, rgba(12, 19, 26, 0.9) 0%, rgba(12, 19, 26, 0.6) 32%, rgba(12, 19, 26, 0) 58%); }
+#descent[data-style="station"] a { text-decoration-color: var(--signal); text-underline-offset: 4px; }
+#descent[data-style="station"] .mark { font: 600 15px/1 var(--f-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
+#descent[data-style="station"] .chip { font: 600 14px/1 var(--f-display); letter-spacing: 0.08em; background: var(--panel); border-color: var(--line); }
+#descent[data-style="station"] .route .nm { font: 600 15px/1.2 var(--f-display); letter-spacing: 0.04em; text-transform: uppercase; }
+#descent[data-style="station"] .route .km { font: 400 13px/1.3 var(--f-body); font-variant-numeric: tabular-nums; }
+#descent[data-style="station"] .route .pip { border-radius: 0; }
+#descent[data-style="station"] .card { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--signal); }
+#descent[data-style="station"] .card h4 { font: 700 18px/1.2 var(--f-display); letter-spacing: 0.05em; }
+#descent[data-style="station"] .card h4 .lv { color: var(--signal); }
+#descent[data-style="station"] .card h4 .lv::before { border-radius: 0; animation: none; }
+#descent[data-style="station"] .card .cdesc { font: 400 15.5px/1.5 var(--f-read); }
+#descent[data-style="station"] .card dl { border-top: 1px solid var(--line); padding-top: 8px; }
+#descent[data-style="station"] .card dt { font: 500 13px/1.35 var(--f-body); }
+#descent[data-style="station"] .card dd { font: 500 13.5px/1.35 var(--f-body); font-variant-numeric: tabular-nums; }
+#descent[data-style="station"] .card .foot { font: 400 12.5px/1.45 var(--f-body); }
+#descent[data-style="station"] .tip { background: rgba(12, 19, 26, 0.94); border-color: var(--line); font: 400 13px/1.45 var(--f-body); }
+#descent[data-style="station"] .tip b { font: 700 16px/1.2 var(--f-display); letter-spacing: 0.04em; text-transform: uppercase; }
+#descent[data-style="station"] h2 { font: 700 clamp(44px, 5.6vw, 76px)/0.92 var(--f-display); letter-spacing: 0.01em; text-transform: uppercase; }
+#descent[data-style="station"] .name { font: 700 clamp(76px, 12vw, 190px)/0.84 var(--f-display); letter-spacing: 0.005em; text-transform: uppercase; }
+#descent[data-style="station"] .tagline { font: 400 clamp(21px, 2vw, 26px)/1.35 var(--f-read); }
+#descent[data-style="station"] .links { font: 600 16px/1 var(--f-display); letter-spacing: 0.08em; }
+#descent[data-style="station"] .hint { font: 400 14.5px/1.5 var(--f-body); letter-spacing: 0; }
+#descent[data-style="station"] .bio { font: 400 clamp(19px, 1.8vw, 22px)/1.6 var(--f-read); }
+/* every section a sheet, with a title block: document number and revision */
+#descent[data-style="station"] main .col { position: relative; background: var(--panel); border: 1px solid var(--line); padding: 54px 28px 28px; }
+#descent[data-style="station"] main section { counter-increment: doc; }
+#descent[data-style="station"] main .col::before {
+  content: "Doc FF-" counter(doc, decimal-leading-zero) "\00a0\00a0\00a0Rev 11 Oct 2026\00a0\00a0\00a0Released";
+  position: absolute; top: 0; left: 0; right: 0; padding: 9px 28px; border-bottom: 1px solid var(--line);
+  font: 600 13px/1.2 var(--f-display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); word-spacing: 0.2em;
+}
+#descent[data-style="station"] .hero .col { padding-top: 60px; }
+#descent[data-style="station"] .chart .yr span, #descent[data-style="station"] .lab { font: 500 12px/1 var(--f-body); font-variant-numeric: tabular-nums; }
+#descent[data-style="station"] .chart .nowline span { font: 700 12px/1 var(--f-display); color: var(--signal); }
+#descent[data-style="station"] .seg { height: 3px; }
+#descent[data-style="station"] .org strong { font: 700 21px/1.2 var(--f-display); letter-spacing: 0.03em; text-transform: uppercase; }
+#descent[data-style="station"] .when { font: 500 14px/1.4 var(--f-body); font-variant-numeric: tabular-nums; }
+#descent[data-style="station"] .desc, #descent[data-style="station"] .role-one, #descent[data-style="station"] .sub li { font-family: var(--f-read); font-size: 16.5px; }
+#descent[data-style="station"] .article { background: var(--panel); border-color: var(--line); }
+#descent[data-style="station"] .article .src, #descent[data-style="station"] .article .cta { font: 600 14px/1 var(--f-display); letter-spacing: 0.1em; }
+#descent[data-style="station"] .article .meta { font: 400 13.5px/1.5 var(--f-body); }
+#descent[data-style="station"] .article h3 { font: 700 clamp(28px, 2.8vw, 38px)/1 var(--f-display); letter-spacing: 0.01em; text-transform: uppercase; }
+#descent[data-style="station"] .degrees li { font: 400 19px/1.4 var(--f-read); }
+#descent[data-style="station"] .hud .k { font: 700 15px/1.3 var(--f-display); letter-spacing: 0.1em; }
+#descent[data-style="station"] .hud .k::before { border-radius: 0; }
+#descent[data-style="station"] .views button, #descent[data-style="station"] .btn, #descent[data-style="station"] .primary { font: 600 14px/1 var(--f-display); letter-spacing: 0.08em; }
+#descent[data-style="station"] .primary { background: var(--signal); color: #12080a; }
+#descent[data-style="station"] .stats dt, #descent[data-style="station"] .tele dt { font: 600 12.5px/1.3 var(--f-display); letter-spacing: 0.08em; }
+#descent[data-style="station"] .stats dd, #descent[data-style="station"] .tele dd, #descent[data-style="station"] .clock, #descent[data-style="station"] .hud-row, #descent[data-style="station"] .scale, #descent[data-style="station"] .facts { font-family: var(--f-body); font-variant-numeric: tabular-nums; }
+#descent[data-style="station"] .drawer { background: rgba(12, 19, 26, 0.96); border-left: 3px solid var(--signal); }
+#descent[data-style="station"] .drawer-head h3 { font: 700 34px/1 var(--f-display); letter-spacing: 0.02em; text-transform: uppercase; }
+#descent[data-style="station"] footer { font: 400 13px/1.4 var(--f-body); }
+#descent[data-style="station"] .door { background: var(--console); }
+#descent[data-style="station"] .oe { display: inline; }   /* plain text here, so the face's own kerning holds */
+#descent[data-style="station"] .door span { font: 700 clamp(48px, 10vw, 150px)/1 var(--f-display); letter-spacing: 0.02em; text-transform: uppercase; }
 `;
 
 export const DESCENT_BODY = String.raw`
+<script>(function () { var s = new URLSearchParams(location.search).get("style"); document.getElementById("descent").dataset.style = s === "station" ? "station" : "polar"; })();</script>
 <div class="cover" id="cover" aria-hidden="true"><div class="door up"><span>__HI__</span></div><div class="door down"><span>__HI__</span></div></div>
 <canvas id="field" aria-hidden="true"></canvas>
 <canvas id="cube" aria-hidden="true" style="position:fixed;inset:0;width:100%;height:100%;z-index:2;pointer-events:none"></canvas>
@@ -274,7 +433,7 @@ export const DESCENT_BODY = String.raw`
 <main>
   <section class="hero" id="top" data-stop="0">
     <div class="col">
-      <h1 class="name">Freider<br>Fløan</h1>
+      <h1 class="name">Freider<br>Fl<span class="oe"><span class="oe-t">ø</span><svg class="oe-s" viewBox="-50 -50 100 100" aria-hidden="true"><ellipse class="oe-ring" cx="0" cy="0" rx="34" ry="29" transform="rotate(29.6)"/><line class="oe-slash" x1="-30" y1="40" x2="30" y2="-40"/><circle class="oe-sat" id="oeSat" cx="34" cy="0" r="8"/></svg></span>an</h1>
       <div class="who">
         <img src="/descent/portrait.jpg" alt="Freider Fløan" width="420" height="420">
         <p class="tagline" data-t="tagline"></p>

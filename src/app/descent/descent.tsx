@@ -97,7 +97,8 @@ export async function Descent({
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: DESCENT_CSS }} />
-      <div id="descent" data-lang={lang} dangerouslySetInnerHTML={{ __html: fill(text[lang], timeline, lang) }} />
+      {/* data-style is set by a script in the markup before the first paint, hence the warning off */}
+      <div id="descent" data-lang={lang} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: fill(text[lang], timeline, lang) }} />
       <script type="application/json" id="tleData" dangerouslySetInnerHTML={{ __html: json(tles) }} />
       <script type="application/json" id="timelineData" dangerouslySetInnerHTML={{ __html: json(timeline) }} />
       <script type="application/json" id="textData" dangerouslySetInnerHTML={{ __html: json(text) }} />

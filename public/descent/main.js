@@ -1,6 +1,7 @@
 (() => {
   "use strict";
   const C = window.Core;
+  const STYLE = document.getElementById("descent").dataset.style;   // "polar" or "station", see markup.ts
   const $ = id => document.getElementById(id);
 
   /* ---------- vectors ---------- */
@@ -248,7 +249,7 @@
   C.extend({
     en: {
       whyShort: "A student satellite I worked on at Orbit NTNU, launched on 5 September 2026. The first satellite ever launched into orbit from continental Europe.",
-      liveTag: "Live · FramSat-1 right now",
+      liveTag: "FramSat-1, right now",
       riding: "Riding with FramSat-1",
       openTracker: "Open full tracker", close: "Close",
       lookHint: "Drag to fly around it",
@@ -281,7 +282,7 @@
     },
     no: {
       whyShort: "En studentsatellitt jeg jobbet med i Orbit NTNU, skutt opp 5. september 2026. Den første satellitten noensinne skutt opp i bane fra det kontinentale Europa.",
-      liveTag: "Direkte · FramSat-1 akkurat nå",
+      liveTag: "FramSat-1, akkurat nå",
       riding: "Om bord hos FramSat-1",
       openTracker: "Åpne full sporing", close: "Lukk",
       lookHint: "Dra for å fly rundt den",
@@ -1488,10 +1489,13 @@
       }
     }
     const d = stopDesc[stopIdx] || { title, text: "" };
-    $("cardTitle").innerHTML = `<span>${String(stopIdx + 1).padStart(2, "0")} · ${d.title}</span><span class="lv">${C.lang === "en" ? "live" : "direkte"}</span>`;
+    // polar night: "The Moon, right now" and a sodium dot; ground station: "01 / The Moon" and "live"
+    $("cardTitle").innerHTML = STYLE === "station"
+      ? `<span>${String(stopIdx + 1).padStart(2, "0")} / ${d.title}</span><span class="lv">${C.lang === "en" ? "Live" : "Direkte"}</span>`
+      : `<span>${d.title}, ${C.lang === "en" ? "right now" : "akkurat nå"}</span><span class="lv" aria-hidden="true"></span>`;
     if ($("cardDesc").dataset.v !== d.text) { $("cardDesc").textContent = d.text; $("cardDesc").dataset.v = d.text; }
     $("cardRows").innerHTML = body;
-    $("cardFoot").textContent = `${s.cardFoot[stopIdx] || ""}${sub2 ? ` · ${sub2}` : ""}`;
+    $("cardFoot").textContent = `${s.cardFoot[stopIdx] || ""}${sub2 ? ` (${sub2})` : ""}`;
     const showMap = stopIdx >= 4;
     $("cardMap").hidden = !showMap; $("live").hidden = stopIdx !== 5; $("views").hidden = stopIdx !== 5;
     card.dataset.view = stopIdx;
@@ -1680,6 +1684,20 @@
     document.body.classList.toggle("can-drag", !hit && draggable() && !!mouse && !(mouse.target && blocked(mouse.target)));
   }
 
+  /* ---------- the Ø ----------
+     FramSat-1's dot on the Ø's ring (markup.ts), at its argument of latitude:
+     how far round its orbit it is from where it last crossed the equator
+     going north, which sits at the end of the ring's long axis. */
+  const oeSat = $("oeSat");
+  function placeOrbitDot(ms) {
+    const s = sv("FRAMSAT-1", ms); if (!oeSat || !s) return;
+    const h = norm(cross(s.r, s.v)), node = norm(cross([0, 0, 1], h));
+    const u = Math.atan2(dot(norm(s.r), cross(h, node)), dot(norm(s.r), node));
+    const x = 34 * Math.cos(u), y = -29 * Math.sin(u), a = rad(29.6);       // the ring in markup.ts, rotate(29.6)
+    oeSat.setAttribute("cx", (x * Math.cos(a) - y * Math.sin(a)).toFixed(2));
+    oeSat.setAttribute("cy", (x * Math.sin(a) + y * Math.cos(a)).toFixed(2));
+  }
+
   /* ---------- loop ---------- */
   let yS = 0, yT = 0;
   const onScroll = () => { yT = scrollY + innerHeight / 2; };
@@ -1724,7 +1742,7 @@
     drawOverlay(camFull, weights, ms, clock, rideW);
     updateHover();
     [...route.children].forEach((li, i) => li.classList.toggle("on", i === curStop));
-    if (now - lastText > 1000) { lastText = now; stopTexts(ms); updateDetail(ms); }
+    if (now - lastText > 1000) { lastText = now; stopTexts(ms); updateDetail(ms); placeOrbitDot(ms); }
     if (now - lastCard > 500) { lastCard = now; updateCard(curStop, ms); }
     globe.frame(now);
     requestAnimationFrame(frame);
@@ -1736,6 +1754,6 @@
   const renderHtml = () => document.querySelectorAll("[data-h]").forEach(el => { el.innerHTML = C.S()[el.dataset.h]; });
   C.onLang(() => { buildRoute(); stopTexts(Date.now()); lastCard = 0; renderHtml(); });
 
-  C.render(); renderHtml(); layout(); onScroll(); yS = yT;
+  C.render(); renderHtml(); layout(); onScroll(); yS = yT; placeOrbitDot(Date.now());
   requestAnimationFrame(frame);
 })();

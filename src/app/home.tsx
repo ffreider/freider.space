@@ -170,7 +170,7 @@ export const TEXT = {
     articleSummary:
       "An NTNU engineering degree turned into satellites, SpaceX and NORSTEC. A profile of the student helping shape Norway’s next generation of space talent.",
     articleByline: "By McKenna Starck. Photo: Ludvik Hestbek, TRD Brand.",
-    articleCta: "Read the article",
+    articleCta: "Read it on Trondheim.com",
     education: "Education",
     degrees: [
       "MSc, Electronic Systems Design (space systems), NTNU",
@@ -195,7 +195,7 @@ export const TEXT = {
     articleSummary:
       "En ingeniørgrad fra NTNU som ble til satellitter, SpaceX og NORSTEC. Et portrett av studenten som er med på å forme neste generasjon norske romfartstalenter.",
     articleByline: "Av McKenna Starck. Foto: Ludvik Hestbek, TRD Brand.",
-    articleCta: "Les artikkelen",
+    articleCta: "Les den på Trondheim.com",
     education: "Utdanning",
     degrees: [
       "Master i elektronisk systemdesign (romsystemer), NTNU",
