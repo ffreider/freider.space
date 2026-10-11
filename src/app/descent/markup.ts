@@ -234,12 +234,50 @@ input[type="range"] { width: 100%; accent-color: var(--fs); }
 footer { position: relative; z-index: 2; padding: 0 var(--gutter) calc(20px + env(safe-area-inset-bottom, 0px)); color: var(--ink-3); font-size: 13px; line-height: 1.5; }
 footer p { max-width: 60ch; }
 
+.sheet-btn { display: none; }
+/* Phones: the scene is a window across the top of the screen and the page
+   scrolls on below it, so text never sits on the pictures. The card shrinks
+   to one line at the window's foot and opens as a sheet. */
 @media (max-width: 900px) {
-  .side { left: var(--gutter); width: auto; top: auto; max-height: 34vh; }
-  .route, .card dl:not(.more), .card .foot { display: none; }
+  :root { --scene: 46svh; }
+  body { background: rgb(var(--haze)); }
+  #field, #overlay, #cube { height: var(--scene) !important; }
+  #field { z-index: 3; }
+  #overlay { z-index: 4; }
+  #cube { z-index: 5 !important; }
+  /* the window's lower edge: text scrolling up fades out under it */
+  .fade, body.live-lock .fade { opacity: 1; inset: auto 0; top: calc(var(--scene) - 1px); height: 36px; z-index: 5; background: linear-gradient(rgb(var(--haze)), rgba(var(--haze), 0)); }
+  .top { z-index: 7; }
+  .top::before { background: linear-gradient(rgba(0, 0, 0, .75) 30%, rgba(0, 0, 0, 0)); }
+  main { z-index: 1; }
+  .hero { justify-content: flex-start; padding-block: calc(var(--scene) + 28px) 48px; }
+  .name { font-size: clamp(52px, 15vw, 96px); margin-bottom: 22px; }
+  .hint { margin-top: 28px; }
+  .band, .band.long { min-height: 0; padding-block: 10svh 26svh; }
+  .arrival { padding-block: 10svh 0; }
+  h2 { font-size: clamp(36px, 10vw, 56px); }
+
+  .side { left: var(--gutter); right: var(--gutter); width: auto; top: auto; bottom: calc(100svh - var(--scene) + 12px); z-index: 6; }
+  .route { display: none; }
   body.riding .side { display: none; }
-  .hud { width: auto; right: var(--gutter); }
-  .fade { background: linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.4)); }
+  .card { position: relative; margin: 0; padding: 11px 14px; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 14px; background: rgba(var(--haze), .78); }
+  .card > * { grid-column: 1 / -1; }
+  .card h4 { grid-column: 1; font-size: 15px; justify-content: flex-start; }
+  .card h4 > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card .stat { grid-column: 2; }
+  .side:not(.open) .card > :not(h4):not(.stat):not(.sheet-btn) { display: none !important; }
+  .side:not(.open) .stat-k { display: none; }
+  .side:not(.open) .stat-v { font-size: 17px; letter-spacing: -0.01em; }
+  /* the whole one-line card is the button that opens it */
+  .side:not(.open) .sheet-btn { display: block; position: absolute; inset: 0; opacity: 0; cursor: pointer; border: 0; border-radius: 12px; }
+  .side:not(.open) .sheet-btn:focus-visible { opacity: 1; background: none; color: transparent; outline: 1px solid var(--ink); }
+  .side.open { left: 0; right: 0; bottom: 0; z-index: 9; }
+  .side.open .card { max-height: 74svh; padding: 18px var(--gutter) calc(18px + env(safe-area-inset-bottom, 0px)); gap: 12px 14px; border-radius: 16px 16px 0 0; background: rgba(var(--haze), .97); box-shadow: 0 -12px 40px rgba(0, 0, 0, .5); }
+  .side.open .card h4 { font-size: 17px; }
+  .side.open .card .stat { grid-column: 1 / -1; }
+  .side.open .sheet-btn { display: block; order: 99; justify-self: start; font: 500 14px/1 var(--f-body); color: var(--ink); background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+
+  .hud { width: auto; right: var(--gutter); max-height: calc(100svh - var(--scene) - 36px); }
 }
 @media (prefers-reduced-motion: reduce) { .drawer, .hud { transition: none; } .hud .k::before { animation: none; } }
 /* The cover: a black screen that says hi while the scene loads, then opens
@@ -290,6 +328,7 @@ export const DESCENT_BODY = String.raw`
     <dl id="cardMoreRows" class="more" hidden></dl>
     <button class="more-btn" id="cardMore" type="button" aria-expanded="false" aria-controls="cardMoreRows" hidden></button>
     <p class="foot" id="cardFoot"></p>
+    <button class="sheet-btn" id="cardSheet" type="button" aria-expanded="false" aria-controls="card"></button>
   </section>
 </aside>
 <div class="tip" id="tip" role="status"></div>

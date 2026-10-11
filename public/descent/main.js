@@ -707,7 +707,13 @@
   }
   const tilt = (cam, ang) => ({ F: norm(add(mul(cam.F, Math.cos(ang)), mul(cam.U, Math.sin(ang)))), U: norm(add(mul(cam.U, Math.cos(ang)), mul(cam.F, -Math.sin(ang)))) });
   const narrow = () => innerWidth <= 900;
-  const portrait = () => innerHeight > innerWidth;
+  // The scene's size. On phones it's a window across the top of the screen
+  // (the canvases' CSS height), with the page scrolling on below it.
+  const sceneEl = $("overlay");
+  const VW = () => innerWidth, VH = () => sceneEl.clientHeight || innerHeight;
+  const portrait = () => VH() > VW();
+  // the part of the screen the text is read in: below the window on phones
+  const readTop = () => (narrow() ? VH() : 0), readH = () => innerHeight - readTop();
 
   // interactive state
   const moonLook = { az: 0, el: 0, taz: 0, tel: 0 };
@@ -730,7 +736,7 @@
   }
 
   function stop(i, ms, drift) {
-    const aspect = innerWidth / innerHeight;
+    const aspect = VW() / VH();
     const sh = narrow() ? 0 : 0.22 * aspect;
     if (i === 0) {
       // Framed around the Sun: the camera looks at the Moon with the Sun just
@@ -843,10 +849,10 @@
   const sections = [...document.querySelectorAll("[data-stop]")];
   let holds = [], lockY = 0;
   function layout() {
-    const vh = innerHeight;
+    const vh = readH();
     holds = sections.map((s, i) => {
       const top = s.offsetTop, h = s.offsetHeight;
-      if (i === 0) return [0, vh * 0.8];
+      if (i === 0) return [0, readTop() + vh * 0.8];
       if (i === 5) return [top + vh * 0.35, top + h - vh * 0.4];   // FramSat-1: a long hold to ride along
       return [top + vh * 0.55, Math.max(top + vh * 0.55, top + h - vh * 0.45)];
     });
@@ -870,7 +876,7 @@
   /* ---------- overlay ---------- */
   const ov = $("overlay"), og = ov.getContext("2d");
   const dprO = Math.min(devicePixelRatio || 1, 2);
-  const sizeOverlay = () => { ov.width = Math.round(innerWidth * dprO); ov.height = Math.round(innerHeight * dprO); };
+  const sizeOverlay = () => { ov.width = Math.round(VW() * dprO); ov.height = Math.round(VH() * dprO); };
   sizeOverlay();
   const STARS = (() => {
     let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
@@ -887,8 +893,8 @@
   function projectDir(cam, d) {
     const z = dot(d, cam.F); if (z <= 1e-6) return null;
     const nx = dot(d, cam.R) / (z * cam.tanH) + cam.shift, ny = dot(d, cam.U) / (z * cam.tanH);
-    const aspect = innerWidth / innerHeight;
-    return [(nx / aspect + 1) / 2 * innerWidth, (1 - ny) / 2 * innerHeight, z];
+    const aspect = VW() / VH();
+    return [(nx / aspect + 1) / 2 * VW(), (1 - ny) / 2 * VH(), z];
   }
   const project = (cam, X) => { const d = sub(X, cam.posKm); return dot(d, cam.F) <= 1 ? null : projectDir(cam, d); };
   function hidden(cam, X, body = [0, 0, 0], R = RE) {
@@ -919,7 +925,7 @@
   function marker(cam, X, label, alpha, color = "#f1f1ee", sub2 = "", hover = null, size = 3) {
     if (alpha <= 0.01) return;
     const s = project(cam, X); if (!s || hidden(cam, X)) return;
-    if (s[0] < -40 || s[1] < -40 || s[0] > innerWidth + 40 || s[1] > innerHeight + 40) return;
+    if (s[0] < -40 || s[1] < -40 || s[0] > VW() + 40 || s[1] > VH() + 40) return;
     og.globalAlpha = alpha;
     og.fillStyle = color; og.beginPath(); og.arc(s[0], s[1], size, 0, Math.PI * 2); og.fill();
     og.strokeStyle = color; og.lineWidth = 1; og.beginPath(); og.arc(s[0], s[1], size + 4, 0, Math.PI * 2); og.stroke();
@@ -955,7 +961,7 @@
     for (const [n, v] of CITY_V) {
       const P = [(cg * v[0] - sg * v[1]) * RE, (sg * v[0] + cg * v[1]) * RE, v[2] * RE];
       if (dot(P, c) <= horizon * 1.001) continue;
-      const s = project(cam, P); if (!s || s[0] < 0 || s[1] < 0 || s[0] > innerWidth || s[1] > innerHeight) continue;
+      const s = project(cam, P); if (!s || s[0] < 0 || s[1] < 0 || s[0] > VW() || s[1] > VH()) continue;
       const isHome = n === "Trondheim" || n === "Andøya";
       const box = [s[0] - 4, s[1] - 16, s[0] + 10 + og.measureText(n).width, s[1] + 4];
       if (!isHome && taken.some(t => box[0] < t[2] && box[2] > t[0] && box[1] < t[3] && box[3] > t[1])) continue;
@@ -1089,7 +1095,7 @@
   }
   function drawCube3(cam, w, t) {
     const T = three; if (!T || !T.model) return null;
-    const r = T.renderer, W = innerWidth, H = innerHeight;
+    const r = T.renderer, W = VW(), H = VH();
     const pr = r.getPixelRatio();
     // While the CubeSat is out of sight its canvas shrinks to a pixel, so it
     // holds no full-screen buffers for most of the page.
@@ -1132,7 +1138,7 @@
     const lab = C.S().labels.fs;
     og.font = `500 11px ${MONO}`;
     const tw = og.measureText(lab).width;
-    const lx = r3.x - r3.px * 2.2 - 24 - tw, ly = r3.y - r3.px * 2.0 - 10;
+    const lx = Math.max(12, r3.x - r3.px * 2.2 - 24 - tw), ly = r3.y - r3.px * 2.0 - 10;
     og.globalAlpha = w;
     og.strokeStyle = "rgba(255,181,71,0.8)"; og.lineWidth = 1;
     og.beginPath(); og.moveTo(r3.x - r3.px * 0.8, r3.y - r3.px * 0.8); og.lineTo(lx + tw + 4, ly + 4); og.stroke();
@@ -1144,7 +1150,7 @@
   }
   function drawCubeFlat(cam, w, t) {
     if (w <= 0.01) return;
-    const aspect = innerWidth / innerHeight;
+    const aspect = VW() / VH();
     const toCam = v => [dot(v, cam.R), dot(v, cam.U), dot(v, cam.F)];
     const sunC = toCam(cam.sun);
     const earthC = toCam(mul(norm(cam.posKm), -1));
@@ -1160,7 +1166,7 @@
       return [x, y, z];
     };
     const world = v => { const r = rot(v); return [base[0] + r[0] * size, base[1] + r[1] * size, base[2] + r[2] * size]; };
-    const P = p => { const nx = p[0] / (p[2] * cam.tanH) + cam.shift, ny = p[1] / (p[2] * cam.tanH); return [(nx / aspect + 1) / 2 * innerWidth, (1 - ny) / 2 * innerHeight]; };
+    const P = p => { const nx = p[0] / (p[2] * cam.tanH) + cam.shift, ny = p[1] / (p[2] * cam.tanH); return [(nx / aspect + 1) / 2 * VW(), (1 - ny) / 2 * VH()]; };
     const items = [];
     for (const f of CUBE.polys) {
       const n = rot(f.n), pts = f.p.map(world);
@@ -1213,7 +1219,7 @@
       }
     }
     const anchor = P(world([0, 0, 0])), lab = C.S().labels.fs;
-    const px = size / cam.tanH * innerHeight / 2;
+    const px = size / cam.tanH * VH() / 2;
     const lx = anchor[0] + px * 2.2 + 20, ly = anchor[1] - px * 1.8 - 10;
     og.strokeStyle = "rgba(255,181,71,0.8)"; og.lineWidth = 1;
     og.beginPath(); og.moveTo(anchor[0] + px * 0.6, anchor[1] - px * 0.6); og.lineTo(lx - 4, ly + 4); og.stroke();
@@ -1236,7 +1242,7 @@
       if (facing < 0.08) continue;
       const sp = project(cam, P); if (!sp) continue;
       const dist = len(toCam);
-      const rpx = dia ? Math.max(3, Math.min(60, (dia / 2) / dist / cam.tanH * innerHeight / 2 * Math.sqrt(facing))) : 3;
+      const rpx = dia ? Math.max(3, Math.min(60, (dia / 2) / dist / cam.tanH * VH() / 2 * Math.sqrt(facing))) : 3;
       shown.push({ f, n, sp, rpx, facing });
     }
     shown.sort((a, b) => b.f[3] - a.f[3]);
@@ -1293,17 +1299,17 @@
 
   function drawOverlay(cam, weights, ms, t, rideW) {
     og.setTransform(dprO, 0, 0, dprO, 0, 0);
-    og.clearRect(0, 0, innerWidth, innerHeight);
+    og.clearRect(0, 0, VW(), VH());
     hovers = [];
     const s = C.S(), L = s.labels, en = C.lang === "en", K = s.k;
     // stars
     const starDim = 1 - 0.6 * C.clamp01((deg(Math.asin(Math.min(1, RE / len(cam.posKm)))) - 15) / 50);
-    const aspect = innerWidth / innerHeight;
+    const aspect = VW() / VH();
     for (const [d, mag, tw] of STARS) {
       const z = dot(d, cam.F); if (z <= 0.2) continue;
       const nx = dot(d, cam.R) / (z * cam.tanH) + cam.shift, ny = dot(d, cam.U) / (z * cam.tanH);
-      const x = (nx / aspect + 1) / 2 * innerWidth, y = (1 - ny) / 2 * innerHeight;
-      if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
+      const x = (nx / aspect + 1) / 2 * VW(), y = (1 - ny) / 2 * VH();
+      if (x < 0 || y < 0 || x > VW() || y > VH()) continue;
       const far = add(cam.posKm, mul(d, 2e6));
       if (hidden(cam, far) || hidden(cam, far, cam.moonKm, RM)) continue;
       og.globalAlpha = Math.min(1, mag * starDim * (0.85 + 0.15 * Math.sin(t * 0.8 + tw * 40)));
@@ -1360,7 +1366,7 @@
       const g = geodetic(st.r, ms), info = GEO_INFO[n], el = elements(n);
       const isThor = n.startsWith("THOR");
       const pretty = n.replace("METEOSAT", "Meteosat").replace("HIMAWARI", "Himawari").replace("ELEKTRO", "Elektro").replace("EUTELSAT", "Eutelsat").replace("INMARSAT", "Inmarsat").replace("ASTRA", "Astra");
-      const label = weights[2] > 0.5 ? (isThor ? (n === "THOR 7" ? "Thor 5 · 6 · 7" : "") : pretty) : "";
+      const label = weights[2] > 0.5 ? (isThor ? (n === "THOR 7" ? "Thor 5 · 6 · 7" : "") : narrow() ? "" : pretty) : "";   // phones: only Norway's own names
       const sp0 = project(cam, st.r), textLimit = narrow() ? 0 : Math.min(innerWidth * 0.55, 720);
       const lk = lookFrom(TRD.lat, TRD.lon, st.r, ms);
       const lonTxt = `${fmtN(Math.abs(g.lon), 2)}° ${g.lon >= 0 ? (en ? "E" : "Ø") : s.west}`;
@@ -1426,7 +1432,7 @@
       b.innerHTML = `<span class="pip" aria-hidden="true"></span><span class="txt"><span class="nm">${nm}</span><span class="km" id="rk${i}" aria-hidden="true"></span></span>`;
       b.addEventListener("click", () => {
         const [a, bb] = holds[i]; const y = (a + Math.min(bb, a + innerHeight * 0.4)) / 2;
-        window.scrollTo({ top: Math.max(0, y - innerHeight / 2), behavior: C.reduceMotion ? "auto" : "smooth" });
+        window.scrollTo({ top: Math.max(0, y - readTop() - readH() / 2), behavior: C.reduceMotion ? "auto" : "smooth" });
       });
       li.append(b); return li;
     }));
@@ -1450,6 +1456,19 @@
   const dl = pairs => pairs.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
   let cardOpen = false;
   $("cardMore").addEventListener("click", () => { cardOpen = !cardOpen; lastCard = 0; });
+  // Phones: the card is one line at the foot of the scene, and opens as a
+  // sheet from the bottom of the screen.
+  const side = $("side"), sheetBtn = $("cardSheet");
+  function setSheet(open) {
+    side.classList.toggle("open", open);
+    sheetBtn.setAttribute("aria-expanded", String(open));
+    sheetBtn.textContent = open ? C.S().close : (C.lang === "en" ? "Details" : "Detaljer");
+    if (!open) card.scrollTop = 0;
+  }
+  sheetBtn.addEventListener("click", () => setSheet(!side.classList.contains("open")));
+  window.addEventListener("pointerdown", e => { if (side.classList.contains("open") && !side.contains(e.target)) setSheet(false); });
+  window.addEventListener("keydown", e => { if (e.key === "Escape" && side.classList.contains("open")) setSheet(false); });
+  setSheet(false);
   function sunText(sn, ms) {
     const s = C.S(); if (!sn || !sn.sh) return "–";
     const m = (sn.sh.t - ms) / 60000;
@@ -1674,7 +1693,7 @@
   const blocked = el => el.closest("a, button, input, .hud, .drawer, .top, .side, .col p, .col h1, .col h2, .col h3, .col li, .who");
   window.addEventListener("pointerdown", e => {
     if (!draggable() || document.body.classList.contains("tracker-open") || blocked(e.target)) return;
-    if (e.pointerType === "touch" && curStop !== 5) return;
+    if (e.pointerType === "touch" && (curStop !== 5 || e.clientY > VH())) return;
     dragging = { x: e.clientX, y: e.clientY, az: moonLook.taz, el: moonLook.tel, yaw: ride.tyaw, pitch: ride.tpitch };
     document.body.classList.add("looking");
   });
@@ -1726,23 +1745,23 @@
   const measureCol = () => { const c = document.querySelector("main .band .col"); colRight = c ? c.getBoundingClientRect().right : 0; };
   window.addEventListener("resize", measureCol);
   function fadeUnderText(stopIdx, rideW) {
-    if (stopIdx === 0 || rideW > 0.5) return;
+    if (stopIdx === 0 || rideW > 0.5 || narrow()) return;     // phones: the text is below the scene
     if (!colRight) measureCol();
     og.save();
     og.globalCompositeOperation = "destination-out";
     if (narrow()) {
-      og.fillStyle = "rgba(0,0,0,.82)"; og.fillRect(0, 0, innerWidth, innerHeight);
+      og.fillStyle = "rgba(0,0,0,.82)"; og.fillRect(0, 0, VW(), VH());
     } else {
       const edge = colRight + 80, g = og.createLinearGradient(0, 0, edge, 0);
       g.addColorStop(0, "rgba(0,0,0,.85)"); g.addColorStop(colRight / edge, "rgba(0,0,0,.85)"); g.addColorStop(1, "rgba(0,0,0,0)");
-      og.fillStyle = g; og.fillRect(0, 0, edge, innerHeight);
+      og.fillStyle = g; og.fillRect(0, 0, edge, VH());
     }
     og.restore();
   }
 
   /* ---------- loop ---------- */
   let yS = 0, yT = 0;
-  const onScroll = () => { yT = scrollY + innerHeight / 2; };
+  const onScroll = () => { yT = scrollY + readTop() + readH() / 2; };
   let last = performance.now(), clock = 0, lastText = 0, lastCard = 0;
   const angDiff = (a, b) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
   function frame(now) {
@@ -1803,5 +1822,8 @@
   C.onLang(() => { buildRoute(); stopTexts(Date.now()); lastCard = 0; renderHtml(); });
 
   C.render(); renderHtml(); layout(); onScroll(); yS = yT;
+  // a timeline wider than a phone starts at its recent end
+  const chartWrap = document.querySelector(".chart-wrap");
+  if (chartWrap) chartWrap.scrollLeft = chartWrap.scrollWidth;
   requestAnimationFrame(frame);
 })();
