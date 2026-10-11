@@ -79,6 +79,7 @@ function fill(text: (typeof TEXT)["en"], timeline: Entry[], lang: Lang) {
           : `<a class="chip" id="langBtn" href="/no" hreflang="nb">Norsk</a>`,
       )
       .replace(`href="/framsat"`, lang === "no" ? `href="/no/framsat"` : `href="/framsat"`)
+      .replaceAll("__HI__", lang === "no" ? "Hei" : "Hi")
   );
 }
 

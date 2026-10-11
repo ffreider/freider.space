@@ -221,22 +221,33 @@ footer { position: relative; z-index: 2; padding: 0 var(--gutter) calc(14px + en
   .fade { background: linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.4)); }
 }
 @media (prefers-reduced-motion: reduce) { .drawer, .hud { transition: none; } .hud .k::before { animation: none; } }
-/* The opening: the hero arrives line by line while the scene loads behind it
-   (main.js has the rest of the opening). */
-@keyframes arrive { from { opacity: 0; transform: translateY(14px); } }
-.hero .name, .hero .who, .hero .links, .hero .hint, .top, .side { animation: arrive 1s cubic-bezier(.2,.7,.2,1) both; }
-.hero .name { animation-delay: .05s; }
-.hero .who { animation-delay: .35s; }
-.hero .links { animation-delay: .55s; }
-.top { animation-delay: .7s; }
-.hero .hint { animation-delay: 1.1s; }
-.side { animation-delay: 1.6s; }
-@media (prefers-reduced-motion: reduce) { .hero .name, .hero .who, .hero .links, .hero .hint, .top, .side { animation: none; } }
+/* The cover: a black screen that says hi while the scene loads, then opens
+   like two doors (main.js adds .open when the first maps are in). Only
+   transforms and opacity, so it costs next to nothing. Without JavaScript it
+   steps aside on its own after a few seconds. */
+.cover { position: fixed; inset: 0; z-index: 20; pointer-events: none; animation: cover-gone 0s 6s forwards; }
+.door { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; background: var(--void); transition: transform .9s cubic-bezier(.7, 0, .2, 1); }
+.door.up { top: 0; }
+.door.down { bottom: 0; }
+.door span { position: absolute; left: 0; right: 0; text-align: center; font-family: var(--f-display); font-weight: 800; font-size: clamp(72px, 13vw, 200px); line-height: 1; letter-spacing: -0.045em; color: var(--ink); animation: hi .7s ease-out .1s both; }
+.door.up span { bottom: 0; transform: translateY(50%); }
+.door.down span { top: 0; transform: translateY(-50%); }
+.cover.open .door.up { transform: translateY(-101%); }
+.cover.open .door.down { transform: translateY(101%); }
+@keyframes hi { from { opacity: 0; } }
+@keyframes cover-gone { to { visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) {
+  .door { transition: none; }
+  .cover { transition: opacity .3s; }
+  .cover.open { opacity: 0; }
+  .cover.open .door.up, .cover.open .door.down { transform: none; }
+}
 /* globals.css gives the light pages' text a glow; not wanted here */
 main, footer { text-shadow: none; }
 `;
 
 export const DESCENT_BODY = String.raw`
+<div class="cover" id="cover" aria-hidden="true"><div class="door up"><span>__HI__</span></div><div class="door down"><span>__HI__</span></div></div>
 <canvas id="field" aria-hidden="true"></canvas>
 <canvas id="cube" aria-hidden="true" style="position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none"></canvas>
 <canvas id="overlay" aria-hidden="true"></canvas>
