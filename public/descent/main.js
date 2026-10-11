@@ -395,6 +395,9 @@
   uniform vec3 uSun; uniform float uGmst; uniform float uFade; uniform float uLoaded; uniform float uNight;
   uniform vec3 uMoon; uniform float uMoonR; uniform vec3 uMX; uniform vec3 uMY; uniform vec3 uMZ;
   uniform sampler2D tDay; uniform sampler2D tNight; uniform sampler2D tWater; uniform sampler2D tClouds; uniform sampler2D tMoon;
+  uniform sampler2D tMoonE; uniform sampler2D tMoonN;      // the Moon's relief: east and north tilt of the surface
+  uniform sampler2D tDetail; uniform vec4 uDetailBox; uniform float uDetail;  // close-up imagery: west, north, width, height (rad)
+  const float RELIEF = 1.5;                                 // relief exaggeration, so craters read from far away
   vec3 toLin(vec3 c){ return pow(c, vec3(2.2)); }
   vec4 texSphere(sampler2D t, vec2 uv){
     vec2 uvB = vec2(fract(uv.x + 0.5) - 0.5, uv.y);
@@ -419,7 +422,14 @@
       float lon = atan(dot(n, uMY), dot(n, uMX)), lat = asin(clamp(dot(n, uMZ), -1.0, 1.0));
       vec2 uv = vec2(lon / 6.2831853 + 0.5, 0.5 - lat / 3.1415927);
       float alb = uLoaded > 0.5 ? toLin(texSphere(tMoon, uv).rrr).r : 0.12;
-      float mu0 = max(dot(n, uSun), 0.0), mu = max(dot(n, -rd), 0.0);
+      vec3 nl = n;
+      if (uLoaded > 0.5) {
+        // tilt the surface by the elevation model: east and north of this point
+        vec2 tilt = vec2(texSphere(tMoonE, uv).r, texSphere(tMoonN, uv).r) * 2.0 - 1.0;
+        vec3 east = normalize(cross(uMZ, n) + vec3(1e-7)), north = cross(n, east);
+        nl = normalize(n * sqrt(max(1.0 - dot(tilt, tilt), 0.0)) + (east * tilt.x + north * tilt.y) * RELIEF);
+      }
+      float mu0 = max(dot(nl, uSun), 0.0), mu = max(dot(n, -rd), 0.0);
       col = vec3(1.0, 0.985, 0.96) * alb * (mu0 / (mu0 + mu + 1e-4)) * 4.2;
       col += vec3(0.30, 0.38, 0.50) * alb * 0.012 * max(dot(n, normalize(-uMoon)), 0.0);
     } else if (tE < 1e8) {
@@ -432,6 +442,17 @@
       float lights = uLoaded > 0.5 ? smoothstep(0.24, 0.75, texSphere(tNight, uv).r) : 0.0;
       float water = uLoaded > 0.5 ? texSphere(tWater, uv).r : 1.0;
       float cloud = uLoaded > 0.5 ? texSphere(tClouds, uv).r : 0.0;
+      // close-up imagery under the ISS or FramSat-1, faded out towards its edges
+      float dw = 0.0;
+      if (uDetail > 0.001) {
+        vec2 d = vec2(fract((lon - uDetailBox.x) / 6.2831853 + 1.0) * 6.2831853 / uDetailBox.z, (uDetailBox.y - lat) / uDetailBox.w);
+        float e = min(min(d.x, 1.0 - d.x), min(d.y, 1.0 - d.y));
+        if (e > 0.0) {
+          vec4 dt = texture(tDetail, d);
+          dw = smoothstep(0.0, 0.12, e) * uDetail * dt.a;
+          day = mix(day, toLin(dt.rgb), dw);
+        }
+      }
       // the maps run out of detail below ~10 km; add fractal detail that fades in only when close
       float near = uNight;
       if (near > 0.01) {
@@ -440,7 +461,7 @@
         float edge = smoothstep(0.04, 0.45, cloud) * (1.0 - smoothstep(0.75, 1.0, cloud));
         cloud = clamp(cloud + fine * 0.55 * edge * near + (fbm4(q * 3.7) - 0.5) * 0.18 * cloud * near, 0.0, 1.0);
         float ter = fbm6(ne.xy * 420.0 + ne.z * 311.0);
-        day *= mix(1.0, 0.82 + 0.36 * ter, (1.0 - water) * near * smoothstep(-0.05, 0.2, dot(n, uSun)));
+        day *= mix(1.0, 0.82 + 0.36 * ter, (1.0 - water) * near * (1.0 - dw) * smoothstep(-0.05, 0.2, dot(n, uSun)));
       }
       float ndl = dot(n, uSun);
       float lit = smoothstep(-0.04, 0.12, ndl);
@@ -482,16 +503,102 @@
   }`;
   const canvas = $("field");
   const field = C.createField(canvas, FRAG,
-    ["uCam", "uF", "uR", "uU", "uTanH", "uShift", "uSun", "uGmst", "uFade", "uLoaded", "uNight", "uMoon", "uMoonR", "uMX", "uMY", "uMZ"], { maxScale: 1.5 });
+    ["uCam", "uF", "uR", "uU", "uTanH", "uShift", "uSun", "uGmst", "uFade", "uLoaded", "uNight", "uMoon", "uMoonR", "uMX", "uMY", "uMZ",
+     "uDetailBox", "uDetail"]);
   let loaded = 0, loadedAt = 0;
-  if (field) {
-    const texs = [["tDay", "day", 0], ["tNight", "night", 1], ["tWater", "water", 2], ["tClouds", "clouds", 3], ["tMoon", "moon", 4]];
-    Promise.all(texs.map(([name, file, unit]) => new Promise(res => {
+
+  /* ---------- maps, sharper in steps ----------
+     Built by scripts/descent-textures.py from NASA's maps. A 2K set loads
+     first so the page appears quickly; then each map is replaced in the
+     background by a sharper one: 4K on phones and small GPUs, 8K on desktops
+     (the Moon's relief stops at 4K, its elevation data's resolution). The
+     Moon's maps go first while the page is on the Moon. With data saver on,
+     it stays at 2K. Big uploads wait for a moment the camera is still. */
+  const MAPS = [ // uniform, file, texture unit, channels, largest size
+    ["tDay", "earth-day", 0, 4, 8192], ["tNight", "earth-night", 1, 1, 8192], ["tWater", "earth-water", 2, 1, 8192],
+    ["tClouds", "earth-clouds", 3, 1, 8192], ["tMoon", "moon", 4, 1, 8192],
+    ["tMoonE", "moon-tilt-east", 6, 1, 4096], ["tMoonN", "moon-tilt-north", 7, 1, 4096],
+  ];
+  const TAG = { 2048: "2k", 4096: "4k", 8192: "8k" };
+  const saveData = !!(navigator.connection && navigator.connection.saveData);
+  const sharpest = !field || saveData ? 2048
+    : !C.coarse && field.maxTexture >= 8192 && (navigator.deviceMemory || 8) >= 8 ? 8192 : 4096;
+  // The load event, not img.decode(), which can stall in a background tab.
+  function image(src, cors) {
+    return new Promise((resolve, reject) => {
       const img = new Image();
-      img.onload = () => { field.texture(name, img, unit); res(); };
-      img.onerror = res;
-      img.src = `/descent/${file}.jpg`;
-    }))).then(() => { loaded = 1; loadedAt = performance.now(); });
+      if (cors) img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error(`Could not load ${src}`));
+      img.src = src;
+    });
+  }
+  const mapUrl = (file, w) => `/descent/tex/${file}-${TAG[w]}.webp`;
+  const calm = () => new Promise(res => {
+    const check = () => (flight.from === flight.to && !dragging ? res() : setTimeout(check, 150));
+    check();
+  });
+  if (field) {
+    (async () => {
+      const first = await Promise.all(MAPS.map(m => image(mapUrl(m[1], 2048)).catch(() => null)));
+      first.forEach((img, i) => { if (img) field.texture(MAPS[i][0], img, MAPS[i][2], MAPS[i][3]); });
+      loaded = 1; loadedAt = performance.now();
+      if (sharpest <= 2048) return;
+      const moonFirst = curStop === 0;
+      const order = [...MAPS].sort((a, b) => (a[1].startsWith("moon") === moonFirst ? -1 : 1) - (b[1].startsWith("moon") === moonFirst ? -1 : 1));
+      for (const [name, file, unit, channels, largest] of order) {
+        const w = Math.min(sharpest, largest);
+        const img = await image(mapUrl(file, w)).catch(() => null);
+        if (!img) continue;
+        await calm();
+        field.texture(name, img, unit, channels);
+      }
+    })();
+  }
+
+  /* ---------- close-up imagery ----------
+     At the ISS and FramSat-1 stops the camera is only a few hundred km up,
+     where a world map can't be sharp. So the region under the spacecraft is
+     put together from NASA GIBS map tiles (Blue Marble with shaded relief
+     and bathymetry, about 1 km per pixel; 48 tiles, 36 x 27 degrees) and
+     blended over the world map. It's rebuilt as the spacecraft moves on. */
+  const GIBS = "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/BlueMarble_ShadedRelief_Bathymetry/default/500m";
+  const DETAIL_LEVEL = 6, TILE_DEG = 4.5, TILE_COLS = 80, TILE_ROWS = 40, BOX_COLS = 8, BOX_ROWS = 6;
+  const detail = { box: null, sat: null, loading: false, fade: 0, ready: false };
+  function subPoint(name, ms) {
+    const s = sv(name, ms); if (!s) return null;
+    const e = rotZ(s.r, -gmst(ms));
+    return { lat: deg(Math.asin(e[2] / len(e))), lon: deg(Math.atan2(e[1], e[0])) };
+  }
+  async function buildDetail(sat, p) {
+    detail.loading = true;
+    const col0 = Math.floor((p.lon + 180) / TILE_DEG) - BOX_COLS / 2;
+    const row0 = Math.max(0, Math.min(TILE_ROWS - BOX_ROWS, Math.floor((90 - p.lat) / TILE_DEG) - BOX_ROWS / 2));
+    const canvas = document.createElement("canvas");
+    canvas.width = BOX_COLS * 512; canvas.height = BOX_ROWS * 512;
+    const g = canvas.getContext("2d");
+    const jobs = [];
+    for (let r = 0; r < BOX_ROWS; r++) for (let c = 0; c < BOX_COLS; c++) {
+      const col = ((col0 + c) % TILE_COLS + TILE_COLS) % TILE_COLS, row = row0 + r;
+      jobs.push(image(`${GIBS}/${DETAIL_LEVEL}/${row}/${col}.jpeg`, true).then(img => g.drawImage(img, c * 512, r * 512)).catch(() => {}));
+    }
+    await Promise.all(jobs);
+    await calm();
+    field.texture("tDetail", canvas, 5);
+    detail.box = { lat: 90 - (row0 + BOX_ROWS / 2) * TILE_DEG, lon: (col0 + BOX_COLS / 2) * TILE_DEG - 180,
+      uniform: [rad(col0 * TILE_DEG - 180), rad(90 - row0 * TILE_DEG), rad(BOX_COLS * TILE_DEG), rad(BOX_ROWS * TILE_DEG)] };
+    if (detail.sat !== sat) detail.fade = 0;
+    detail.sat = sat; detail.ready = true; detail.loading = false;
+  }
+  function updateDetail(ms) {
+    if (!field || !loaded || detail.loading) return;
+    const stopNow = flight.to;
+    const sat = stopNow === 4 ? "ISS" : stopNow === 5 ? "FRAMSAT-1" : null;
+    if (!sat) return;
+    const p = subPoint(sat, ms); if (!p) return;
+    const b = detail.box;
+    const dLon = b ? Math.abs(((p.lon - b.lon + 540) % 360) - 180) : 1e9;
+    if (detail.sat !== sat || !b || dLon > BOX_COLS * TILE_DEG * 0.25 || Math.abs(p.lat - b.lat) > BOX_ROWS * TILE_DEG * 0.25) buildDetail(sat, p);
   }
 
   /* ---------- camera ---------- */
@@ -1544,12 +1651,16 @@
       const fade = loaded ? C.clamp01((now - loadedAt) / 900) : 0.35;
       field.draw({ uCam: mul(cam.pos, 1 / RE), uF: cam.F, uR: R, uU: U, uTanH: camFull.tanH, uShift: cam.shift,
         uSun: sun, uGmst: gmst(ms), uFade: smooth(fade), uLoaded: loaded, uNight: Math.max(rideW, weights[4]),
-        uMoon: mul(mf.moon, 1 / RE), uMoonR: RM / RE, uMX: mf.mx, uMY: mf.my, uMZ: mf.mz }, dt);
+        uMoon: mul(mf.moon, 1 / RE), uMoonR: RM / RE, uMX: mf.mx, uMY: mf.my, uMZ: mf.mz,
+        uDetailBox: detail.box ? detail.box.uniform : [0, 0, 1, 1], uDetail: detail.fade * Math.min(1, weights[4] + weights[5]) }, dt);
+      // Let the renderer lower its resolution only while the view is moving.
+      field.setMoving(a !== b || !!dragging || Math.abs(yT - yS) > 2);
+      if (detail.ready) detail.fade = Math.min(1, detail.fade + dt / 1.2);
     }
     drawOverlay(camFull, weights, ms, clock, rideW);
     updateHover();
     [...route.children].forEach((li, i) => li.classList.toggle("on", i === curStop));
-    if (now - lastText > 1000) { lastText = now; stopTexts(ms); }
+    if (now - lastText > 1000) { lastText = now; stopTexts(ms); updateDetail(ms); }
     if (now - lastCard > 500) { lastCard = now; updateCard(curStop, ms); }
     globe.frame(now);
     requestAnimationFrame(frame);

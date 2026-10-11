@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# NASA source maps for the descent textures (scripts/descent-textures.py)
+/.textures-src/

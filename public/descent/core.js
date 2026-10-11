@@ -549,12 +549,42 @@ window.Core = (() => {
     const U = {};
     ["uRes", "uScale", "uMode", "uProbe"].concat(uniformNames).forEach(n => U[n] = gl.getUniformLocation(prog, n));
 
+    // Resolution. The shader draws at the screen's full pixel density (up to
+    // 2x) wherever the GPU keeps up. When frames get slow it tries a lower
+    // resolution, and keeps it only if frames really get faster: slow frames
+    // are often the 2D overlay, which a lower resolution doesn't help. While
+    // the camera is moving (setMoving) it may go lower; at rest it returns to
+    // the resolution it has learned for still frames, normally the full one.
     const coarse = window.matchMedia && matchMedia("(pointer: coarse)").matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const maxScale = coarse ? Math.min(dpr, 1) * 0.75 : Math.min(dpr, opts.maxScale || 1.25);
-    let scale = coarse ? 0.6 : Math.min(maxScale, 1);
-    let ema = 16, lastAdapt = 0;
+    const maxScale = Math.min(dpr, opts.maxScale || 2);
+    const minScale = Math.min(maxScale, coarse ? 0.75 : 0.6);
+    const levels = { still: maxScale, moving: maxScale };
+    let moving = false, scale = maxScale;
+    let ema = 16, lastAdapt = 0, trial = null, cooldownUntil = 0;
     const born = performance.now();
+    const level = () => (moving ? "moving" : "still");
+    function apply() { scale = Math.min(levels.still, levels[level()]); resize(); }
+    function adapt(now, dt) {
+      if (document.hidden || dt > 0.25) return;            // a paused tab says nothing about the GPU
+      ema = ema * 0.9 + dt * 1000 * 0.1;
+      if (now - born < 2500 || now - lastAdapt < 1500) return;
+      const k = level(), slow = moving ? 24 : 34;           // ms per frame: about 40 and 30 fps
+      lastAdapt = now;
+      if (trial) {
+        if (ema > trial.before * 0.9) { levels[k] = trial.prev; cooldownUntil = now + 20000; apply(); }
+        trial = null;
+      } else if (ema > slow && levels[k] > minScale && now > cooldownUntil) {
+        trial = { before: ema, prev: levels[k] };
+        levels[k] = Math.max(minScale, levels[k] * 0.8); apply();
+      } else if (ema < 18 && levels[k] < maxScale) {
+        levels[k] = Math.min(maxScale, levels[k] * 1.1); apply();
+      }
+    }
+    function setMoving(m) {
+      if (m === moving) return;
+      moving = m; trial = null; lastAdapt = performance.now(); apply();
+    }
     function resize() {
       const w = Math.max(1, Math.round(canvas.clientWidth * scale)), h = Math.max(1, Math.round(canvas.clientHeight * scale));
       if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
@@ -579,7 +609,7 @@ window.Core = (() => {
         const v = vals[k], loc = U[k];
         if (loc == null) continue;
         if (v instanceof Float32Array) gl.uniform1fv(loc, v);
-        else if (Array.isArray(v)) v.length === 2 ? gl.uniform2f(loc, v[0], v[1]) : gl.uniform3f(loc, v[0], v[1], v[2]);
+        else if (Array.isArray(v)) v.length === 2 ? gl.uniform2f(loc, v[0], v[1]) : v.length === 4 ? gl.uniform4f(loc, v[0], v[1], v[2], v[3]) : gl.uniform3f(loc, v[0], v[1], v[2]);
         else if (typeof v === "object" && v && "i" in v) gl.uniform1i(loc, v.i);
         else gl.uniform1f(loc, v);
       }
@@ -589,12 +619,7 @@ window.Core = (() => {
       gl.viewport(0, 0, canvas.width, canvas.height);
       setU(vals); gl.uniform1i(U.uMode, 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      const now = performance.now();
-      ema = ema * 0.92 + dt * 1000 * 0.08;
-      if (now - lastAdapt > 2000 && now - born > 2500) {
-        if (ema > 30 && scale > 0.45) { scale = Math.max(0.45, scale * 0.85); lastAdapt = now; resize(); }
-        else if (ema < 17 && scale < maxScale) { scale = Math.min(maxScale, scale * 1.08); lastAdapt = now; resize(); }
-      }
+      adapt(performance.now(), dt);
     }
     function probe(vals, cssX, cssY) {
       if (!fbo) return null;
@@ -608,12 +633,20 @@ window.Core = (() => {
       return [px[0] / 255, px[1] / 255, px[2] / 255];
     }
     const aniso = gl.getExtension("EXT_texture_filter_anisotropic");
-    function texture(name, source, unit) {
-      const t = gl.createTexture();
+    // A map for the shader. channels: 1 for greyscale maps (stored as one
+    // channel, a quarter of the GPU memory), otherwise colour. Loading a
+    // sharper version under the same name replaces the old one.
+    const textures = {};
+    const maxTexture = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+    function texture(name, source, unit, channels = 4) {
+      if (textures[name]) gl.deleteTexture(textures[name]);
+      const t = textures[name] = gl.createTexture();
       gl.activeTexture(gl.TEXTURE0 + unit);
       gl.bindTexture(gl.TEXTURE_2D, t);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+      gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+      if (channels === 1) gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, gl.RED, gl.UNSIGNED_BYTE, source);
+      else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
       gl.generateMipmap(gl.TEXTURE_2D);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -623,7 +656,7 @@ window.Core = (() => {
       gl.useProgram(prog);
       gl.uniform1i(gl.getUniformLocation(prog, name), unit);
     }
-    return { draw, probe, texture, get scale() { return scale; } };
+    return { draw, probe, texture, setMoving, maxTexture, get scale() { return scale; } };
   }
 
   return {
