@@ -447,6 +447,7 @@
   const FRAG = `
   uniform vec3 uCam; uniform vec3 uF; uniform vec3 uR; uniform vec3 uU; uniform float uTanH; uniform float uShift;
   uniform vec3 uSun; uniform float uGmst; uniform float uFade; uniform float uLoaded; uniform float uNight;
+  uniform vec3 uMoonSun; uniform float uDawn;              // the opening: the Sun as the Moon sees it, and how far it has risen
   uniform vec3 uMoon; uniform float uMoonR; uniform vec3 uMX; uniform vec3 uMY; uniform vec3 uMZ;
   uniform sampler2D tDay; uniform sampler2D tNight; uniform sampler2D tWater; uniform sampler2D tClouds; uniform sampler2D tMoon;
   uniform sampler2D tMoonE; uniform sampler2D tMoonN;      // the Moon's relief: east and north tilt of the surface
@@ -483,9 +484,11 @@
         vec3 east = normalize(cross(uMZ, n) + vec3(1e-7)), north = cross(n, east);
         nl = normalize(n * sqrt(max(1.0 - dot(tilt, tilt), 0.0)) + (east * tilt.x + north * tilt.y) * RELIEF);
       }
-      float mu0 = max(dot(nl, uSun), 0.0), mu = max(dot(n, -rd), 0.0);
+      float mu0 = max(dot(nl, uMoonSun), 0.0), mu = max(dot(n, -rd), 0.0);
       col = vec3(1.0, 0.985, 0.96) * alb * (mu0 / (mu0 + mu + 1e-4)) * 4.2;
       col += vec3(0.30, 0.38, 0.50) * alb * 0.012 * max(dot(n, normalize(-uMoon)), 0.0);
+      // before sunrise, a faint cool rim, so the dark Moon reads as a shape against the stars
+      col += vec3(0.05, 0.06, 0.08) * pow(1.0 - mu, 5.0) * (1.0 - uDawn);
     } else if (tE < 1e8) {
       vec3 n = normalize(ro + rd * tE);
       float cg = cos(uGmst), sg = sin(uGmst);
@@ -558,7 +561,7 @@
   const canvas = $("field");
   const field = C.createField(canvas, FRAG,
     ["uCam", "uF", "uR", "uU", "uTanH", "uShift", "uSun", "uGmst", "uFade", "uLoaded", "uNight", "uMoon", "uMoonR", "uMX", "uMY", "uMZ",
-     "uDetailBox", "uDetail"]);
+     "uDetailBox", "uDetail", "uMoonSun", "uDawn"]);
   let loaded = 0, loadedAt = 0;
 
   /* ---------- maps, sharper in steps ----------
@@ -655,6 +658,42 @@
     if (detail.sat !== sat || !b || dLon > BOX_COLS * TILE_DEG * 0.25 || Math.abs(p.lat - b.lat) > BOX_ROWS * TILE_DEG * 0.25) buildDetail(sat, p);
   }
 
+  /* ---------- the opening ----------
+     The first maps take a moment, so the page opens on its own terms instead
+     of on a flat grey Moon. The hero text arrives line by line (CSS, in
+     markup.ts) while, by default, the Moon waits as a dark silhouette against
+     the stars and the Sun then rises across it once its maps are in. With
+     ?intro=approach, the camera instead drifts in towards the Moon from far
+     out, easing off while the maps load and finishing once they're in. It
+     waits at least INTRO_MIN, at most INTRO_MAX; scrolling on ends it. */
+  const INTRO = new URLSearchParams(location.search).get("intro") === "approach" ? "approach" : "dawn";
+  const INTRO_MIN = 800, INTRO_MAX = 4000, DAWN_MS = 3200;
+  const introStart = performance.now();
+  const intro = { dawn: 1, approach: 1, began: 0 };
+  if (!C.reduceMotion && scrollY < innerHeight * 0.3) intro[INTRO] = 0;
+  function updateIntro(now, dt) {
+    if (intro.dawn >= 1 && intro.approach >= 1) return;
+    if (scrollY > innerHeight * 0.3) { intro.dawn = intro.approach = 1; return; }
+    const ready = (loaded && now - introStart > INTRO_MIN) || now - introStart > INTRO_MAX;
+    if (intro.dawn < 1) {
+      if (!intro.began && ready) intro.began = now;
+      if (intro.began) intro.dawn = Math.min(1, (now - intro.began) / DAWN_MS);
+    }
+    if (intro.approach < 1) {
+      // glide most of the way at once, then wait out the loading near the end
+      const goal = ready ? 1 : 0.72, rate = ready ? 1.4 : 1.2;
+      intro.approach = Math.min(1, intro.approach + (goal - intro.approach) * (1 - Math.exp(-dt * rate)) + (ready ? dt * 0.03 : 0));
+    }
+  }
+  // the Sun as the Moon sees it during the opening: from behind the Moon at
+  // first, swinging round to where it really is
+  function moonSun(camPos, moonPos, sun) {
+    if (intro.dawn >= 1) return sun;
+    const behind = norm(sub(moonPos, camPos));
+    const e = intro.dawn < 0.5 ? 4 * intro.dawn ** 3 : 1 - (-2 * intro.dawn + 2) ** 3 / 2;
+    return slerp(behind, sun, e);
+  }
+
   /* ---------- camera ---------- */
   function lookAt(pos, target, upHint) {
     const F = norm(sub(target, pos));
@@ -687,7 +726,8 @@
       side = len(side) < 1e-3 ? norm(cross(away, [0, 0, 1])) : norm(side);
       const e3 = norm(cross(away, side));
       // orbit the Moon on a sphere: az turns around e3, el tilts toward/away from it
-      const off0 = add(mul(away, 7600), mul(side, 2300 + drift * 400)), D = len(off0);
+      // the opening approach (?intro=approach) starts ten times farther out
+      const off0 = add(mul(away, 7600), mul(side, 2300 + drift * 400)), D = len(off0) * (1 + 9 * Math.pow(1 - smooth(intro.approach), 2));
       let d = rotAround(norm(off0), e3, moonLook.az);
       const tAx = norm(cross(e3, d));
       d = rotAround(d, tAx, moonLook.el);
@@ -1245,7 +1285,8 @@
       og.beginPath(); og.arc(x, y, 0.5 + mag * 1.1, 0, Math.PI * 2); og.fill();
     }
     og.globalAlpha = 1;
-    moonFeatures(cam, cam.mf, weights[0], ms);
+    // crater names come up with the sunrise, or once the approach is close
+    moonFeatures(cam, cam.mf, weights[0] * smooth((intro.dawn - 0.45) / 0.4) * intro.approach ** 6, ms);
 
     // ASBM: orbits, coverage cone of whichever is switched on, the 65° N line
     const wA = Math.max(weights[1], 0.12 * (weights[0] + weights[2]));
@@ -1640,6 +1681,7 @@
     moonLook.az += (moonLook.taz - moonLook.az) * k; moonLook.el += (moonLook.tel - moonLook.el) * k;
     if (ride.pitch !== null) { ride.yaw += angDiff(ride.yaw, ride.tyaw) * k; ride.pitch += (ride.tpitch - ride.pitch) * k; }
     const ms = Date.now();
+    updateIntro(now, dt);
     const w = where(yS);
     const a = w.i, b = w.j, t = w.t;
     curStop = t < 0.5 ? a : b;
@@ -1658,11 +1700,12 @@
     const camFull = { posKm: cam.pos, F: cam.F, U, R, tanH: Math.tan(rad(cam.half)), shift: cam.shift, sun, moonKm: mf.moon, mf,
       mode: rideW > 0.98 ? "ride" : "", cube: smooth((rideW - 0.35) / 0.5), sat: cam.sat };
     if (field) {
-      const fade = loaded ? C.clamp01((now - loadedAt) / 900) : 0.35;
+      const fade = 0.6 + 0.4 * (loaded ? C.clamp01((now - loadedAt) / 900) : 0);
       field.draw({ uCam: mul(cam.pos, 1 / RE), uF: cam.F, uR: R, uU: U, uTanH: camFull.tanH, uShift: cam.shift,
         uSun: sun, uGmst: gmst(ms), uFade: smooth(fade), uLoaded: loaded, uNight: Math.max(rideW, weights[4]),
         uMoon: mul(mf.moon, 1 / RE), uMoonR: RM / RE, uMX: mf.mx, uMY: mf.my, uMZ: mf.mz,
-        uDetailBox: detail.box ? detail.box.uniform : [0, 0, 1, 1], uDetail: detail.fade * Math.min(1, weights[4] + weights[5]) }, dt);
+        uDetailBox: detail.box ? detail.box.uniform : [0, 0, 1, 1], uDetail: detail.fade * Math.min(1, weights[4] + weights[5]),
+        uMoonSun: moonSun(cam.pos, mf.moon, sun), uDawn: intro.dawn }, dt);
       // Let the renderer lower its resolution only while the view is moving.
       field.setMoving(a !== b || !!dragging || Math.abs(yT - yS) > 2);
       if (detail.ready) detail.fade = Math.min(1, detail.fade + dt / 1.2);

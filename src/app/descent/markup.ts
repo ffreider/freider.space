@@ -221,6 +221,17 @@ footer { position: relative; z-index: 2; padding: 0 var(--gutter) calc(14px + en
   .fade { background: linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.4)); }
 }
 @media (prefers-reduced-motion: reduce) { .drawer, .hud { transition: none; } .hud .k::before { animation: none; } }
+/* The opening: the hero arrives line by line while the scene loads behind it
+   (main.js has the rest of the opening). */
+@keyframes arrive { from { opacity: 0; transform: translateY(14px); } }
+.hero .name, .hero .who, .hero .links, .hero .hint, .top, .side { animation: arrive 1s cubic-bezier(.2,.7,.2,1) both; }
+.hero .name { animation-delay: .05s; }
+.hero .who { animation-delay: .35s; }
+.hero .links { animation-delay: .55s; }
+.top { animation-delay: .7s; }
+.hero .hint { animation-delay: 1.1s; }
+.side { animation-delay: 1.6s; }
+@media (prefers-reduced-motion: reduce) { .hero .name, .hero .who, .hero .links, .hero .hint, .top, .side { animation: none; } }
 /* globals.css gives the light pages' text a glow; not wanted here */
 main, footer { text-shadow: none; }
 `;
