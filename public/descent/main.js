@@ -158,18 +158,35 @@
   const CITY_V = CITIES.map(([n, la, lo]) => [n, ecefUnit(la, lo)]);
   const TRD = { lat: 63.4305, lon: 10.3951, h: 0.05 };
 
-  // coastlines, borders and the graticule as Earth-fixed unit vectors
-  let COAST = [], BORDERS = [], GRAT = [], COUNTRIES = [], ISO = {};
+  // the graticule as Earth-fixed unit vectors, and the countries for naming
+  // the place below (the maps now show coastlines and borders well enough)
+  let GRAT = [], COUNTRIES = [], ISO = {};
   if (window.d3 && window.topojson) {
     const world = JSON.parse($("worldData").textContent);
     ISO = JSON.parse($("isoData").textContent);
     COUNTRIES = topojson.feature(world, world.objects.countries).features;
-    const toV = lines => lines.map(line => line.map(([lo, la]) => ecefUnit(la, lo)));
-    COAST = toV(topojson.mesh(world, world.objects.countries, (a, b) => a === b).coordinates);
-    BORDERS = toV(topojson.mesh(world, world.objects.countries, (a, b) => a !== b).coordinates);
     for (let la = -80; la <= 80; la += 10) { const l = []; for (let lo = -180; lo <= 180; lo += 3) l.push(ecefUnit(la, lo)); GRAT.push(l); }
     for (let lo = -180; lo < 180; lo += 10) { const l = []; for (let la = -80; la <= 80; la += 3) l.push(ecefUnit(la, lo)); GRAT.push(l); }
   }
+  // Seas inside or beside the continents, as rough boxes (south, north, west,
+  // east). Only asked when the point isn't in a country, so a box may overlap
+  // land; where boxes overlap, the first wins. Without these, the ocean guess
+  // below called the Black Sea "the Pacific Ocean".
+  const SEAS = [
+    [40.8, 46.8, 27.3, 41.8, { en: "the Black Sea", no: "Svartehavet" }],
+    [36.5, 47.2, 46.5, 54.8, { en: "the Caspian Sea", no: "Det kaspiske hav" }],
+    [23.8, 30.5, 47.5, 56.5, { en: "the Persian Gulf", no: "Persiabukta" }],
+    [12.5, 30.0, 32.0, 43.5, { en: "the Red Sea", no: "Rødehavet" }],
+    [30.0, 46.0, -6.0, 36.5, { en: "the Mediterranean Sea", no: "Middelhavet" }],
+    [53.5, 66.0, 9.5, 30.5, { en: "the Baltic Sea", no: "Østersjøen" }],
+    [51.0, 61.5, -4.5, 9.5, { en: "the North Sea", no: "Nordsjøen" }],
+    [61.5, 72.0, -10.0, 16.0, { en: "the Norwegian Sea", no: "Norskehavet" }],
+    [69.0, 80.0, 16.0, 60.0, { en: "the Barents Sea", no: "Barentshavet" }],
+    [18.0, 31.0, -98.0, -80.5, { en: "the Gulf of Mexico", no: "Mexicogolfen" }],
+    [9.0, 22.0, -88.0, -59.5, { en: "the Caribbean Sea", no: "Karibhavet" }],
+    [51.0, 64.0, -95.0, -76.5, { en: "Hudson Bay", no: "Hudsonbukta" }],
+    [34.0, 52.0, 127.0, 142.5, { en: "the Sea of Japan", no: "Japanhavet" }],
+  ];
   function placeName(lat, lon) {
     const s = C.S();
     if (window.d3) for (const f of COUNTRIES) if (d3.geoContains(f, [lon, lat])) {
@@ -177,8 +194,10 @@
       try { if (a2) return new Intl.DisplayNames([s.region], { type: "region" }).of(a2); } catch (_) {}
       return f.properties.name;
     }
+    for (const [la0, la1, lo0, lo1, name] of SEAS) if (lat >= la0 && lat <= la1 && lon >= lo0 && lon <= lo1) return name[C.lang];
     const o = s.ocean;
     if (lat > 66) return o.arctic; if (lat < -60) return o.southern;
+    if (lat < -30 && lon > 20 && lon < 147) return o.indian;
     if (lon >= -70 && lon <= 20) return o.atlantic;
     if (lon > -100 && lon < -70 && lat > 8) return o.atlantic;
     if (lon > 20 && lon < 120 && lat < 25) return o.indian;
@@ -877,8 +896,6 @@
       og.stroke(); og.globalAlpha = 1;
     };
     draw(GRAT, "rgba(160,200,255,1)", 0.6, 0.14);
-    draw(BORDERS, "rgba(241,241,238,1)", 0.7, 0.32);
-    draw(COAST, "rgba(241,241,238,1)", 1.1, 0.62);
     // cities
     og.font = `500 10.5px ${MONO}`;
     for (const [n, v] of CITY_V) {
