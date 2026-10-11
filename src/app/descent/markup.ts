@@ -140,7 +140,7 @@ p { margin: 0; }
 .article img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; object-position: 50% 30%; display: block; margin-bottom: 4px; }
 .article .src { font: 500 10.5px/1 var(--f-data); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
 .article:hover { border-color: var(--ink-3); }
-.article h3 { font-family: var(--f-display); font-weight: 800; letter-spacing: -0.02em; font-size: clamp(24px, 2.4vw, 32px); line-height: 1.08; margin: 0; overflow-wrap: break-word; text-wrap: balance; }
+.article h3 { font-family: var(--f-display); font-weight: 800; letter-spacing: -0.02em; font-size: clamp(24px, 2.4vw, 32px); line-height: 1.08; margin-block: 0; overflow-wrap: break-word; text-wrap: balance; }
 .article:hover h3 { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
 .article .meta { font: 400 11.5px/1.5 var(--f-data); color: var(--ink-3); }
 .article .byline { font-size: 14px; color: var(--ink-3); }
@@ -221,23 +221,19 @@ footer { position: relative; z-index: 2; padding: 0 var(--gutter) calc(14px + en
   .fade { background: linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.4)); }
 }
 @media (prefers-reduced-motion: reduce) { .drawer, .hud { transition: none; } .hud .k::before { animation: none; } }
-/* The cover: a black screen that says hi while the scene loads, then flies
-   into the words as the black fades (main.js adds .open when the first maps
-   are in). It's two halves with the greeting split across the seam, so the
-   words scale from the middle of the screen. Only transforms and opacity, so
-   it costs next to nothing. Without JavaScript it steps aside on its own
-   after a few seconds. */
+/* The cover: a black screen that says hi while the scene loads, then opens
+   like two doors, splitting the greeting across the seam (main.js adds .open
+   when the first maps are in). Only transforms, so it costs next to nothing.
+   Without JavaScript it steps aside on its own after a few seconds. */
 .cover { position: fixed; inset: 0; z-index: 20; pointer-events: none; animation: cover-gone 0s 6s forwards; }
-.door { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; background: var(--void); transition: background-color .9s ease-in .1s; }
+.door { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; background: var(--void); transition: transform .9s cubic-bezier(.7, 0, .2, 1); }
 .door.up { top: 0; }
 .door.down { bottom: 0; }
-.door span { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; font-family: var(--f-display); font-weight: 800; font-size: clamp(44px, 9vw, 140px); line-height: 1; letter-spacing: -0.04em; color: var(--ink); animation: hi .7s ease-out .1s backwards; transition: transform 1.1s cubic-bezier(.6, 0, .9, .6), opacity .9s ease-in .2s; } /* backwards: once in, opacity is free to transition out */
+.door span { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; font-family: var(--f-display); font-weight: 800; font-size: clamp(44px, 9vw, 140px); line-height: 1; letter-spacing: -0.04em; color: var(--ink); animation: hi .7s ease-out .1s backwards; }
 .door.up span { bottom: 0; transform: translateY(50%); }
 .door.down span { top: 0; transform: translateY(-50%); }
-.cover.open .door { background-color: transparent; }
-.cover.open .door span { animation: none; opacity: 0; }
-.cover.open .door.up span { transform: translateY(50%) scale(14); }
-.cover.open .door.down span { transform: translateY(-50%) scale(14); }
+.cover.open .door.up { transform: translateY(-101%); }
+.cover.open .door.down { transform: translateY(101%); }
 @keyframes hi { from { opacity: 0; } }
 @keyframes cover-gone { to { visibility: hidden; } }
 @media (prefers-reduced-motion: reduce) {
@@ -252,7 +248,7 @@ main, footer { text-shadow: none; }
 export const DESCENT_BODY = String.raw`
 <div class="cover" id="cover" aria-hidden="true"><div class="door up"><span>__HI__</span></div><div class="door down"><span>__HI__</span></div></div>
 <canvas id="field" aria-hidden="true"></canvas>
-<canvas id="cube" aria-hidden="true" style="position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none"></canvas>
+<canvas id="cube" aria-hidden="true" style="position:fixed;inset:0;width:100%;height:100%;z-index:2;pointer-events:none"></canvas>
 <canvas id="overlay" aria-hidden="true"></canvas>
 <div class="fade" aria-hidden="true"></div>
 

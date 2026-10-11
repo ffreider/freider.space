@@ -773,6 +773,19 @@
   }
 
   const aimOf = c => c.tgt || add(c.pos, mul(c.F, Math.min(len(c.pos) * 0.9, 400000)));
+  // Leaving the Moon, the camera starts only a few thousand km from it, so
+  // an even move in distance from Earth made it shoot away at first and then
+  // crawl. Instead, find the point along the move where the distance from the
+  // Moon has grown by an even factor: the Moon then shrinks at a steady pace.
+  function leaveMoon(A, B, t, moon) {
+    if (t <= 0 || t >= 1) return t;
+    const d0 = len(sub(A.pos, moon)), d1 = len(sub(B.pos, moon));
+    const want = d0 * Math.pow(d1 / d0, t);
+    const posAt = s => mul(slerp(norm(A.pos), norm(B.pos), s), Math.exp(lerp(Math.log(len(A.pos)), Math.log(len(B.pos)), s)));
+    let lo = 0, hi = 1;
+    for (let k = 0; k < 24; k++) { const mid = (lo + hi) / 2; if (len(sub(posAt(mid), moon)) < want) lo = mid; else hi = mid; }
+    return (lo + hi) / 2;
+  }
   function blend(A, B, t) {
     const ra = len(A.pos), rb = len(B.pos);
     const r = Math.exp(lerp(Math.log(ra), Math.log(rb), t));
@@ -1055,10 +1068,10 @@
       // a symbol at the satellite's true position (the real thing would be far smaller than a pixel)
       const d = sub(cam.sat, cam.posKm);
       T.holder.position.set(dot(d, cam.R), dot(d, cam.U), -dot(d, cam.F));
-      size = len(d) * 0.075 * cam.tanH * (0.55 + 0.45 * w);
+      size = len(d) * 0.04 * cam.tanH * (0.55 + 0.45 * w);
       T.camera3.near = 5; T.camera3.far = 2e5; T.camera3.updateProjectionMatrix();
     } else {
-      size = 0.12 * cam.tanH * (0.55 + 0.45 * w);
+      size = 0.065 * cam.tanH * (0.55 + 0.45 * w);
       T.holder.position.set(0.04 * cam.tanH * aspect, -0.22 * cam.tanH, -1);
       T.camera3.near = 0.0005; T.camera3.far = 50; T.camera3.updateProjectionMatrix();
     }
@@ -1662,7 +1675,7 @@
     const a = w.i, b = w.j, t = w.t;
     curStop = t < 0.5 ? a : b;
     const A = stop(a, ms, w.drift), B = b !== a ? stop(b, ms, 0) : A;
-    let cam = b !== a ? blend(A, B, t) : A;
+    let cam = b !== a ? blend(A, B, a === 0 ? leaveMoon(A, B, t, moonEci(ms)) : t) : A;
     if (A.frame) lastFrame = A.frame; else if (B.frame) lastFrame = B.frame;
     const weights = [0, 0, 0, 0, 0, 0];
     weights[a] += 1 - t; weights[b] += t;
