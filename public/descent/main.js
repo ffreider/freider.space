@@ -628,17 +628,65 @@
     const s = sections[sections.length - 1];
     lockY = s.offsetTop + s.offsetHeight - innerHeight * 0.75;
   }
-  function where(y) {
-    for (let i = 0; i < holds.length; i++) {
-      const [a, b] = holds[i];
-      if (y <= b || i === holds.length - 1) {
-        if (y >= a || i === 0) return { i, j: i, t: 0, drift: C.clamp01((y - a) / Math.max(1, b - a)) };
-        const pa = holds[i - 1][1];
-        return { i: i - 1, j: i, t: smooth((y - pa) / Math.max(1, a - pa)), drift: 1 };
+  // How far through its hold the page is, for the slow drift within a stop.
+  const driftOf = (i, y) => C.clamp01((y - holds[i][0]) / Math.max(1, holds[i][1] - holds[i][0]));
+
+  /* ---------- transitions between stops ----------
+     Scrolling doesn't scrub the camera from stop to stop. Scrolling past the
+     middle of the gap between two stops picks the next one, and the camera
+     then flies there over a fixed time with its own easing, so every
+     transition plays the same however fast or unevenly you scroll. Turning
+     back mid-flight reverses it smoothly; jumping several stops (the route
+     list) flies straight there, a little slower. Within a stop, scrolling
+     still drifts the camera. */
+  const FLIGHT_MS = 1500, EXTRA_STOP_MS = 350, MAX_FLIGHT_MS = 2600;
+  const HYSTERESIS = 0.08;                     // of the screen height, so the choice doesn't flicker
+  const easeInOut = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const flight = { from: 0, to: 0, t0: 0, dur: 0 };
+  let target = 0;
+  function pickStop(y) {
+    const h = innerHeight * HYSTERESIS;
+    for (let i = 0; i < holds.length - 1; i++) {
+      const mid = (holds[i][1] + holds[i + 1][0]) / 2;
+      if (y < (target <= i ? mid + h : mid - h)) return i;
+    }
+    return holds.length - 1;
+  }
+  const flightProgress = now => flight.dur ? C.clamp01((now - flight.t0) / flight.dur) : 1;
+  function fly(now) {
+    if (flight.from !== flight.to && flightProgress(now) >= 1) flight.from = flight.to;
+    if (target === flight.to) return;
+    if (flight.from === flight.to) {
+      const n = Math.abs(target - flight.from);
+      const dur = C.reduceMotion ? 0 : Math.min(MAX_FLIGHT_MS, FLIGHT_MS + EXTRA_STOP_MS * (n - 1));
+      Object.assign(flight, { from: flight.from, to: target, t0: now, dur });
+    } else if (target === flight.from) {
+      // Turn around where it is: the easing is symmetric, so p becomes 1 - p.
+      const p = flightProgress(now);
+      Object.assign(flight, { from: flight.to, to: flight.from, t0: now - (1 - p) * flight.dur });
+    }
+    // Otherwise a new stop was picked mid-flight: this flight finishes first.
+  }
+  function jumpTo(i) { target = i; Object.assign(flight, { from: i, to: i, t0: 0, dur: 0 }); }
+
+  // When scrolling stops in the gap between two stops, settle onto the one
+  // the camera is at or heading for, so the page never rests halfway.
+  let settleTimer = 0, touching = false;
+  function settle() {
+    if (C.reduceMotion || touching || document.body.classList.contains("tracker-open")) return;
+    const y = scrollY + innerHeight / 2;
+    for (let i = 0; i < holds.length - 1; i++) {
+      const end = holds[i][1], next = holds[i + 1][0];
+      if (y > end && y < next) {
+        const to = target <= i ? end - 2 : next + 2;
+        window.scrollTo({ top: to - innerHeight / 2, behavior: "smooth" });
+        return;
       }
     }
-    return { i: holds.length - 1, j: holds.length - 1, t: 0, drift: 1 };
   }
+  const scheduleSettle = () => { clearTimeout(settleTimer); settleTimer = setTimeout(settle, 240); };
+  window.addEventListener("touchstart", () => { touching = true; clearTimeout(settleTimer); }, { passive: true });
+  window.addEventListener("touchend", () => { touching = false; scheduleSettle(); }, { passive: true });
 
   /* ---------- overlay ---------- */
   const ov = $("overlay"), og = ov.getContext("2d");
@@ -1464,7 +1512,7 @@
 
   /* ---------- loop ---------- */
   let yS = 0, yT = 0;
-  const onScroll = () => { yT = scrollY + innerHeight / 2; };
+  const onScroll = () => { yT = scrollY + innerHeight / 2; scheduleSettle(); };
   let last = performance.now(), clock = 0, lastText = 0, lastCard = 0;
   const angDiff = (a, b) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
   function frame(now) {
@@ -1475,15 +1523,16 @@
     moonLook.az += (moonLook.taz - moonLook.az) * k; moonLook.el += (moonLook.tel - moonLook.el) * k;
     if (ride.pitch !== null) { ride.yaw += angDiff(ride.yaw, ride.tyaw) * k; ride.pitch += (ride.tpitch - ride.pitch) * k; }
     const ms = Date.now();
-    const w = where(yS);
-    curStop = w.t < 0.5 ? w.i : w.j;
-    const A = stop(w.i, ms, w.drift), B = w.j !== w.i ? stop(w.j, ms, 0) : A;
-    let cam = w.j !== w.i ? blend(A, B, w.t) : A;
+    target = pickStop(yT); fly(now);
+    const a = flight.from, b = flight.to, t = a === b ? 0 : easeInOut(flightProgress(now));
+    curStop = t < 0.5 ? a : b;
+    const A = stop(a, ms, driftOf(a, yS)), B = b !== a ? stop(b, ms, driftOf(b, yS)) : A;
+    let cam = b !== a ? blend(A, B, t) : A;
     if (A.frame) lastFrame = A.frame; else if (B.frame) lastFrame = B.frame;
     const weights = [0, 0, 0, 0, 0, 0];
-    weights[w.i] += 1 - w.t; weights[w.j] += w.t;
-    const rideW = (w.i === 5 || w.j === 5) ? (w.i === 5 ? 1 : w.t) : 0;
-    const locked = w.i === 5 && yS >= lockY;
+    weights[a] += 1 - t; weights[b] += t;
+    const rideW = a === b ? (a === 5 ? 1 : 0) : (a === 5 ? 1 - t : 0) + (b === 5 ? t : 0);
+    const locked = a === 5 && b === 5 && yS >= lockY;
     document.body.classList.toggle("live-lock", locked);
     document.body.classList.toggle("riding", rideW > 0.6);
     const U = norm(sub(cam.U, mul(cam.F, dot(cam.U, cam.F))));
@@ -1512,6 +1561,6 @@
   const renderHtml = () => document.querySelectorAll("[data-h]").forEach(el => { el.innerHTML = C.S()[el.dataset.h]; });
   C.onLang(() => { buildRoute(); stopTexts(Date.now()); lastCard = 0; renderHtml(); });
 
-  C.render(); renderHtml(); layout(); onScroll(); yS = yT;
+  C.render(); renderHtml(); layout(); onScroll(); yS = yT; jumpTo(pickStop(yT));
   requestAnimationFrame(frame);
 })();
