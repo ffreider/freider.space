@@ -29,7 +29,8 @@ function parse(text: string) {
 
 async function fetchGroup(query: string) {
   try {
-    const res = await fetch(`${CELESTRAK}?${query}&FORMAT=tle`, { next: { revalidate: 21600 } });
+    // a slow CelesTrak must not hold up the build (Vercel stops a page after 60 s)
+    const res = await fetch(`${CELESTRAK}?${query}&FORMAT=tle`, { next: { revalidate: 21600 }, signal: AbortSignal.timeout(10000) });
     return res.ok ? parse(await res.text()) : new Map();
   } catch {
     return new Map();

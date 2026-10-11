@@ -13,7 +13,7 @@ const FALLBACK: Tle = {
 
 export async function framsatTle(): Promise<Tle> {
   try {
-    const res = await fetch(SATNOGS_URL, { next: { revalidate: 21600 } });
+    const res = await fetch(SATNOGS_URL, { next: { revalidate: 21600 }, signal: AbortSignal.timeout(10000) });
     if (!res.ok) return FALLBACK;
     const [latest] = await res.json();
     if (typeof latest?.tle1 !== "string" || typeof latest?.tle2 !== "string") {
