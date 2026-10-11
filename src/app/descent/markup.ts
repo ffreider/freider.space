@@ -106,6 +106,7 @@ p { margin: 0; }
 
 .band { min-height: 140vh; display: flex; flex-direction: column; justify-content: center; padding-block: 25vh; }
 .band.long { min-height: 0; padding-block: 35vh 45vh; }
+.moon-band { min-height: 110vh; padding-block: 0; }
 .bio { font-size: clamp(19px, 1.8vw, 22px); line-height: 1.55; }
 
 .chart-wrap { overflow-x: auto; margin: 0 -4px 10px; padding: 26px 4px 30px; }
@@ -288,14 +289,17 @@ export const DESCENT_BODY = String.raw`
     </div>
   </section>
 
-  <section class="band" data-stop="1">
+  <!-- the Moon: no text, room to look at it and turn it -->
+  <section class="band moon-band" data-stop="1" aria-hidden="true"></section>
+
+  <section class="band" data-stop="2">
     <div class="col">
       <h2 data-t="about"></h2>
       <p class="bio" data-t="bio"></p>
     </div>
   </section>
 
-  <section class="band long" data-stop="2">
+  <section class="band long" data-stop="3">
     <div class="col">
       <h2 data-t="experience"></h2>
       <div class="chart-wrap"><figure class="chart" id="chart"></figure></div>
@@ -303,7 +307,7 @@ export const DESCENT_BODY = String.raw`
     </div>
   </section>
 
-  <section class="band" data-stop="3">
+  <section class="band" data-stop="4">
     <div class="col">
       <p class="meta" data-t="featured" style="margin-bottom:14px"></p>
       <a class="article" href="https://trondheim.com/journal/the-extracurricular-that-left-earth" target="_blank" rel="noopener">
@@ -318,7 +322,7 @@ export const DESCENT_BODY = String.raw`
     </div>
   </section>
 
-  <section class="band" data-stop="4">
+  <section class="band" data-stop="5">
     <div class="col">
       <h2 data-t="education"></h2>
       <ul class="degrees" id="degrees"></ul>
@@ -326,7 +330,7 @@ export const DESCENT_BODY = String.raw`
     </div>
   </section>
 
-  <section class="arrival" id="framsat" data-stop="5">
+  <section class="arrival" id="framsat" data-stop="6">
     <div class="col">
       <h2 data-t="joining"></h2>
       <p class="bio" data-h="whyHtml"></p>

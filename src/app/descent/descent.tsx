@@ -1,4 +1,5 @@
 import { descentTles } from "@/lib/descent-tles";
+import { spaceWeather } from "@/lib/space-weather";
 import type { Entry, TEXT, YearMonth } from "../home";
 import type { Lang } from "../i18n";
 import { DescentScripts } from "./scripts";
@@ -92,7 +93,7 @@ export async function Descent({
   timeline: Entry[];
   text: typeof TEXT;
 }) {
-  const tles = await descentTles();
+  const [tles, weather] = await Promise.all([descentTles(), spaceWeather()]);
 
   return (
     <>
@@ -100,6 +101,7 @@ export async function Descent({
       <div id="descent" data-lang={lang} dangerouslySetInnerHTML={{ __html: fill(text[lang], timeline, lang) }} />
       <script type="application/json" id="tleData" dangerouslySetInnerHTML={{ __html: json(tles) }} />
       <script type="application/json" id="timelineData" dangerouslySetInnerHTML={{ __html: json(timeline) }} />
+      <script type="application/json" id="weatherData" dangerouslySetInnerHTML={{ __html: json(weather) }} />
       <script type="application/json" id="textData" dangerouslySetInnerHTML={{ __html: json(text) }} />
       <DescentScripts />
     </>
