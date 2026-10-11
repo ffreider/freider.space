@@ -571,8 +571,11 @@
      Moon's maps go first while the page is on the Moon. With data saver on,
      it stays at 2K. Big uploads wait for a moment the camera is still. */
   const MAPS = [ // uniform, file, texture unit, channels, largest size
-    ["tDay", "earth-day", 0, 4, 8192], ["tNight", "earth-night", 1, 1, 8192], ["tWater", "earth-water", 2, 1, 8192],
-    ["tClouds", "earth-clouds", 3, 1, 8192], ["tMoon", "moon", 4, 1, 8192],
+    // Only the day map and the Moon go to 8K. Night lights, the water mask
+    // and clouds stop at 4K: soft anyway, the close-ups cover the low stops,
+    // and each 8K greyscale map costs about 45 MB of GPU memory.
+    ["tDay", "earth-day", 0, 4, 8192], ["tNight", "earth-night", 1, 1, 4096], ["tWater", "earth-water", 2, 1, 4096],
+    ["tClouds", "earth-clouds", 3, 1, 4096], ["tMoon", "moon", 4, 1, 8192],
     ["tMoonE", "moon-tilt-east", 6, 1, 4096], ["tMoonN", "moon-tilt-north", 7, 1, 4096],
   ];
   const TAG = { 2048: "2k", 4096: "4k", 8192: "8k" };
@@ -607,14 +610,25 @@
     });
   }
   const mapUrl = (file, w) => `/descent/tex/${file}-${TAG[w]}.webp`;
+  // A map decoded to an ImageBitmap, so its memory can be released (close())
+  // as soon as it is on the GPU, rather than whenever the browser gets round
+  // to it. An 8K map decoded is about 130 MB.
+  async function bitmap(src) {
+    if (!window.createImageBitmap) return image(src);
+    const res = await fetch(src);
+    if (!res.ok) throw new Error(`Could not load ${src}`);
+    return createImageBitmap(await res.blob(), { premultiplyAlpha: "none", colorSpaceConversion: "none" });
+  }
+  const upload = (name, img, unit, channels) => { field.texture(name, img, unit, channels); if (img.close) img.close(); };
   const calm = () => new Promise(res => {
     const check = () => (Math.abs(yT - yS) < 2 && !dragging ? res() : setTimeout(check, 150));
     check();
   });
   if (field) {
     (async () => {
-      const first = await Promise.all(MAPS.map(m => image(mapUrl(m[1], 2048)).catch(() => null)));
-      first.forEach((img, i) => { if (img) field.texture(MAPS[i][0], img, MAPS[i][2], MAPS[i][3]); });
+      const first = await Promise.all(MAPS.map(m => bitmap(mapUrl(m[1], 2048)).catch(() => null)));
+      first.forEach((img, i) => { if (img) upload(MAPS[i][0], img, MAPS[i][2], MAPS[i][3]); });
+      first.length = 0;
       loaded = 1; loadedAt = performance.now();
       requestAnimationFrame(() => requestAnimationFrame(openCover));   // after a frame with the maps
       if (sharpest <= 2048) return;
@@ -622,10 +636,10 @@
       const order = [...MAPS].sort((a, b) => (a[1].startsWith("moon") === moonFirst ? -1 : 1) - (b[1].startsWith("moon") === moonFirst ? -1 : 1));
       for (const [name, file, unit, channels, largest] of order) {
         const w = Math.min(sharpest, largest);
-        const img = await image(mapUrl(file, w)).catch(() => null);
+        const img = await bitmap(mapUrl(file, w)).catch(() => null);
         if (!img) continue;
         await calm();
-        field.texture(name, img, unit, channels);
+        upload(name, img, unit, channels);
       }
     })();
   }
@@ -659,6 +673,7 @@
     await Promise.all(jobs);
     await calm();
     field.texture("tDetail", canvas, 5);
+    canvas.width = canvas.height = 0;                       // the 50 MB canvas is no longer needed
     detail.box = { lat: 90 - (row0 + BOX_ROWS / 2) * TILE_DEG, lon: (col0 + BOX_COLS / 2) * TILE_DEG - 180,
       uniform: [rad(col0 * TILE_DEG - 180), rad(90 - row0 * TILE_DEG), rad(BOX_COLS * TILE_DEG), rad(BOX_ROWS * TILE_DEG)] };
     if (detail.sat !== sat) detail.fade = 0;
@@ -668,7 +683,14 @@
     if (!field || !loaded || detail.loading) return;
     const stopNow = curStop;
     const sat = stopNow === 4 ? "ISS" : stopNow === 5 ? "FRAMSAT-1" : null;
-    if (!sat) return;
+    if (!sat) {
+      // away from the low stops for 15 s: give the close-up's GPU memory back
+      if (!detail.ready) return;
+      detail.leftAt = detail.leftAt || ms;
+      if (ms - detail.leftAt > 15000) { detail.ready = false; detail.box = null; detail.sat = null; detail.fade = 0; field.drop("tDetail"); }
+      return;
+    }
+    detail.leftAt = 0;
     const p = subPoint(sat, ms); if (!p) return;
     const b = detail.box;
     const dLon = b ? Math.abs(((p.lon - b.lon + 540) % 360) - 180) : 1e9;
@@ -1044,7 +1066,7 @@
   let three = null;
   if (window.THREE && THREE.GLTFLoader) {
     try {
-      const renderer = new THREE.WebGLRenderer({ canvas: $("cube"), alpha: true, antialias: true, premultipliedAlpha: false });
+      const renderer = new THREE.WebGLRenderer({ canvas: $("cube"), alpha: true, antialias: false, premultipliedAlpha: false });
       renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
       renderer.setClearColor(0x000000, 0);
       renderer.outputEncoding = THREE.sRGBEncoding;
@@ -1069,8 +1091,10 @@
     const T = three; if (!T || !T.model) return null;
     const r = T.renderer, W = innerWidth, H = innerHeight;
     const pr = r.getPixelRatio();
+    // While the CubeSat is out of sight its canvas shrinks to a pixel, so it
+    // holds no full-screen buffers for most of the page.
+    if (w <= 0.01) { if (T.shown || r.domElement.width > 1) { r.setSize(1, 1, false); T.shown = false; } return { hidden: true }; }
     if (r.domElement.width !== Math.round(W * pr) || r.domElement.height !== Math.round(H * pr)) r.setSize(W, H, false);
-    if (w <= 0.01) { if (T.shown) { r.clear(); T.shown = false; } return { hidden: true }; }
     T.shown = true;
     T.camera3.fov = 2 * deg(Math.atan(cam.tanH)); T.camera3.aspect = W / H; T.camera3.updateProjectionMatrix();
     const aspect = W / H;

@@ -690,7 +690,9 @@ window.Core = (() => {
       gl.useProgram(prog);
       gl.uniform1i(gl.getUniformLocation(prog, name), unit);
     }
-    return { draw, probe, texture, setMoving, maxTexture, get scale() { return scale; } };
+    // free a map's GPU memory (the shader must stop sampling it first)
+    function drop(name) { if (textures[name]) { gl.deleteTexture(textures[name]); delete textures[name]; } }
+    return { draw, probe, texture, drop, setMoving, maxTexture, get scale() { return scale; } };
   }
 
   return {
