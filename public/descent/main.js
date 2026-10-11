@@ -255,7 +255,7 @@
       moreTracker: "Sky plot, receptions and the annotated TLE:",
       views: ["Behind", "Above", "In front", "Facing the Sun"],
       stops: [
-        ["The Moon", d => `${d} km from Earth right now. Drag to orbit it and hover the names. The descent starts here and falls inward past real spacecraft.`],
+        ["The Moon", d => `${d} km from Earth right now. Drag to turn it and hover the names. The descent starts here and falls inward past real spacecraft.`],
         ["ASBM-1 and ASBM-2", (pe, ap) => `Space Norway’s Arctic broadband satellites. Their 16-hour orbits swing from ${pe} km up to ${ap} km and linger at the top, high over the Arctic. Each is switched on for about 10 hours around the top of its orbit, and the two overlap, so everything north of 65° N has coverage around the clock. The cone shows what the active one sees.`],
         ["The geostationary belt", () => "35,786 km up, where an orbit takes exactly one day, so a satellite hangs still over one spot. Hover any of them. Space Norway’s Thor 5, 6 and 7 sit near 1° West."],
         ["Galileo above Trondheim", () => "Europe’s own navigation system, 23,222 km up in three orbital planes. The lines show the Galileo satellites a phone in Trondheim could use right now, placed from their latest TLEs. Your position comes from timing their signals, which left them about 80 milliseconds ago."],
@@ -276,7 +276,7 @@
       sunlitNow: "Sunlit", darkNow: "In Earth’s shadow",
       passFmt: (t, el, vis) => `${t}, ${el}° high${vis ? ", visible" : ""}`, noPass2: "None in 24 h",
       phases: ["New moon", "Waxing crescent", "First quarter", "Waxing gibbous", "Full moon", "Waning gibbous", "Last quarter", "Waning crescent"],
-      cardFoot: ["Drag to orbit the Moon, double-click to reset. Hover the names.", "Coverage per Space Norway: north of 65° N, 24/7. The 10-hour active window is approximate.", "Hover any satellite for details. Most sit on the line; a few older ones are allowed to drift north and south.", "Galileo’s hydrogen-maser clocks drift about one second in three million years. Norway hosts Galileo ground stations on Svalbard, on Jan Mayen and at Troll in Antarctica.", "Computed live in your browser from the latest TLE.", "Computed live in your browser from its TLE."],
+      cardFoot: ["Drag to turn the Moon, double-click to reset. Hover the names.", "Coverage per Space Norway: north of 65° N, 24/7. The 10-hour active window is approximate.", "Hover any satellite for details. Most sit on the line; a few older ones are allowed to drift north and south.", "Galileo’s hydrogen-maser clocks drift about one second in three million years. Norway hosts Galileo ground stations on Svalbard, on Jan Mayen and at Troll in Antarctica.", "Computed live in your browser from the latest TLE.", "Computed live in your browser from its TLE."],
       moonShown: "positions from a low-precision ephemeris",
     },
     no: {
@@ -288,7 +288,7 @@
       moreTracker: "Himmelkart, mottak og forklart TLE:",
       views: ["Bak", "Over", "Foran", "Mot Solen"],
       stops: [
-        ["Månen", d => `${d} km fra Jorden akkurat nå. Dra for å fly rundt den og hold over navnene. Turen starter her og faller innover forbi ekte romfartøy.`],
+        ["Månen", d => `${d} km fra Jorden akkurat nå. Dra for å snu den og hold over navnene. Turen starter her og faller innover forbi ekte romfartøy.`],
         ["ASBM-1 og ASBM-2", (pe, ap) => `Space Norways bredbåndssatellitter for Arktis. Banene på 16 timer svinger fra ${pe} km opp til ${ap} km og blir hengende på toppen, høyt over Arktis. Hver er slått på i rundt 10 timer rundt toppen av banen, og de overlapper, så alt nord for 65° N har dekning hele døgnet. Kjeglen viser hva den aktive ser.`],
         ["Det geostasjonære beltet", () => "35 786 km opp, der ett omløp tar nøyaktig ett døgn, så satellitten henger stille over ett punkt. Hold over hvilken som helst av dem. Space Norways Thor 5, 6 og 7 står nær 1° vest."],
         ["Galileo over Trondheim", () => "Europas eget navigasjonssystem, 23 222 km opp i tre baneplan. Linjene viser Galileo-satellittene en mobil i Trondheim kan bruke akkurat nå, plassert fra nyeste TLE. Posisjonen din regnes ut ved å måle tiden signalene bruker, rundt 80 millisekunder."],
@@ -309,7 +309,7 @@
       sunlitNow: "I sollys", darkNow: "I jordskyggen",
       passFmt: (t, el, vis) => `${t}, ${el}° høyt${vis ? ", synlig" : ""}`, noPass2: "Ingen innen 24 t",
       phases: ["Nymåne", "Voksende månesigd", "Første kvarter", "Voksende måne", "Fullmåne", "Minkende måne", "Siste kvarter", "Minkende månesigd"],
-      cardFoot: ["Dra for å fly rundt Månen, dobbeltklikk for å nullstille. Hold over navnene.", "Dekning ifølge Space Norway: nord for 65° N, hele døgnet. Det aktive vinduet på 10 timer er omtrentlig.", "Hold over en satellitt for detaljer. De fleste ligger på linjen; noen eldre får drive nord og sør.", "Galileos hydrogenmaser-klokker driver rundt ett sekund på tre millioner år. Norge har Galileo-bakkestasjoner på Svalbard, Jan Mayen og Troll i Antarktis.", "Regnet ut direkte i nettleseren fra nyeste TLE.", "Regnet ut direkte i nettleseren fra TLE-en."],
+      cardFoot: ["Dra for å snu Månen, dobbeltklikk for å nullstille. Hold over navnene.", "Dekning ifølge Space Norway: nord for 65° N, hele døgnet. Det aktive vinduet på 10 timer er omtrentlig.", "Hold over en satellitt for detaljer. De fleste ligger på linjen; noen eldre får drive nord og sør.", "Galileos hydrogenmaser-klokker driver rundt ett sekund på tre millioner år. Norge har Galileo-bakkestasjoner på Svalbard, Jan Mayen og Troll i Antarktis.", "Regnet ut direkte i nettleseren fra nyeste TLE.", "Regnet ut direkte i nettleseren fra TLE-en."],
       moonShown: "posisjoner fra en forenklet efemeride",
     },
   });
@@ -687,6 +687,15 @@
 
   // interactive state
   const moonLook = { az: 0, el: 0, taz: 0, tel: 0 };
+  let moonAxes = null;                 // the hero view's up and right, to turn the Moon around
+  // The Moon turned by dragging, like spinning a globe: around the view's up
+  // axis for left and right, around its right axis for up and down. The
+  // sunlight stays where it is.
+  function spinMoon(mf) {
+    if (!moonAxes || (!moonLook.az && !moonLook.el)) return mf;
+    const turn = v => rotAround(rotAround(v, moonAxes.U, moonLook.az), moonAxes.R, moonLook.el);
+    return { ...mf, mx: turn(mf.mx), my: turn(mf.my), mz: turn(mf.mz) };
+  }
   const ride = { yaw: 0, pitch: null, tyaw: 0, tpitch: null, preset: 0 };
   const RIDE_DIST = 2600, RIDE_PITCH = 0.8;
 
@@ -703,20 +712,17 @@
       const M = moonEci(ms), away = norm(M), sun = sunEci(ms);
       let side = sub(sun, mul(away, dot(sun, away)));
       side = len(side) < 1e-3 ? norm(cross(away, [0, 0, 1])) : norm(side);
-      const e3 = norm(cross(away, side));
-      // orbit the Moon on a sphere: az turns around e3, el tilts toward/away from it
-      const off0 = add(mul(away, 7600), mul(side, 2300 + drift * 400)), D = len(off0);
-      let d = rotAround(norm(off0), e3, moonLook.az);
-      const tAx = norm(cross(e3, d));
-      d = rotAround(d, tAx, moonLook.el);
-      const pos = add(M, mul(d, D));
-      const upH = rotAround(rotAround(side, e3, moonLook.az), tAx, moonLook.el);
-      const k = smooth(Math.hypot(moonLook.az, moonLook.el) / 0.4);
-      const rest = tilt(lookAt(pos, [0, 0, 0], upH), rad(-7.5));
-      const atMoon = lookAt(pos, M, upH);
-      const F = slerp(rest.F, atMoon.F, k);
-      let U = slerp(rest.U, atMoon.U, k); U = norm(sub(U, mul(F, dot(U, F))));
-      return { pos, F, U, half: portrait() ? 30 : 21, shift: sh * 0.8 * (1 - k * 0.75) };
+      // A fixed view just beyond the Moon, looking back at Earth. Dragging
+      // turns the Moon itself (spinMoon), not the camera.
+      const off0 = add(mul(away, 7600), mul(side, 2300 + drift * 400));
+      const pos = add(M, off0);
+      const { F, U } = tilt(lookAt(pos, [0, 0, 0], side), rad(-7.5));
+      moonAxes = { U, R: cross(F, U) };
+      // The way out, as a curve with two bends: first back along the
+      // Earth-Moon line, so the Moon shrinks ahead of you with Earth behind
+      // it, then wide around it, so it never rushes past right beside you.
+      const hop = [add(M, add(mul(away, 80000), mul(side, 10000))), add(M, add(mul(away, -60000), mul(side, 140000)))];
+      return { pos, F, U, half: portrait() ? 30 : 21, shift: sh * 0.8, hop };
     }
     if (i === 1) {
       // face-on to the ASBM orbital plane so the true shape shows, apogee (the Arctic) at the top
@@ -773,19 +779,6 @@
   }
 
   const aimOf = c => c.tgt || add(c.pos, mul(c.F, Math.min(len(c.pos) * 0.9, 400000)));
-  // Leaving the Moon, the camera starts only a few thousand km from it, so
-  // an even move in distance from Earth made it shoot away at first and then
-  // crawl. Instead, find the point along the move where the distance from the
-  // Moon has grown by an even factor: the Moon then shrinks at a steady pace.
-  function leaveMoon(A, B, t, moon) {
-    if (t <= 0 || t >= 1) return t;
-    const d0 = len(sub(A.pos, moon)), d1 = len(sub(B.pos, moon));
-    const want = d0 * Math.pow(d1 / d0, t);
-    const posAt = s => mul(slerp(norm(A.pos), norm(B.pos), s), Math.exp(lerp(Math.log(len(A.pos)), Math.log(len(B.pos)), s)));
-    let lo = 0, hi = 1;
-    for (let k = 0; k < 24; k++) { const mid = (lo + hi) / 2; if (len(sub(posAt(mid), moon)) < want) lo = mid; else hi = mid; }
-    return (lo + hi) / 2;
-  }
   function blend(A, B, t) {
     const ra = len(A.pos), rb = len(B.pos);
     const r = Math.exp(lerp(Math.log(ra), Math.log(rb), t));
@@ -794,7 +787,11 @@
     // only climb when hopping between two low stops on different sides of the planet
     const low = C.clamp01((30000 - Math.max(ra, rb)) / 20000);
     const lift = 1 + Math.sin(Math.PI * t) * Math.min(1.6, arc) * 0.9 * low;
-    const pos = mul(dir, Math.max(r * lift, RE + 150));
+    // leaving the Moon: the curve set out by A.hop (see stop 0), else the usual path
+    const u = 1 - t;
+    const pos = A.hop
+      ? add(add(mul(A.pos, u * u * u), mul(A.hop[0], 3 * u * u * t)), add(mul(A.hop[1], 3 * u * t * t), mul(B.pos, t * t * t)))
+      : mul(dir, Math.max(r * lift, RE + 150));
     // aim at a point that slides from one stop's subject to the next, so the view never swings past it
     const e = t * t * (3 - 2 * t);
     const aim = add(mul(aimOf(A), 1 - e), mul(aimOf(B), e));
@@ -1625,8 +1622,8 @@
     if (!dragging) return;
     const dx = e.clientX - dragging.x, dy = e.clientY - dragging.y, k = 2.2 / innerHeight;
     if (curStop === 0) {
-      moonLook.taz = dragging.az - dx * k * 1.3;
-      moonLook.tel = Math.max(-1.35, Math.min(1.35, dragging.el - dy * k * 1.3));
+      moonLook.taz = dragging.az + dx * k * 1.3;
+      moonLook.tel = Math.max(-1.35, Math.min(1.35, dragging.el + dy * k * 1.3));
     } else {
       ride.tyaw = dragging.yaw + dx * k;
       ride.tpitch = Math.max(0.12, Math.min(1.45, dragging.pitch + dy * k));
@@ -1675,7 +1672,7 @@
     const a = w.i, b = w.j, t = w.t;
     curStop = t < 0.5 ? a : b;
     const A = stop(a, ms, w.drift), B = b !== a ? stop(b, ms, 0) : A;
-    let cam = b !== a ? blend(A, B, a === 0 ? leaveMoon(A, B, t, moonEci(ms)) : t) : A;
+    let cam = b !== a ? blend(A, B, t) : A;
     if (A.frame) lastFrame = A.frame; else if (B.frame) lastFrame = B.frame;
     const weights = [0, 0, 0, 0, 0, 0];
     weights[a] += 1 - t; weights[b] += t;
@@ -1685,7 +1682,7 @@
     document.body.classList.toggle("riding", rideW > 0.6);
     const U = norm(sub(cam.U, mul(cam.F, dot(cam.U, cam.F))));
     const R = cross(cam.F, U);
-    const sun = sunEci(ms), mf = moonFrame(ms);
+    const sun = sunEci(ms), mf = spinMoon(moonFrame(ms));
     const camFull = { posKm: cam.pos, F: cam.F, U, R, tanH: Math.tan(rad(cam.half)), shift: cam.shift, sun, moonKm: mf.moon, mf,
       mode: rideW > 0.98 ? "ride" : "", cube: smooth((rideW - 0.35) / 0.5), sat: cam.sat };
     if (field) {
