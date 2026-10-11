@@ -235,39 +235,30 @@ footer { position: relative; z-index: 2; padding: 0 var(--gutter) calc(20px + en
 footer p { max-width: 60ch; }
 
 .view { display: none; }
-/* Phones: text and scene take turns. The scene is fixed in the top part of
-   the screen; each stop's text is a solid block that slides over it, and
-   after the text comes a "view": a gap that shows the stop's object, with
-   its card (copied in by main.js) below the window. So: text, Moon, text,
+/* Phones: text and scene take turns. The scene fills the screen; while a
+   stop's text is on screen it fades down to a glow behind it (main.js sets
+   its opacity), and after the text comes a "view", a screen of the stop's
+   object at full strength, with its card at the end. So: text, Moon, text,
    ASBM, and so on. */
 @media (max-width: 900px) {
-  :root { --scene: 58svh; }
-  body { background: rgb(var(--haze)); }
-  #field, #overlay, #cube { height: var(--scene) !important; }
-  /* the window's lower edge fades into the page */
-  .fade, body.live-lock .fade { opacity: 1; inset: auto 0; top: calc(var(--scene) - 64px); height: 64px; background: linear-gradient(rgba(var(--haze), 0), rgb(var(--haze))); }
+  .fade { display: none; }
   .top { z-index: 7; }
   .top::before { background: linear-gradient(rgba(0, 0, 0, .7) 30%, rgba(0, 0, 0, 0)); }
-  main { z-index: 3; }
+  #field, #overlay, #cube { transition: opacity .25s linear; }
   section { padding-inline: 0; }
   .hero, .band, .band.long, .arrival { display: block; min-height: 0; padding: 0; }
-  main .col { position: relative; max-width: none; padding: 9svh var(--gutter) 10svh; background: rgb(var(--haze)); }
+  main .col { max-width: none; padding: 14svh var(--gutter); }
   .hero .col { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding-top: calc(70px + env(safe-area-inset-top, 0px)); }
-  /* soft edges where a text block meets the scene */
-  main .col::before, main .col::after { content: ""; position: absolute; left: 0; right: 0; height: 56px; pointer-events: none; }
-  main .col::before { bottom: 100%; background: linear-gradient(rgba(var(--haze), 0), rgb(var(--haze))); }
-  main .col::after { top: 100%; background: linear-gradient(rgb(var(--haze)), rgba(var(--haze), 0)); }
-  .hero .col::before { display: none; }
   .name { font-size: clamp(52px, 15vw, 96px); margin-bottom: 22px; }
   .hint { margin-top: 28px; }
   h2 { font-size: clamp(36px, 10vw, 56px); }
-  .view { display: block; min-height: 100svh; padding: calc(var(--scene) + 8px) var(--gutter) 28px; }
+  .view { display: block; padding: 82svh var(--gutter) 6svh; }
   .view .slot { display: block; }
   .side { display: none; }
-  .slot .card { margin: 0; overflow: visible; background: #141d2c; border: 1px solid var(--rule); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  /* the end: the ride's panel is the last block of the page, after FramSat-1's view */
+  .slot .card { margin: 0; overflow: visible; background: rgba(var(--haze), .9); border: 1px solid var(--rule); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+  /* the end: the ride's panel is the last block of the page */
   .hud, body.live-lock .hud { position: relative; z-index: 3; left: auto; bottom: auto; width: auto; max-height: none; overflow: visible; opacity: 1; transform: none; pointer-events: auto;
-    padding: 6svh var(--gutter) calc(28px + env(safe-area-inset-bottom, 0px)); background: rgb(var(--haze)); }
+    padding: 14svh var(--gutter) calc(28px + env(safe-area-inset-bottom, 0px)); }
   .hud .why, .hud-actions .hint { display: none; }
   footer, body.live-lock footer { display: none; }
 }

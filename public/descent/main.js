@@ -859,17 +859,34 @@
     const s = sections[5];
     lockY = s.offsetTop + s.offsetHeight - innerHeight * 0.75;
   }
-  // Phones: a stop holds while its view is open, from a little before the
-  // text above has cleared the window until the text below starts to cover
-  // it; the moves between stops happen while the text is over the scene.
+  // Phones: a stop holds while its view is on screen; the moves between
+  // stops happen while the text is on screen and the scene is faded down.
+  let textBlocks = [];
   function layoutPhone() {
-    const H = innerHeight, S = VH(), views = [...document.querySelectorAll(".view")];
+    const H = innerHeight, views = [...document.querySelectorAll(".view")];
+    const span = el => { const top = el.getBoundingClientRect().top + scrollY; return [top, top + el.offsetHeight]; };
     holds = views.map((v, i) => {
-      const top = v.getBoundingClientRect().top + scrollY, h = v.offsetHeight;
-      const a = top - 0.2 * H + H / 2, b = Math.max(a, top + h - S + 0.2 * H + H / 2);
+      const [top, bottom] = span(v);
+      const a = top - 0.3 * H + H / 2, b = Math.max(a, bottom - 0.7 * H + H / 2);
       return [i === 0 ? 0 : a, i === 5 ? Infinity : b];
     });
-    lockY = holds[5][0] + 0.2 * H;
+    lockY = holds[5][0] + 0.3 * H;
+    textBlocks = [...document.querySelectorAll("main .col, .hud")].map(span);
+  }
+  // how much of the screen is text: the scene fades down to a glow behind it
+  const sceneEls = ["field", "overlay", "cube"].map($);
+  let sceneDim = -1;
+  function dimUnderText() {
+    let k = 0;
+    if (narrow()) {
+      const H = innerHeight, y0 = scrollY, y1 = y0 + H;
+      let cover = 0;
+      for (const [a, b] of textBlocks) cover += Math.max(0, Math.min(b, y1) - Math.max(a, y0));
+      k = smooth(C.clamp01(cover / H * 1.6));
+    }
+    const o = 1 - 0.84 * k;
+    // the labels go further down than the picture: text reads over a glow, not over words
+    if (Math.abs(o - sceneDim) > 0.01) { sceneDim = o; sceneEls.forEach((el, i) => { el.style.opacity = (i === 1 ? 1 - 0.95 * k : o).toFixed(2); }); }
   }
   // Where the page is: inside one stop's hold (i === j, with drift for the
   // slow movement within it), or between two (t, the progress from i to j).
@@ -1825,6 +1842,7 @@
       }
     });
     if (now - lastText > 1000) { lastText = now; stopTexts(ms); updateDetail(ms); }
+    dimUnderText();
     if (now - lastCard > 500) {
       lastCard = now;
       if (!narrow()) updateCard(curStop, ms);
