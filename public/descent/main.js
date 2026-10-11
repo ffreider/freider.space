@@ -584,8 +584,6 @@
     if (coverOpen) return;
     coverOpen = true;
     const cover = $("cover"); if (!cover) return;
-    const style = new URLSearchParams(location.search).get("cover");
-    cover.dataset.style = ["curtain", "through"].includes(style) ? style : "doors";
     setTimeout(() => {
       cover.classList.add("open");
       setTimeout(() => cover.remove(), 1600);         // free its layers once it's gone

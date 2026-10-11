@@ -221,43 +221,25 @@ footer { position: relative; z-index: 2; padding: 0 var(--gutter) calc(14px + en
   .fade { background: linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.4)); }
 }
 @media (prefers-reduced-motion: reduce) { .drawer, .hud { transition: none; } .hud .k::before { animation: none; } }
-/* The cover: a black screen that says hi while the scene loads, then opens
-   onto the page (main.js adds .open when the first maps are in). It's two
-   halves with the greeting split across the seam, so it can open three ways,
-   picked with ?cover= while we choose: doors (the default) part in the
-   middle, curtain rises as one, through flies into the words as the black
-   fades. Only transforms and opacity, so it costs next to nothing. Without
-   JavaScript it steps aside on its own after a few seconds. */
+/* The cover: a black screen that says hi while the scene loads, then flies
+   into the words as the black fades (main.js adds .open when the first maps
+   are in). It's two halves with the greeting split across the seam, so the
+   words scale from the middle of the screen. Only transforms and opacity, so
+   it costs next to nothing. Without JavaScript it steps aside on its own
+   after a few seconds. */
 .cover { position: fixed; inset: 0; z-index: 20; pointer-events: none; animation: cover-gone 0s 6s forwards; }
-.door { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; background: var(--void); }
+.door { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; background: var(--void); transition: background-color .9s ease-in .1s; }
 .door.up { top: 0; }
 .door.down { bottom: 0; }
-.door span { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; font-family: var(--f-display); font-weight: 800; font-size: clamp(44px, 9vw, 140px); line-height: 1; letter-spacing: -0.04em; color: var(--ink); animation: hi .7s ease-out .1s backwards; } /* backwards: once in, opacity is free to transition out */
+.door span { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; font-family: var(--f-display); font-weight: 800; font-size: clamp(44px, 9vw, 140px); line-height: 1; letter-spacing: -0.04em; color: var(--ink); animation: hi .7s ease-out .1s backwards; transition: transform 1.1s cubic-bezier(.6, 0, .9, .6), opacity .9s ease-in .2s; } /* backwards: once in, opacity is free to transition out */
 .door.up span { bottom: 0; transform: translateY(50%); }
 .door.down span { top: 0; transform: translateY(-50%); }
-.cover.open .door span { animation: none; }
+.cover.open .door { background-color: transparent; }
+.cover.open .door span { animation: none; opacity: 0; }
+.cover.open .door.up span { transform: translateY(50%) scale(14); }
+.cover.open .door.down span { transform: translateY(-50%) scale(14); }
 @keyframes hi { from { opacity: 0; } }
 @keyframes cover-gone { to { visibility: hidden; } }
-
-/* doors: the halves part */
-.cover[data-style="doors"] .door { transition: transform .9s cubic-bezier(.7, 0, .2, 1); }
-.cover[data-style="doors"].open .door.up { transform: translateY(-101%); }
-.cover[data-style="doors"].open .door.down { transform: translateY(101%); }
-
-/* curtain: the words lift away, then the whole cover rises */
-.cover[data-style="curtain"] .door { transition: transform 1s cubic-bezier(.7, 0, .2, 1) .15s; }
-.cover[data-style="curtain"] .door span { transition: transform .5s cubic-bezier(.5, 0, .7, .4), opacity .4s; }
-.cover[data-style="curtain"].open .door { transform: translateY(-100vh); }
-.cover[data-style="curtain"].open .door.up span { transform: translateY(calc(50% - 40px)); opacity: 0; }
-.cover[data-style="curtain"].open .door.down span { transform: translateY(calc(-50% - 40px)); opacity: 0; }
-
-/* through: fly into the words while the black fades away */
-.cover[data-style="through"] .door { transition: background-color .9s ease-in .1s; }
-.cover[data-style="through"] .door span { transition: transform 1.1s cubic-bezier(.6, 0, .9, .6), opacity .9s ease-in .2s; }
-.cover[data-style="through"].open .door { background-color: transparent; }
-.cover[data-style="through"].open .door.up span { transform: translateY(50%) scale(14); opacity: 0; }
-.cover[data-style="through"].open .door.down span { transform: translateY(-50%) scale(14); opacity: 0; }
-
 @media (prefers-reduced-motion: reduce) {
   .cover .door, .cover .door span { transition: none !important; }
   .cover { transition: opacity .3s; }
