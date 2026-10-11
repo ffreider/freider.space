@@ -564,7 +564,11 @@ window.Core = (() => {
     let ema = 16, lastAdapt = 0, trial = null, cooldownUntil = 0;
     const born = performance.now();
     const level = () => (moving ? "moving" : "still");
-    function apply() { scale = Math.min(levels.still, levels[level()]); resize(); }
+    // A new size is applied at the start of the next draw, never after one:
+    // resizing a canvas clears it, and clearing it after drawing showed a blank
+    // frame (the flicker).
+    let pending = false;
+    function apply() { scale = Math.min(levels.still, levels[level()]); pending = true; }
     function adapt(now, dt) {
       if (document.hidden || dt > 0.25) return;            // a paused tab says nothing about the GPU
       ema = ema * 0.9 + dt * 1000 * 0.1;
@@ -581,16 +585,22 @@ window.Core = (() => {
         levels[k] = Math.min(maxScale, levels[k] * 1.1); apply();
       }
     }
+    // Moving starts at once but only ends after the view has been still for
+    // a moment, so the end of a scroll doesn't flip the resolution back and forth.
+    let stillSince = 0;
     function setMoving(m) {
-      if (m === moving) return;
-      moving = m; trial = null; lastAdapt = performance.now(); apply();
+      const now = performance.now();
+      if (m) stillSince = 0; else if (moving && !stillSince) stillSince = now;
+      const next = m || (moving && now - stillSince < 400);
+      if (next === moving) return;
+      moving = next; trial = null; lastAdapt = now; apply();
     }
     function resize() {
       const w = Math.max(1, Math.round(canvas.clientWidth * scale)), h = Math.max(1, Math.round(canvas.clientHeight * scale));
       if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
     }
     resize();
-    window.addEventListener("resize", resize);
+    window.addEventListener("resize", () => { pending = true; });
 
     // optional probe target
     let fbo = null; const px = new Uint8Array(4);
@@ -615,6 +625,7 @@ window.Core = (() => {
       }
     }
     function draw(vals, dt) {
+      if (pending) { pending = false; resize(); }
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       gl.viewport(0, 0, canvas.width, canvas.height);
       setU(vals); gl.uniform1i(U.uMode, 0);

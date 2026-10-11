@@ -576,17 +576,19 @@
   const TAG = { 2048: "2k", 4096: "4k", 8192: "8k" };
 
   // The cover (markup.ts) opens once the first maps are on screen: no sooner
-  // than COVER_MIN after the page started loading, so "Hi" doesn't just flash,
+  // than COVER_MIN after the page started loading, so the greeting can be read,
   // and no later than COVER_MAX, slow connection or not.
-  const COVER_MIN = 700, COVER_MAX = 5000;
+  const COVER_MIN = 1200, COVER_MAX = 5000;
   let coverOpen = false;
   function openCover() {
     if (coverOpen) return;
     coverOpen = true;
     const cover = $("cover"); if (!cover) return;
+    const style = new URLSearchParams(location.search).get("cover");
+    cover.dataset.style = ["curtain", "through"].includes(style) ? style : "doors";
     setTimeout(() => {
       cover.classList.add("open");
-      setTimeout(() => cover.remove(), 1200);         // free its layers once the doors are gone
+      setTimeout(() => cover.remove(), 1600);         // free its layers once it's gone
     }, Math.max(0, COVER_MIN - performance.now()));
   }
   setTimeout(openCover, Math.max(0, COVER_MAX - performance.now()));
