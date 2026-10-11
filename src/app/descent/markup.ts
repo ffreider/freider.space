@@ -50,7 +50,7 @@ body.can-drag main { -webkit-user-select: none; user-select: none; }
 }
 .card h4 { margin: 0; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font: 600 16px/1.3 var(--f-body); color: var(--ink); }
 .card h4 .lv { color: var(--fs); display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
-.card h4 .lv::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
+.card h4 .lv::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .card .cdesc { margin: 0; font: 400 14px/1.5 var(--f-body); color: var(--ink-2); }
 .card #live { margin: 0; font: 500 15px/1.45 var(--f-body); color: var(--ink); }
 #cardMap { display: block; width: 100%; aspect-ratio: 2 / 1; height: auto; border-radius: 8px; }
@@ -73,6 +73,7 @@ body.can-drag main { -webkit-user-select: none; user-select: none; }
 body.looking { cursor: grabbing; user-select: none; }
 
 .top { position: fixed; z-index: 6; top: calc(16px + env(safe-area-inset-top, 0px)); left: var(--gutter); right: var(--gutter); display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+.top::before { content: ""; position: absolute; z-index: -1; left: calc(-1 * var(--gutter)); right: calc(-1 * var(--gutter)); top: calc(-16px - env(safe-area-inset-top, 0px)); height: calc(84px + env(safe-area-inset-top, 0px)); background: linear-gradient(rgba(var(--haze), .92) 40%, rgba(var(--haze), 0)); }
 .mark { font: 600 15px/1 var(--f-body); color: var(--ink); pointer-events: auto; text-decoration: none; }
 /* the other language: a plain link, like the rest */
 .chip { pointer-events: auto; font: 500 15px/1 var(--f-body); color: var(--ink-2); padding: 8px 0; text-decoration: none; }
@@ -95,6 +96,7 @@ body.riding .route { display: none; }
 main { position: relative; z-index: 2; }
 section { padding-inline: var(--gutter); }
 .col { max-width: 600px; }
+@media (min-width: 901px) { main .col { max-width: min(600px, calc(100vw - min(340px, 32vw) - 3 * var(--gutter))); } }
 .stop { font: 500 13px/1.5 var(--f-data); color: var(--ink-3); margin: 0 0 22px; max-width: 54ch; }
 .stop b { color: var(--ink); font-weight: 500; display: block; margin-bottom: 4px; }
 h2 { font-family: var(--f-display); font-weight: 800; font-size: clamp(40px, 5.2vw, 68px); line-height: .94; letter-spacing: -0.03em; margin: 0 0 22px; }
@@ -215,7 +217,8 @@ input[type="range"] { width: 100%; accent-color: var(--fs); }
 .note { font-size: 13.5px; color: var(--ink-3); }
 .fs-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; font-size: 13.5px; color: var(--ink-3); }
 .fs-foot a { font: 500 14px/1 var(--f-data); color: var(--fs); }
-footer { position: relative; z-index: 2; padding: 0 var(--gutter) calc(14px + env(safe-area-inset-bottom, 0px)); color: var(--ink-4); font-size: 12px; text-align: right; }
+footer { position: relative; z-index: 2; padding: 0 var(--gutter) calc(20px + env(safe-area-inset-bottom, 0px)); color: var(--ink-3); font-size: 13px; line-height: 1.5; }
+footer p { max-width: 60ch; }
 
 @media (max-width: 900px) {
   .side { left: var(--gutter); width: auto; top: auto; max-height: 34vh; }
@@ -265,7 +268,7 @@ export const DESCENT_BODY = String.raw`
   <section class="card" id="card">
     <h4 id="cardTitle"></h4>
     <p class="cdesc" id="cardDesc"></p>
-    <p id="live" aria-live="polite" hidden></p>
+    <p id="live" hidden></p>
     <canvas id="cardMap" hidden></canvas>
     <div class="views" id="views" hidden><div id="viewBtns" role="group" aria-label="View" style="display:flex;flex-wrap:wrap;gap:4px"></div></div>
     <dl id="cardRows"></dl>

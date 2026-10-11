@@ -20,6 +20,16 @@ const json = (value: unknown) => JSON.stringify(value).replace(/</g, "\\u003c");
 
 const NOW_WORD = { en: "now", no: "nå" };
 
+// The markup's accessible labels, in Norwegian for /no.
+const LABELS_NO: Record<string, string> = {
+  "What you are passing": "Det du passerer",
+  Stops: "Stopp",
+  View: "Visning",
+  "FramSat-1 tracker": "FramSat-1-sporing",
+  "Globe showing FramSat-1's position and ground track. Drag to turn it.": "Globus med FramSat-1s posisjon og bakkespor. Dra for å snu den.",
+  "Time offset in minutes": "Tidsforskyvning i minutter",
+};
+
 const period = (start: YearMonth, end: YearMonth | undefined, lang: Lang) =>
   end
     ? start[0] === end[0]
@@ -80,6 +90,7 @@ function fill(text: (typeof TEXT)["en"], timeline: Entry[], lang: Lang) {
       )
       .replace(`href="/framsat"`, lang === "no" ? `href="/no/framsat"` : `href="/framsat"`)
       .replaceAll("__HI__", lang === "no" ? "Hei der :)" : "Hi there :)")
+      .replace(/aria-label="([^"]+)"/g, (whole, label: string) => (lang === "no" && LABELS_NO[label] ? `aria-label="${LABELS_NO[label]}"` : whole))
   );
 }
 

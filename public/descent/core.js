@@ -104,6 +104,38 @@ window.Core = (() => {
   function onLang(f) { listeners.push(f); }
   function setLang(l) { lang = l; render(); }
 
+  // Water that isn't in a country: seas inside or beside the continents, as rough boxes (south, north, west,
+  // east). Only asked when the point isn't in a country, so a box may overlap
+  // land; where boxes overlap, the first wins. Without these, the ocean guess
+  // called the Black Sea "the Pacific Ocean". Shared by the card (main.js)
+  // and the tracker, so they never disagree.
+  const SEAS = [
+    [40.8, 46.8, 27.3, 41.8, { en: "the Black Sea", no: "Svartehavet" }],
+    [36.5, 47.2, 46.5, 54.8, { en: "the Caspian Sea", no: "Det kaspiske hav" }],
+    [23.8, 30.5, 47.5, 56.5, { en: "the Persian Gulf", no: "Persiabukta" }],
+    [12.5, 30.0, 32.0, 43.5, { en: "the Red Sea", no: "Rødehavet" }],
+    [30.0, 46.0, -6.0, 36.5, { en: "the Mediterranean Sea", no: "Middelhavet" }],
+    [53.5, 66.0, 9.5, 30.5, { en: "the Baltic Sea", no: "Østersjøen" }],
+    [51.0, 61.5, -4.5, 9.5, { en: "the North Sea", no: "Nordsjøen" }],
+    [61.5, 72.0, -10.0, 16.0, { en: "the Norwegian Sea", no: "Norskehavet" }],
+    [69.0, 80.0, 16.0, 60.0, { en: "the Barents Sea", no: "Barentshavet" }],
+    [18.0, 31.0, -98.0, -80.5, { en: "the Gulf of Mexico", no: "Mexicogolfen" }],
+    [9.0, 22.0, -88.0, -59.5, { en: "the Caribbean Sea", no: "Karibhavet" }],
+    [51.0, 64.0, -95.0, -76.5, { en: "Hudson Bay", no: "Hudsonbukta" }],
+    [34.0, 52.0, 127.0, 142.5, { en: "the Sea of Japan", no: "Japanhavet" }],
+  ];
+  function oceanName(lat, lon) {
+    for (const [la0, la1, lo0, lo1, name] of SEAS) if (lat >= la0 && lat <= la1 && lon >= lo0 && lon <= lo1) return name[lang];
+    const o = S().ocean;
+    if (lat > 66) return o.arctic;
+    if (lat < -60) return o.southern;
+    if (lat < -30 && lon > 20 && lon < 147) return o.indian;
+    if (lon >= -70 && lon <= 20) return o.atlantic;
+    if (lon > -100 && lon < -70 && lat > 8) return o.atlantic;
+    if (lon > 20 && lon < 120 && lat < 25) return o.indian;
+    return o.pacific;
+  }
+
   /* ---------- experience ---------- */
   const FIRST = 2019, LAST = 2027;
   const toY = ([y, m]) => y + (m - 1) / 12;
@@ -281,13 +313,7 @@ window.Core = (() => {
           return f.properties.name;
         }
       }
-      const o = s.ocean;
-      if (lat > 66) return o.arctic;
-      if (lat < -60) return o.southern;
-      if (lon >= -70 && lon <= 20) return o.atlantic;
-      if (lon > -100 && lon < -70 && lat > 8) return o.atlantic;
-      if (lon > 20 && lon < 120 && lat < 25) return o.indian;
-      return o.pacific;
+      return oceanName(lat, lon);
     }
     const fmtTime = ms => new Date(ms).toLocaleTimeString(S().locale, { hour: "2-digit", minute: "2-digit" });
     const fmtNum = (n, d) => n.toLocaleString(S().locale, { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -312,11 +338,8 @@ window.Core = (() => {
       const s = S(), d = new Date(now);
       const p = sat(d), p2 = sat(new Date(now + 10000));
       if (!p || !p2) return;
-      const dir = p2.lat >= p.lat ? s.north : s.south;
-      const place = placeName(p.lat, p.lon);
       const alt = Math.round(p.alt);
       const diff = (now - Date.now()) / 60000;
-      setText("live", Math.abs(diff) < 1 ? s.liveNow(alt, place, dir, fmtNum(p.spd, 1)) : s.liveAt(fmtTime(now), diff > 0 ? s.inH(diff) : s.agoH(diff), alt, place, dir));
       setText("clock", new Date(now).toLocaleString(s.locale, { weekday: "short", hour: "2-digit", minute: "2-digit", second: speed ? undefined : "2-digit" }));
       setText("tLat", `${fmtNum(Math.abs(p.lat), 2)}° ${p.lat >= 0 ? "N" : "S"}`);
       setText("tLon", `${fmtNum(Math.abs(p.lon), 2)}° ${p.lon >= 0 ? "E" : s.west}`);
@@ -671,7 +694,7 @@ window.Core = (() => {
   }
 
   return {
-    get lang() { return lang; }, S, setLang, onLang, extend, render,
+    get lang() { return lang; }, S, setLang, onLang, extend, render, oceanName,
     inferno, magma, turbo, oiii, css, gradient, clamp01, fmtDur,
     setBarGradient: g => { barGradient = g; },
     createGlobe, createField,
