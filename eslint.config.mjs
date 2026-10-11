@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Plain browser scripts of the descent, loaded as they are.
+    "public/**",
   ]),
 ]);
 

@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { framsatTle } from "@/lib/framsat-tle";
 import { recentReceptions } from "@/lib/satnogs";
+import { Backdrop } from "./backdrop";
 import { FramsatSection } from "./framsat";
 import { TEXT } from "./home";
 import type { Lang } from "./i18n";
+import { LaunchEasterEgg } from "./launch";
 
 // The FramSat-1 tracker on a page of its own (/framsat and /no/framsat), so
-// it can be found and linked to directly. The background globe opens up
-// fully because the section starts at the top of the page.
+// it can be found and linked to directly. It keeps the light design with the
+// background globe, which opens up fully because the section starts at the top
+// of the page.
 
 const NAV = {
   en: { home: "/", other: { label: "Norsk", href: "/no/framsat", lang: "nb" } },
@@ -46,14 +49,16 @@ export async function FramsatPage({ lang }: { lang: Lang }) {
 
   return (
     <div lang={lang === "no" ? "nb" : "en"} className="contents">
+      <Backdrop tle={tle} stations={receptions} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData(lang)) }}
       />
       <nav className="flex w-full items-baseline justify-between px-6 pt-6 text-sm sm:px-8">
-        <Link href={nav.home} className="display text-base">
+        {/* A full page load: the homepage's descent sets up its own page. */}
+        <a href={nav.home} className="display text-base">
           Freider Fløan
-        </Link>
+        </a>
         <Link href={nav.other.href} hrefLang={nav.other.lang} lang={nav.other.lang} className="text-fg-3 hover:text-fg">
           {nav.other.label}
         </Link>
@@ -62,8 +67,9 @@ export async function FramsatPage({ lang }: { lang: Lang }) {
       <FramsatSection tle={tle} receptions={receptions} lang={lang} standalone />
 
       <footer className="mx-auto w-full max-w-3xl px-6 pb-12 sm:px-8">
-        <p className="text-xs text-fg-4">{TEXT[lang].privacy}</p>
+        <p className="text-xs text-fg-4">{TEXT[lang].privacyTracker}</p>
       </footer>
+      <LaunchEasterEgg />
     </div>
   );
 }
