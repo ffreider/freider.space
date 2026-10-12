@@ -182,6 +182,7 @@ p { margin: 0; }
   position: absolute; left: 0; right: 0; bottom: 0; margin: 0; max-width: none; padding: 28px 12px 10px; border-radius: 0 0 8px 8px;
   font-size: 13px; line-height: 1.45; color: var(--ink); background: linear-gradient(rgba(4, 8, 16, 0), rgba(4, 8, 16, .82) 55%);
   opacity: 0; transform: translateY(4px); transition: opacity .3s var(--ease), transform .3s var(--ease); pointer-events: none; }
+.shots figcaption { padding: 22px 10px 8px; font-size: 12px; line-height: 1.4; }   /* small thumbnails: a lighter touch */
 .shots figcaption a, .photo figcaption a { color: var(--ink); text-decoration-color: var(--fs); white-space: nowrap; pointer-events: auto; }
 .shots figure:hover figcaption, .shots figure:focus-within figcaption, .photo:hover figcaption, .photo:focus-within figcaption { opacity: 1; transform: none; }
 .shot:hover img { filter: brightness(.92); }
