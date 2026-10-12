@@ -218,7 +218,8 @@ window.Core = (() => {
   function render() {
     const s = S();
     document.documentElement.lang = lang === "no" ? "nb" : "en";
-    document.querySelectorAll("[data-t]").forEach(n => { const v = s[n.dataset.t]; if (typeof v === "string") n.textContent = v; });
+    const keepUnits = v => v.replace(/(\d) (?=(km\/s|km|ms|kg|s|min|h|%)(?![\w]))/g, "$1\u00a0");   // as on the server
+    document.querySelectorAll("[data-t]").forEach(n => { const v = s[n.dataset.t]; if (typeof v === "string") n.textContent = keepUnits(v); });
     const $ = id => document.getElementById(id);
     if ($("langBtn")) $("langBtn").textContent = s.other;
     if ($("trackerLink")) $("trackerLink").href = s.trackerHref;

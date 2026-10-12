@@ -15,6 +15,9 @@ import { DESCENT_BODY, DESCENT_CSS } from "./markup";
 const escape = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+// A number never parts from its unit at a line break ("35,786 km").
+const keepUnits = (s: string) => s.replace(/(\d) (?=(km\/s|km|ms|kg|s|min|h|%)(?![\w]))/g, "$1\u00a0");
+
 // JSON that is safe to place inside a <script> element.
 const json = (value: unknown) => JSON.stringify(value).replace(/</g, "\\u003c");
 
@@ -71,11 +74,11 @@ function fill(text: (typeof TEXT)["en"], timeline: Entry[], lang: Lang) {
     DESCENT_BODY
       // <tag data-t="key"></tag>: plain text
       .replace(/(<([a-z0-9]+)\b[^>]*\bdata-t="(\w+)"[^>]*>)(<\/\2>)/g, (whole, open, _tag, key, close) =>
-        typeof strings[key] === "string" ? open + escape(strings[key] as string) + close : whole,
+        typeof strings[key] === "string" ? open + keepUnits(escape(strings[key] as string)) + close : whole,
       )
       // <tag data-h="key"></tag>: HTML (links)
       .replace(/(<([a-z0-9]+)\b[^>]*\bdata-h="(\w+)"[^>]*>)(<\/\2>)/g, (whole, open, _tag, key, close) =>
-        typeof strings[key] === "string" ? open + strings[key] + close : whole,
+        typeof strings[key] === "string" ? open + keepUnits(strings[key] as string) + close : whole,
       )
       .replace(`<ul class="roles" id="roles"></ul>`, `<ul class="roles" id="roles">${rolesHtml(timeline, lang)}</ul>`)
       .replace(

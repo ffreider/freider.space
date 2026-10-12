@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Home } from "../home";
 
 // Search results get a descriptive title and description; link previews
@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image", title: "Freider Fløan", description: tagline },
 };
+
+// The phone browser's bars in polar night, like the page.
+export const viewport: Viewport = { themeColor: "#0a1220" };
 
 export default function Page() {
   return <Home lang="no" />;

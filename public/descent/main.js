@@ -218,6 +218,9 @@
   const fmtN = (n, d) => n.toLocaleString(C.S().locale, { minimumFractionDigits: d, maximumFractionDigits: d });
   const fmtMin = m => { if (m < 1) return C.lang === "en" ? "under a minute" : "under ett minutt"; m = Math.round(m); const h = Math.floor(m / 60); return h ? `${h} h ${String(m % 60).padStart(2, "0")} min` : `${m} min`; };
   const fmtTime = ms => new Date(ms).toLocaleTimeString(C.S().locale, { hour: "2-digit", minute: "2-digit" });
+  // A number never parts from its unit at a line break, and negatives get a
+  // real minus sign.
+  const nb = t => String(t).replace(/(\d) (?=(km\/s|km\/h|km|ms|s|min|h|m\/|MHz|days|dager|kg|%)(?![\w]))/g, "$1\u00a0").replace(/(^|[\s(])-(?=\d)/g, "$1\u2212");
   const lc = t => t[0].toLowerCase() + t.slice(1);          // "Seen from Trondheim" -> "seen from Trondheim"
   const pct = n => C.lang === "en" ? `${n}%` : `${n} %`;   // "4%" in English, "4 %" in Norwegian
   const fmtWhen = ms => new Date(ms).toLocaleString(C.S().locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -308,7 +311,7 @@
   const azName = az => (C.lang === "en" ? ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] : ["N", "NØ", "Ø", "SØ", "S", "SV", "V", "NV"])[Math.round(az / 45) % 8];
   const skyText = l => l.el > 0 ? `${fmtN(l.el, 1)}° ${C.lang === "en" ? "up" : "opp"}, ${Math.round(l.az)}° ${azName(l.az)}` : (C.lang === "en" ? `below the horizon (${Math.round(l.el)}°)` : `under horisonten (${Math.round(l.el)}°)`);
   function tipHTML(title, subline, desc, rows) {
-    return `<b>${title}</b>${subline ? `<span class="m">${subline}</span>` : ""}${desc ? `<p>${desc}</p>` : ""}${rows && rows.length ? `<dl>${rows.filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>` : ""}`;
+    return `<b>${title}</b>${subline ? `<span class="m">${nb(subline)}</span>` : ""}${desc ? `<p>${nb(desc)}</p>` : ""}${rows && rows.length ? `<dl>${rows.filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${nb(v)}</dd>`).join("")}</dl>` : ""}`;
   }
   // orbit facts that are easy to compute and rarely shown
   function orbitExtras(name, ms) {
@@ -1086,11 +1089,27 @@
   }
 
   /* ---------- text with a dark halo, so labels read over bright terrain ---------- */
+  // Scene labels fade in over 0.3 s when they come into view instead of
+  // popping, and sit on whole device pixels so the small type stays crisp.
+  // A label is known by its words (digits aside), so live numbers in it don't
+  // restart the fade.
+  const labelSeen = new Map();
+  let labelNow = 0, labelFrame = 0;
   function haloText(t, x, y, color, font) {
+    const key = String(t).replace(/[\d.,\s\u00a0\u2212-]+/g, "#");
+    let e = labelSeen.get(key);
+    if (!e || labelFrame - e.frame > 1) { e = { start: labelNow, frame: labelFrame }; labelSeen.set(key, e); }   // not drawn last frame: fade in again
+    e.frame = labelFrame;
+    const ga = og.globalAlpha, f = C.reduceMotion ? 1 : smooth((labelNow - e.start) / 300);
+    if (f <= 0.01) return;
+    og.globalAlpha = ga * f;
+    x = Math.round(x * dprO) / dprO; y = Math.round(y * dprO) / dprO;
     og.font = font || `500 11px ${MONO}`;
     og.lineJoin = "round"; og.lineWidth = 3.5; og.strokeStyle = "rgba(0,0,0,0.85)";
     og.strokeText(t, x, y);
     og.fillStyle = color; og.fillText(t, x, y);
+    og.globalAlpha = ga;
+    if (labelSeen.size > 600) for (const [k, v] of labelSeen) if (labelFrame - v.frame > 120) labelSeen.delete(k);
   }
 
   /* ---------- FramSat-1, a 1U CubeSat, in front of the lens ---------- */
@@ -1552,7 +1571,34 @@
   // A card's numbers as [label, value] pairs: the first is the standout
   // number, the next three show, the rest wait behind "More numbers".
   const rows = pairs => pairs.filter(Boolean);
-  const dl = pairs => pairs.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+  const dl = pairs => pairs.map(([k, v]) => `<dt>${k}</dt><dd>${nb(v)}</dd>`).join("");
+  // The standout number rolls to each new value instead of jumping: the
+  // first number in the text is eased over 0.6 s, the rest stays as it is.
+  const rolling = new Set();
+  function parseNum(t) {
+    const m = t.match(/[\u2212-]?\d[\d,.\u00a0\u202f ]*\d|\d/); if (!m) return null;
+    const en = C.lang === "en", raw = m[0].replace(/\u2212/, "-");
+    const dec = en ? "." : ",", grp = en ? /,/g : /[\u00a0\u202f ]/g;
+    const clean = raw.replace(grp, ""), i = clean.indexOf(dec);
+    return { pre: t.slice(0, m.index), post: t.slice(m.index + m[0].length), v: parseFloat(clean.replace(dec, ".")), d: i < 0 ? 0 : clean.length - i - 1 };
+  }
+  function roll(el, text) {
+    text = nb(text);
+    const p = parseNum(text), r = el._roll;
+    if (C.reduceMotion || !p || !r || r.pre !== p.pre || r.post !== p.post || r.d !== p.d || Math.abs(p.v - r.to) > Math.max(5000, Math.abs(r.to) * 0.05)) {
+      el._roll = p && { ...p, from: p ? p.v : 0, to: p ? p.v : 0, t0: 0 }; el.textContent = text; rolling.delete(el); return;
+    }
+    if (p.v === r.to) return;
+    r.from = r.cur ?? r.to; r.to = p.v; r.t0 = performance.now(); rolling.add(el);
+  }
+  function rollTick(now) {
+    for (const el of rolling) {
+      const r = el._roll, t = Math.min(1, (now - r.t0) / 600), e = 1 - Math.pow(1 - t, 3);
+      r.cur = r.from + (r.to - r.from) * e;
+      el.textContent = nb(r.pre + r.cur.toLocaleString(C.S().locale, { minimumFractionDigits: r.d, maximumFractionDigits: r.d }) + r.post);
+      if (t >= 1) { r.cur = r.to; rolling.delete(el); }
+    }
+  }
   // Phones: each stop's card sits in the page, at the start of the stop's
   // text (the .slot elements), so cards and text take turns instead of the
   // card covering the text. The cards are copies of the side panel's.
@@ -1656,9 +1702,17 @@
     }
     const d = stopDesc[stopIdx] || { title, text: "" };
     q("c-title").innerHTML = `<span>${d.title}</span><span class="lv">${C.lang === "en" ? "Live" : "Direkte"}</span>`;
-    if (q("c-desc").dataset.v !== d.text) { q("c-desc").textContent = d.text; q("c-desc").dataset.v = d.text; }
+    if (q("c-desc").dataset.v !== d.text) { q("c-desc").textContent = nb(d.text); q("c-desc").dataset.v = d.text; }
+    // a new stop: the card's content fades in rather than swapping in place
+    if (root.dataset.view !== String(stopIdx) && root.dataset.view !== undefined && !C.reduceMotion) { root.classList.remove("swap"); void root.offsetWidth; root.classList.add("swap"); }
     const [hero, ...rest] = body, shown = rest.slice(0, 3), extra = rest.slice(3);
-    q("c-stat").innerHTML = hero ? `<span class="stat-v">${hero[1]}</span><span class="stat-k">${hero[0]}</span>` : "";
+    const stat = q("c-stat");
+    if (!hero) stat.replaceChildren();
+    else {
+      if (!stat.firstChild) stat.innerHTML = `<span class="stat-v"></span><span class="stat-k"></span>`;
+      if (root.dataset.view !== String(stopIdx)) stat.firstChild._roll = null;          // another stop's number: no roll from it
+      roll(stat.firstChild, hero[1]); stat.lastChild.textContent = hero[0];
+    }
     q("c-rows").innerHTML = dl(shown);
     q("c-more-rows").innerHTML = dl(extra);
     q("c-more-rows").hidden = !open || !extra.length;
@@ -1816,6 +1870,7 @@
     if (!draggable() || document.body.classList.contains("tracker-open") || blocked(e.target)) return;
     if (e.pointerType === "touch" && (curStop !== 5 || e.clientY > VH())) return;
     dragging = { x: e.clientX, y: e.clientY, az: moonLook.taz, el: moonLook.tel, yaw: ride.tyaw, pitch: ride.tpitch };
+    hasDragged = true;
     document.body.classList.add("looking");
   });
   window.addEventListener("pointermove", e => {
@@ -1853,8 +1908,18 @@
       tip.classList.add("on");
     } else tip.classList.remove("on");
     document.body.classList.toggle("can-point", !!hit);
-    document.body.classList.toggle("can-drag", !hit && draggable() && !!mouse && !(mouse.target && blocked(mouse.target)));
+    const canDrag = !hit && draggable() && !!mouse && !(mouse.target && blocked(mouse.target));
+    document.body.classList.toggle("can-drag", canDrag);
+    // a small "drag" cue by the cursor until you've tried it once
+    const showCue = canDrag && !hasDragged && !dragging;
+    if (showCue) {
+      dragCue.textContent = curStop === 0 ? (C.lang === "en" ? "Drag to turn" : "Dra for å snu") : (C.lang === "en" ? "Drag to fly around" : "Dra for å fly rundt");
+      dragCue.style.transform = `translate(${Math.round(mouse.x + 18)}px, ${Math.round(mouse.y + 18)}px)`;
+    }
+    dragCue.classList.toggle("on", showCue);
   }
+  const dragCue = $("dragCue");
+  let hasDragged = false;
 
   /* ---------- labels clear of the text ----------
      Scene labels and lines are thinned out where the text column is, so they
@@ -1897,6 +1962,7 @@
   const angDiff = (a, b) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
   function frame(now) {
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    labelNow = now; labelFrame++; rollTick(now);
     clock += dt;
     const k = C.reduceMotion ? 1 : 1 - Math.exp(-dt * 5);
     yS += (yT - yS) * k; if (Math.abs(yT - yS) < 0.3) yS = yT;
@@ -1954,7 +2020,7 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", () => { sizeOverlay(); layout(); onScroll(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layout(); onScroll(); });
-  const renderHtml = () => document.querySelectorAll("[data-h]").forEach(el => { el.innerHTML = C.S()[el.dataset.h]; });
+  const renderHtml = () => document.querySelectorAll("[data-h]").forEach(el => { el.innerHTML = nb(C.S()[el.dataset.h]); });
   C.onLang(() => { buildRoute(); stopTexts(Date.now()); lastCard = 0; renderHtml(); });
 
   C.render(); renderHtml();

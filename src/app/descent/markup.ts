@@ -21,13 +21,25 @@ export const DESCENT_CSS = String.raw`
   --f-body: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
   --f-data: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
   --gutter: clamp(18px, 4.5vw, 72px);
+  --ease: cubic-bezier(.2, .7, .2, 1);      /* one curve and pace for everything that moves */
+  --t: .45s;
   color-scheme: dark;
 }
 [hidden] { display: none !important; }
 body { background: var(--void); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-a { color: inherit; text-decoration: underline; text-decoration-color: var(--ink-4); text-underline-offset: 4px; }
-a:hover { text-decoration-color: var(--ink); }
-:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+a { color: inherit; text-decoration: underline; text-decoration-color: var(--ink-4); text-decoration-thickness: 1px; text-underline-offset: 4px;
+  transition: text-decoration-color .25s var(--ease), text-underline-offset .25s var(--ease); }
+a:hover { text-decoration-color: var(--ink); text-underline-offset: 2.5px; }
+:focus-visible { outline: 2px solid rgba(169, 214, 255, .85); outline-offset: 3px; border-radius: 6px; }
+h1, h2, h3, h4 { text-wrap: balance; }
+p, li, dd { text-wrap: pretty; }
+/* buttons give a little when pressed */
+button { transition: transform .15s var(--ease), background-color .25s var(--ease), color .25s var(--ease), border-color .25s var(--ease); }
+button:active { transform: scale(.97); }
+.drag-cue { position: fixed; z-index: 7; left: 0; top: 0; pointer-events: none; font: 500 12.5px/1 var(--f-body); color: var(--ink);
+  background: rgba(var(--haze), .85); border: 1px solid var(--rule); border-radius: 999px; padding: 7px 11px; opacity: 0; transition: opacity .25s var(--ease); }
+.drag-cue.on { opacity: 1; transition-delay: .35s; }
+@media (pointer: coarse) { .drag-cue { display: none; } }
 
 #field, #overlay { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 #field { z-index: 0; }
@@ -45,9 +57,17 @@ body.can-point { cursor: pointer; }
 #field, #overlay, #cube { -webkit-user-select: none; user-select: none; }
 body.can-drag main { -webkit-user-select: none; user-select: none; }
 .card {
-  margin-top: auto; padding: 14px 16px 16px; display: grid; gap: 10px; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  margin-top: auto; padding: 16px; display: grid; gap: 12px; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
   background: var(--panel); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-radius: 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 12px 32px -14px rgba(0, 0, 0, .55);   /* light catching the top edge */
 }
+/* a new stop's card fades up into place; the extra numbers open rather than jump */
+.card.swap > * { animation: card-in var(--t) var(--ease) both; }
+.card.swap > :nth-child(n+3) { animation-delay: .04s; }
+.card.swap > :nth-child(n+6) { animation-delay: .08s; }
+@keyframes card-in { from { opacity: 0; transform: translateY(4px); } }
+.card dl.more:not([hidden]) { overflow: hidden; animation: more-in var(--t) var(--ease) both; }
+@keyframes more-in { from { max-height: 0; opacity: 0; } to { max-height: 900px; opacity: 1; } }
 .card h4 { margin: 0; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font: 600 16px/1.3 var(--f-body); color: var(--ink); }
 .card h4 .lv { color: var(--fs); display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
 .card h4 .lv::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
@@ -69,9 +89,9 @@ body.can-drag main { -webkit-user-select: none; user-select: none; }
 .tip {
   position: fixed; z-index: 7; left: 0; top: 0; max-width: 340px; pointer-events: none; padding: 12px 14px;
   background: rgba(var(--haze), .92); border-radius: 12px; font: 400 14px/1.45 var(--f-data); color: var(--ink-2);
-  opacity: 0; transition: opacity .15s;
+  opacity: 0; transition: opacity .2s var(--ease);
 }
-.tip.on { opacity: 1; }
+.tip.on { opacity: 1; transition-delay: .12s; }   /* a moment's pause, so passing the mouse over doesn't flicker */
 .tip b { display: block; font: 500 12.5px/1.3 var(--f-body); color: var(--ink); margin-bottom: 3px; }
 .tip .m { display: block; color: var(--ink-3); margin-bottom: 6px; }
 .tip p { margin: 0 0 8px; font: 400 13px/1.45 var(--f-body); color: var(--ink-2); }
@@ -169,7 +189,7 @@ p { margin: 0; }
 .hud {
   position: fixed; z-index: 5; left: var(--gutter); bottom: calc(var(--gutter) * .7 + env(safe-area-inset-bottom, 0px));
   width: min(520px, calc(100vw - 2 * var(--gutter) - 380px)); display: grid; gap: 14px; max-height: calc(100vh - 90px); overflow-y: auto;
-  opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .6s, transform .6s;
+  opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .6s var(--ease), transform .6s var(--ease);
 }
 body.live-lock .hud { opacity: 1; transform: none; pointer-events: auto; cursor: auto; }
 /* a soft pool of polar night behind the panel, so it reads over the bright Earth */
@@ -208,7 +228,7 @@ body.live-lock footer { visibility: hidden; }
 .drawer {
   position: fixed; z-index: 8; top: 0; right: 0; bottom: 0; width: min(560px, 100vw);
   background: rgba(var(--haze), .95); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-left: 1px solid var(--rule);
-  transform: translateX(102%); transition: transform .45s cubic-bezier(.2,.7,.2,1); overflow-y: auto; overscroll-behavior: contain;
+  transform: translateX(102%); transition: transform var(--t) var(--ease); overflow-y: auto; overscroll-behavior: contain;
   padding: calc(18px + env(safe-area-inset-top, 0px)) 24px calc(28px + env(safe-area-inset-bottom, 0px));
   display: grid; gap: 18px; align-content: start;
 }
@@ -269,7 +289,7 @@ footer p { max-width: 60ch; }
   footer, body.live-lock footer { display: none; }
 }
 }
-@media (prefers-reduced-motion: reduce) { .drawer, .hud { transition: none; } .hud .k::before { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .drawer, .hud, a, button, .tip, .drag-cue { transition: none; } .hud .k::before, .card.swap > *, .card dl.more { animation: none; } button:active { transform: none; } }
 /* The cover: a black screen that says hi while the scene loads, then opens
    like two doors, splitting the greeting across the seam (main.js adds .open
    when the first maps are in). Only transforms, so it costs next to nothing.
@@ -321,6 +341,7 @@ export const DESCENT_BODY = String.raw`
   </section>
 </aside>
 <div class="tip" id="tip" role="status"></div>
+<div class="drag-cue" id="dragCue" aria-hidden="true"></div>
 
 <main>
   <section class="hero" id="top" data-stop="0">

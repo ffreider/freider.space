@@ -29,8 +29,8 @@ export default async function OpenGraphImage() {
     readFile(join(process.cwd(), "public/freider.jpg")),
   ]);
 
-  // The same split as the homepage: the name huge on the left, the photo
-  // large on the right, on ice with one signal red.
+  // As the homepage opens: the name huge on the left on polar night, the
+  // photo on the right, one glacier-blue dot.
   return new ImageResponse(
     (
       <div
@@ -38,8 +38,8 @@ export default async function OpenGraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          backgroundColor: "#e7edf1",
-          color: "#16202a",
+          backgroundColor: "#0a1220",
+          color: "#eef2f5",
         }}
       >
         <div
@@ -65,11 +65,11 @@ export default async function OpenGraphImage() {
             <span>Fløan</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-            <div style={{ fontFamily: "Schibsted", fontSize: 40, lineHeight: 1.3, color: "#2a3642", maxWidth: 520 }}>
+            <div style={{ fontFamily: "Schibsted", fontSize: 40, lineHeight: 1.3, color: "rgba(238, 242, 245, 0.8)", maxWidth: 520 }}>
               {TAGLINE}
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, fontFamily: "Schibsted", fontSize: 26, color: "#56626e" }}>
-              <div style={{ width: 14, height: 14, borderRadius: 999, backgroundColor: "#d42a3c" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 16, fontFamily: "Schibsted", fontSize: 26, color: "#93a4b4" }}>
+              <div style={{ width: 14, height: 14, borderRadius: 999, backgroundColor: "#a9d6ff" }} />
               freider.space
             </div>
           </div>
