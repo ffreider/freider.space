@@ -81,6 +81,7 @@ export const timeline: Entry[] = [
     href: "https://norstec.no",
     photos: [
       { src: "norstec-napkin", w: 1600, h: 1067, caption: { en: "NORSTEC’s co-founders. I’m holding the napkin we signed in 2023.", no: "NORSTECs medgründere. Jeg holder servietten vi signerte i 2023." } },
+      { src: "spaceport-young", w: 1600, h: 900, caption: { en: "Receiving the Spaceport Young award at Spaceport Norway’s award dinner, 2024.", no: "Mottar Spaceport Young-prisen på Spaceport Norways prisutdeling i 2024." } },
     ],
     description: {
       en: "The Norwegian Space Technology Collective, an umbrella organization for 10 student space and rocketry organizations with 550+ members.",
@@ -196,6 +197,7 @@ export const TEXT = {
       "BSc, Economics and Business Administration, NTNU Business School",
     ],
     finishing: "Working on it... Finishing soon ish.",
+    aboutCaption: "Trying on a spacesuit from Nåva Space.",
     launchCaption: "Spectrum lifting off from Andøya on its second flight, with FramSat-1 on board. Photo: Isar Aerospace",
     joining: "Joining FramSat-1",
     whyHtml:
@@ -224,6 +226,7 @@ export const TEXT = {
       "Bachelor i økonomi og administrasjon, NTNU Handelshøyskolen",
     ],
     finishing: "Jobber med saken... Ferdig snart, sånn ca.",
+    aboutCaption: "Prøver en romdrakt fra Nåva Space.",
     launchCaption: "Spectrum letter fra Andøya på sin andre ferd, med FramSat-1 om bord. Foto: Isar Aerospace",
     joining: "Slår følge med FramSat-1",
     whyHtml:

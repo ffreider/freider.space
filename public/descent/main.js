@@ -1850,7 +1850,8 @@
       img.src = small.currentSrc || small.src;                      // the small one at once, then the large
       img.alt = small.alt; img.width = shot.dataset.pw; img.height = shot.dataset.ph;
       const big = new Image(); big.onload = () => { if (lightbox.open) img.src = big.src; }; big.src = shot.dataset.full;
-      lightbox.querySelector("p").textContent = small.alt;
+      const cap = shot.closest("figure") && shot.closest("figure").querySelector("figcaption");
+      lightbox.querySelector("p").textContent = cap ? cap.textContent : small.alt;
       lightbox.showModal();
       return;
     }

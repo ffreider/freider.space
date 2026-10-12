@@ -102,6 +102,10 @@ function fill(text: (typeof TEXT)["en"], timeline: Entry[], lang: Lang) {
       .replace(`href="/framsat"`, lang === "no" ? `href="/no/framsat"` : `href="/framsat"`)
       .replaceAll("__HI__", lang === "no" ? "Hei der :)" : "Hi there :)")
       .replace(
+        "__ABOUT_ALT__",
+        lang === "no" ? "Freider i en hvit romdrakt med hjelm, mellom to folk fra Nåva Space" : "Freider in a white spacesuit and helmet, between two people from Nåva Space",
+      )
+      .replace(
         "__LAUNCH_ALT__",
         lang === "no"
           ? "Isar Aerospaces Spectrum-rakett letter fra oppskytningsrampen på Andøya i flammer og røyk"
