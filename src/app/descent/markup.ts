@@ -171,7 +171,11 @@ p { margin: 0; }
 
 .article { display: grid; gap: 12px; text-decoration: none; background: var(--panel); border-radius: 12px; overflow: hidden; padding: 0 0 22px; max-width: 480px; }
 .article > *:not(img) { margin-inline: 20px; }
-.article img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; object-position: 50% 30%; display: block; margin-bottom: 4px; }
+.article img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; object-position: 50% 20%; display: block; margin-bottom: 4px; }
+/* the launch, under Joining FramSat-1 */
+.launch { margin: 32px 0 0; max-width: 560px; display: grid; gap: 10px; }
+.launch img { width: 100%; height: auto; display: block; border-radius: 8px; box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .7); }
+.launch figcaption { font-size: 13.5px; line-height: 1.5; color: var(--ink-3); max-width: 60ch; }
 .article .src { font: 500 14px/1 var(--f-body); color: var(--ink-3); }
 .article:hover { background: rgba(var(--haze), .75); }
 .article h3 { font-family: var(--f-display); font-weight: 800; letter-spacing: -0.02em; font-size: clamp(24px, 2.4vw, 32px); line-height: 1.08; margin-block: 0; overflow-wrap: break-word; text-wrap: balance; }
@@ -382,7 +386,7 @@ export const DESCENT_BODY = String.raw`
     <div class="col">
       <p class="meta" data-t="featured" style="margin-bottom:14px"></p>
       <a class="article" href="https://trondheim.com/journal/the-extracurricular-that-left-earth" target="_blank" rel="noopener">
-        <img src="/descent/article.jpg" alt="Freider Fløan, photographed for Trondheim.com" width="1000" height="600">
+        <img src="/descent/article.jpg" alt="Freider Fløan, photographed for Trondheim.com" width="1200" height="1200">
         <p class="src">trondheim.com</p>
         <h3>The extracurricular that left Earth</h3>
         <p class="meta" data-t="articleMeta"></p>
@@ -407,6 +411,10 @@ export const DESCENT_BODY = String.raw`
     <div class="col">
       <h2 data-t="joining"></h2>
       <p class="bio" data-h="whyHtml"></p>
+      <figure class="launch">
+        <img src="/descent/launch.jpg" alt="__LAUNCH_ALT__" width="1920" height="1281" loading="lazy" decoding="async">
+        <figcaption data-t="launchCaption"></figcaption>
+      </figure>
     </div>
     <div class="view"><div class="slot" data-slot="5"></div></div>
   </section>

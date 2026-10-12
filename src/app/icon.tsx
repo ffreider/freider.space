@@ -10,7 +10,6 @@ export const revalidate = 21600;
 export default function Icon() {
   const svg = moonSvg(64);
   return new ImageResponse(
-    // eslint-disable-next-line @next/next/no-img-element
     <img src={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`} width={64} height={64} alt="" />,
     size,
   );

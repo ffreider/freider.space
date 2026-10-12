@@ -177,6 +177,7 @@ export const TEXT = {
       "BSc, Economics and Business Administration, NTNU Business School",
     ],
     finishing: "Working on it... Finishing soon ish.",
+    launchCaption: "Spectrum lifting off from Andøya on its second flight, with FramSat-1 on board. Photo: Isar Aerospace",
     joining: "Joining FramSat-1",
     whyHtml:
       'A student satellite I worked on at <a href="https://orbitntnu.com/projects/FramSat-1" target="_blank" rel="noopener">Orbit NTNU</a>. It launched on 5 September 2026.',
@@ -204,6 +205,7 @@ export const TEXT = {
       "Bachelor i økonomi og administrasjon, NTNU Handelshøyskolen",
     ],
     finishing: "Jobber med saken... Ferdig snart, sånn ca.",
+    launchCaption: "Spectrum letter fra Andøya på sin andre ferd, med FramSat-1 om bord. Foto: Isar Aerospace",
     joining: "Slår følge med FramSat-1",
     whyHtml:
       'En studentsatellitt jeg jobbet med i <a href="https://orbitntnu.com/projects/FramSat-1" target="_blank" rel="noopener">Orbit NTNU</a>. Den ble skutt opp 5. september 2026.',

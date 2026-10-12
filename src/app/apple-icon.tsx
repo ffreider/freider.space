@@ -11,7 +11,6 @@ export const revalidate = 21600;
 export default function AppleIcon() {
   const svg = moonSvg(180, { tile: true });
   return new ImageResponse(
-    // eslint-disable-next-line @next/next/no-img-element
     <img src={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`} width={180} height={180} alt="" />,
     size,
   );

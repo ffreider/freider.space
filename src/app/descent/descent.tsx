@@ -93,6 +93,12 @@ function fill(text: (typeof TEXT)["en"], timeline: Entry[], lang: Lang) {
       )
       .replace(`href="/framsat"`, lang === "no" ? `href="/no/framsat"` : `href="/framsat"`)
       .replaceAll("__HI__", lang === "no" ? "Hei der :)" : "Hi there :)")
+      .replace(
+        "__LAUNCH_ALT__",
+        lang === "no"
+          ? "Isar Aerospaces Spectrum-rakett letter fra oppskytningsrampen på Andøya i flammer og røyk"
+          : "Isar Aerospace’s Spectrum rocket lifting off its pad on Andøya in fire and smoke",
+      )
       .replace(/aria-label="([^"]+)"/g, (whole, label: string) => (lang === "no" && LABELS_NO[label] ? `aria-label="${LABELS_NO[label]}"` : whole))
   );
 }
