@@ -790,9 +790,23 @@
     return { moon, mx, my, mz: ECL_N };
   }
 
+  // Desktop: the scene is centred in the free space between the text column
+  // and the side panel (measured, so it follows the layout), as a horizontal
+  // offset in the shader's units.
+  let freeAt = 0, freeShift = 0;
+  function sceneShift() {
+    if (narrow()) return 0;
+    if (performance.now() - freeAt > 1000) {
+      freeAt = performance.now();
+      const col = document.querySelector("main .band .col"), side = $("side");
+      const l = col ? col.getBoundingClientRect().right : VW() * 0.4, r = side ? side.getBoundingClientRect().left : VW() * 0.75;
+      freeShift = (2 * ((l + r) / 2) / VW() - 1) * (VW() / VH());
+    }
+    return freeShift;
+  }
   function stop(i, ms, drift) {
     const aspect = VW() / VH();
-    const sh = narrow() ? 0 : 0.22 * aspect;
+    const sh = sceneShift();
     if (i === 0) {
       // The real phase: the camera looks at the Moon along the line from
       // Earth, so it's lit as it is in tonight's sky (a thin crescent near new
@@ -809,7 +823,7 @@
       // then curve in towards Earth. The view turns round on the way (blend).
       const back = sub(pos, mul(F, 60000));
       const hop = [back, mul(back, 0.45)];
-      return { pos, F, U, half: portrait() ? 30 : 21, shift: sh * 0.8, hop };
+      return { pos, F, U, half: portrait() ? 30 : 21, shift: sh, hop };
     }
     if (i === 1) {
       // face-on to the ASBM orbital plane so the true shape shows, apogee (the Arctic) at the top
@@ -826,7 +840,7 @@
       const view = norm(add(add(mul(h, 0.94), mul([0, 0, 1], 0.18)), mul(side, 0.12 - 0.24 * drift)));
       const pos = add(center, mul(view, portrait() ? 150000 : 128000));
       const o = lookAt(pos, center, apoD);
-      return { pos, ...o, half: portrait() ? 36 : 26, shift: sh * 0.45, tgt: center };
+      return { pos, ...o, half: portrait() ? 36 : 26, shift: sh, tgt: center };
     }
     if (i === 2) {
       const t7 = sv("THOR 7", ms);
@@ -835,7 +849,7 @@
       const dir = [Math.cos(lon) * Math.cos(rad(16)), Math.sin(lon) * Math.cos(rad(16)), Math.sin(rad(16))];
       const pos = mul(dir, 128000);
       const o = lookAt(pos, [0, 0, 0], [0, 0, 1]);
-      return { pos, ...o, half: portrait() ? 36 : 24, shift: narrow() ? 0 : 0.42 * aspect };
+      return { pos, ...o, half: portrait() ? 36 : 24, shift: sh };
     }
     if (i === 3) {
       // look past Trondheim out into the Galileo shell
@@ -851,7 +865,7 @@
       const pos = add(add(s.r, mul(up, 2600)), mul(fwd, -3200 + drift * 600));
       const tgt = add(s.r, mul(fwd, 1400));
       const o = lookAt(pos, tgt, up);
-      return { pos, ...o, half: portrait() ? 38 : 30, shift: sh * 0.6, tgt };
+      return { pos, ...o, half: portrait() ? 38 : 30, shift: sh, tgt };
     }
     // FramSat-1: a chase camera a few thousand km out, looking at the satellite with the ground below it
     const s = sv("FRAMSAT-1", ms) || { r: [RE + 560, 0, 0], v: [0, 7.6, 0] };

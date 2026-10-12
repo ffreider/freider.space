@@ -136,7 +136,7 @@ export const timeline: Entry[] = [
     org: same("Orbit NTNU"),
     href: "https://orbitntnu.com/",
     photos: [
-      { src: "selfiesat", w: 1600, h: 1202, caption: { en: "SelfieSat in orbit.", no: "SelfieSat i bane." } },
+      { src: "selfiesat", w: 1600, h: 1202, caption: { en: "SelfieSat in orbit. Photo: Orbit NTNU", no: "SelfieSat i bane. Foto: Orbit NTNU" } },
       { src: "orbit-team", w: 1600, h: 969, caption: { en: "The Orbit NTNU team.", no: "Orbit NTNU-gjengen." } },
       { src: "framsat-gala", w: 1600, h: 1092, caption: { en: "Playing at the FramSat-1 gala in Banksalen, Trondheim.", no: "Spiller på FramSat-1-gallaen i Banksalen i Trondheim." } },
     ],
@@ -204,8 +204,8 @@ export const TEXT = {
     ],
     finishing: "Working on it... Finishing soon ish.",
     aboutCaption: "Trying on a spacesuit from Nåva Space.",
-    framsatCaption: "FramSat-1 before launch.",
-    andoyaCaption: "A Spectrum launch arcing out over Andøya.",
+    framsatCaption: "FramSat-1 before launch. Photo: Orbit NTNU",
+    andoyaCaption: "A Spectrum launch arcing out over Andøya. Photo: Isar Aerospace",
     launchCaption: "Spectrum lifting off from Andøya on its second flight, with FramSat-1 on board. Photo: Isar Aerospace",
     joining: "Joining FramSat-1",
     whyHtml:
@@ -235,8 +235,8 @@ export const TEXT = {
     ],
     finishing: "Jobber med saken... Ferdig snart, sånn ca.",
     aboutCaption: "Prøver en romdrakt fra Nåva Space.",
-    framsatCaption: "FramSat-1 før oppskytingen.",
-    andoyaCaption: "En Spectrum-oppskyting i bue ut over Andøya.",
+    framsatCaption: "FramSat-1 før oppskytingen. Foto: Orbit NTNU",
+    andoyaCaption: "En Spectrum-oppskyting i bue ut over Andøya. Foto: Isar Aerospace",
     launchCaption: "Spectrum letter fra Andøya på sin andre ferd, med FramSat-1 om bord. Foto: Isar Aerospace",
     joining: "Slår følge med FramSat-1",
     whyHtml:

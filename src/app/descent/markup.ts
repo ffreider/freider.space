@@ -20,7 +20,7 @@ export const DESCENT_CSS = String.raw`
   --f-display: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
   --f-body: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
   --f-data: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
-  --gutter: clamp(18px, 4.5vw, 72px);
+  --gutter: clamp(16px, 2.6vw, 44px);
   --ease: cubic-bezier(.2, .7, .2, 1);      /* one curve and pace for everything that moves */
   --t: .45s;
   color-scheme: dark;
@@ -44,14 +44,14 @@ button:active { transform: scale(.97); }
 #field, #overlay { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 #field { z-index: 0; }
 #overlay { z-index: 1; pointer-events: none; }
-.fade { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(var(--haze), .88) 0%, rgba(var(--haze), .6) 30%, rgba(var(--haze), 0) 58%); transition: opacity .6s; }
+.fade { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(var(--haze), .88) 0, rgba(var(--haze), .6) calc(var(--gutter) + 380px), rgba(var(--haze), 0) calc(var(--gutter) + 820px));   /* follows the text column, not the window */ transition: opacity .6s; }
 body.live-lock .fade { opacity: .35; }
 body.can-drag { cursor: grab; }
 body.can-point { cursor: pointer; }
 /* right side: the space stuff. route on top, a live card below */
 .side {
   position: fixed; z-index: 4; right: var(--gutter); top: calc(70px + env(safe-area-inset-top, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-  width: min(340px, 32vw); display: flex; flex-direction: column; gap: 14px; pointer-events: none;
+  width: min(320px, 28vw); display: flex; flex-direction: column; gap: 14px; pointer-events: none;
 }
 .side > * { pointer-events: auto; }
 #field, #overlay, #cube { -webkit-user-select: none; user-select: none; }
@@ -123,8 +123,8 @@ body.riding .route { display: none; }
 
 main { position: relative; z-index: 2; }
 section { padding-inline: var(--gutter); }
-.col { max-width: 600px; }
-@media (min-width: 901px) { main .col { max-width: min(600px, calc(100vw - min(340px, 32vw) - 3 * var(--gutter))); } }
+.col { max-width: 540px; }
+@media (min-width: 901px) { main .col { max-width: min(540px, calc(100vw - min(320px, 28vw) - 3 * var(--gutter))); } }
 .stop { font: 500 13px/1.5 var(--f-data); color: var(--ink-3); margin: 0 0 22px; max-width: 54ch; }
 .stop b { color: var(--ink); font-weight: 500; display: block; margin-bottom: 4px; }
 h2 { font-family: var(--f-display); font-weight: 800; font-size: clamp(40px, 5.2vw, 68px); line-height: .94; letter-spacing: -0.03em; margin: 0 0 22px; }
