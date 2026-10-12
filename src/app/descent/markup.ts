@@ -176,6 +176,7 @@ p { margin: 0; }
 .shot img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; transition: transform .6s var(--ease), filter .3s var(--ease); filter: saturate(.9); }
 .shot:hover img { transform: scale(1.03); filter: none; }
 .shots figcaption { font-size: 13px; line-height: 1.45; color: var(--ink-3); }
+.shots figcaption a { color: var(--ink-2); text-decoration-color: var(--fs); white-space: nowrap; }
 .lightbox { border: 0; padding: 0; background: none; max-width: min(1200px, 92vw); color: var(--ink); overflow: visible; }
 .lightbox::backdrop { background: rgba(4, 8, 16, .86); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .lightbox[open] { animation: lb-in var(--t) var(--ease); }

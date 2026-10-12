@@ -27,7 +27,7 @@ export type Entry = {
   photos?: Photo[];
 };
 
-export type Photo = { src: string; w: number; h: number; caption: L };
+export type Photo = { src: string; w: number; h: number; caption: L; link?: { href: string; text: L } };
 
 const same = (text: string): L => ({ en: text, no: text });
 
@@ -45,7 +45,7 @@ export const timeline: Entry[] = [
     short: same("NASA HUNCH"),
     href: "https://nasahunch.no",
     photos: [
-      { src: "artemis-earth", w: 1600, h: 1067, caption: { en: "Earth beyond the edge of the Moon, from NASA’s Artemis programme. Photo: NASA", no: "Jorden bak kanten av Månen, fra NASAs Artemis-program. Foto: NASA" } },
+      { src: "artemis-earth", w: 1600, h: 1067, caption: { en: "Earth beyond the edge of the Moon. NASA HUNCH is moving on from the ISS to Artemis. Photo: NASA", no: "Jorden bak kanten av Månen. NASA HUNCH går videre fra ISS til Artemis. Foto: NASA" } },
     ],
     roles: [{ start: [2025, 8], title: { en: "Chair of the board", no: "Styreleder" } }],
   },
@@ -53,7 +53,8 @@ export const timeline: Entry[] = [
     org: same("Spacepodden"),
     href: "https://open.spotify.com/show/7ofO8qm8tRBk2llQEMK8JB",
     photos: [
-      { src: "spacepodden-minister", w: 1600, h: 1067, caption: { en: "Recording an episode with the Minister of Trade and Industry.", no: "Opptak av en episode med næringsministeren." } },
+      { src: "spacepodden-minister", w: 1600, h: 1067, caption: { en: "Recording an episode with the Minister of Trade and Industry.", no: "Opptak av en episode med næringsministeren." },
+        link: { href: "https://open.spotify.com/episode/0MWnkZlSXTMstxdJcawQJL", text: { en: "Listen to the episode", no: "Hør episoden" } } },
     ],
     description: {
       en: "A weekly Norwegian-language podcast about space.",
