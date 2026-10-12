@@ -738,18 +738,15 @@
     const aspect = VW() / VH();
     const sh = narrow() ? 0 : 0.22 * aspect;
     if (i === 0) {
-      // Lit from above: the camera looks at the Moon from about 55° off the
-      // line to the Sun, so the top of the Moon is a thick sunlit crescent
-      // (about a fifth of the face, whatever the real phase) and the rest is
-      // night side in earthshine. The Sun sits just above the frame, up and a
-      // touch left. Dragging turns the Moon itself (spinMoon).
+      // The real phase: the camera looks at the Moon along the line from
+      // Earth, so it's lit as it is in tonight's sky (a thin crescent near new
+      // Moon, a full disc at full Moon). The view is turned so the sunlit
+      // side is at the top. Dragging turns the Moon itself (spinMoon).
       const M = moonEci(ms), sun = sunEci(ms), D = 7900 + drift * 400;
-      let U0 = sub(ECL_N, mul(sun, dot(ECL_N, sun)));
-      U0 = len(U0) < 1e-3 ? norm(cross(sun, [1, 0, 0])) : norm(U0);
-      const up = norm(sub(mul(U0, 0.97), mul(cross(sun, U0), 0.26)));   // towards the Sun, across the sky
-      const B = rad(55);
-      const toMoon = norm(sub(mul(sun, Math.cos(B)), mul(up, Math.sin(B))));
-      const Uv = norm(add(mul(up, Math.cos(B)), mul(sun, Math.sin(B))));
+      const toMoon = norm(M);
+      let Uv = sub(sun, mul(toMoon, dot(sun, toMoon)));
+      if (len(Uv) < 1e-3) Uv = sub(ECL_N, mul(toMoon, dot(ECL_N, toMoon)));   // exactly new or full: ecliptic north up
+      Uv = norm(Uv);
       const F = norm(sub(mul(toMoon, Math.cos(rad(4))), mul(Uv, Math.sin(rad(4)))));   // the Moon a little above centre
       const pos = sub(M, mul(toMoon, D));
       const U = norm(sub(Uv, mul(F, dot(Uv, F))));
