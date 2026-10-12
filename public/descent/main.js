@@ -598,7 +598,9 @@
       if (sd > 0.0) {
         float r = length(cross(rd, uSun)) / 0.004653;      // angle from its centre, in solar radii
         if (r < 1.0) col += vec3(1.0, 0.9, 0.76) * (1.0 - 0.6 * (1.0 - sqrt(1.0 - r * r))) * 9.0;
-        else col += vec3(1.0, 0.84, 0.64) * (0.5 * pow(1.0 / r, 3.0) + 0.05 * pow(1.0 / r, 1.4));
+        // the bloom's long tail fades out well before 90 degrees from the Sun,
+        // where it used to stop at once and leave a faint straight edge across the sky
+        else col += vec3(1.0, 0.84, 0.64) * (0.5 * pow(1.0 / r, 3.0) + 0.05 * pow(1.0 / r, 1.4)) * smoothstep(0.0, 0.7, sd);
         col += vec3(1.0, 0.96, 0.88) * pow(sd, 900.0) * 0.3;
       }
     }
