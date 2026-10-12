@@ -56,7 +56,7 @@ body.can-drag main { -webkit-user-select: none; user-select: none; }
 .c-map { display: block; width: 100%; aspect-ratio: 2 / 1; height: auto; border-radius: 8px; }
 .card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; }
 .card dt { font: 400 13px/1.35 var(--f-data); color: var(--ink-3); }
-.card dd { margin: 0; font: 500 14px/1.35 var(--f-data); color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+.card dd { margin: 0; font: 500 14px/1.35 var(--f-data); color: var(--ink); text-align: right; }   /* proportional figures: tabular ones space out "1.32" */
 /* the card, short by default: one standout number, a few rows, the rest on request */
 .stat { display: grid; gap: 2px; }
 .stat:empty { display: none; }

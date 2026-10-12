@@ -218,6 +218,9 @@
   const fmtN = (n, d) => n.toLocaleString(C.S().locale, { minimumFractionDigits: d, maximumFractionDigits: d });
   const fmtMin = m => { if (m < 1) return C.lang === "en" ? "under a minute" : "under ett minutt"; m = Math.round(m); const h = Math.floor(m / 60); return h ? `${h} h ${String(m % 60).padStart(2, "0")} min` : `${m} min`; };
   const fmtTime = ms => new Date(ms).toLocaleTimeString(C.S().locale, { hour: "2-digit", minute: "2-digit" });
+  const lc = t => t[0].toLowerCase() + t.slice(1);          // "Seen from Trondheim" -> "seen from Trondheim"
+  const pct = n => C.lang === "en" ? `${n}%` : `${n} %`;   // "4%" in English, "4 %" in Norwegian
+  const fmtWhen = ms => new Date(ms).toLocaleString(C.S().locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
   const latlon = (la, lo) => `${fmtN(Math.abs(la), 1)}° ${la >= 0 ? "N" : "S"}, ${fmtN(Math.abs(lo), 1)}° ${lo >= 0 ? "E" : C.S().west}`;
   C.extend({
     en: {
@@ -238,7 +241,10 @@
       ],
       route: ["Moon", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1"],
       labels: { moon: "Moon", fs: "FramSat-1, 1U CubeSat", sensor: "Sun sensor (EIDEL)", gps: "GPS planes", gal: "Galileo planes", apo: "Apogee", peri: "Perigee", trd: "Trondheim", n65: "65° N, round-the-clock coverage", on: "on", off: "off", near: "Near side", far: "Far side", lit: "Sunlit", dark: "Night", kinds: { crater: "Crater", mare: "Mare", basin: "Impact basin", site: "Landing site" }, offFor: m => `switches on in ${fmtMin(m)}`, onFor: m => `on for another ${fmtMin(m)}`, sunAlt: a => a > 0 ? `${Math.round(a)}° above the horizon` : "below the horizon", visNow: "usable now", grav: "Plane", galTip: "Galileo satellite, part of the EU’s navigation system, run by EUSPA. Each carries hydrogen-maser and rubidium clocks and a search-and-rescue transponder that can tell a distress beacon that help is on the way." },
-      k: { dist: "Distance", lit: "Illuminated", phase: "Phase", light: "Light time", size: "Size seen from Earth", here: "From here",
+      k: { dist: "Distance", lit: "Illuminated", phase: "Phase", light: "Its light takes",
+        age: "Days since new Moon", full: "Next full Moon", fresh: "Next new Moon", nearNext: "Next closest", farNext: "Next farthest", earthSize: "Earth seen from there",
+        dish: "A dish in Trondheim points", trdThor: "Trondheim to Thor 7", upDown: "Signal up and back down", ping: "Round trip (a ping)", radius: "Distance from Earth’s centre", ring: "Length of the belt",
+        highest: "Highest over Trondheim", size: "Size seen from Earth", here: "From here",
         alt: "Altitude", spd: "Speed", pos: "Position", over: "Over", sun: "Sunlight", orbit: "Orbit no.", period: "Period", inc: "Inclination",
         pa: "Lowest and highest", pass: "Next pass, Trondheim", trd: "From Trondheim", gspd: "Ground speed", aboard: "Crewed since", sunrises: "Sunrises a day",
         days: "Days in orbit", lon: "Longitude", launched: "Launched", op: "Operator", shown: "Satellites shown", lst: "Local time below", rate: "Orbits a day",
@@ -271,7 +277,10 @@
       ],
       route: ["Månen", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1"],
       labels: { moon: "Månen", fs: "FramSat-1, 1U-CubeSat", sensor: "Solsensor (EIDEL)", gps: "GPS-plan", gal: "Galileo-plan", apo: "Apogeum", peri: "Perigeum", trd: "Trondheim", n65: "65° N, dekning hele døgnet", on: "på", off: "av", near: "Forsiden", far: "Baksiden", lit: "I sollys", dark: "Natt", kinds: { crater: "Krater", mare: "Hav", basin: "Nedslagsbasseng", site: "Landingssted" }, offFor: m => `slås på om ${fmtMin(m)}`, onFor: m => `på i ${fmtMin(m)} til`, sunAlt: a => a > 0 ? `${Math.round(a)}° over horisonten` : "under horisonten", visNow: "brukbar nå", grav: "Plan", galTip: "Galileo-satellitt, del av EUs navigasjonssystem, drevet av EUSPA. Hver har hydrogenmaser- og rubidiumklokker og en søk-og-redning-transponder som kan si fra til en nødpeilesender at hjelp er på vei." },
-      k: { dist: "Avstand", lit: "Belyst", phase: "Fase", light: "Lystid", size: "Størrelse sett fra Jorden", here: "Herfra",
+      k: { dist: "Avstand", lit: "Belyst", phase: "Fase", light: "Lyset bruker",
+        age: "Dager siden nymåne", full: "Neste fullmåne", fresh: "Neste nymåne", nearNext: "Neste nærmeste", farNext: "Neste fjerneste", earthSize: "Jorden sett derfra",
+        dish: "En parabol i Trondheim peker", trdThor: "Trondheim til Thor 7", upDown: "Signal opp og ned igjen", ping: "Tur-retur (en ping)", radius: "Avstand fra Jordens sentrum", ring: "Lengden på beltet",
+        highest: "Høyest over Trondheim", size: "Størrelse sett fra Jorden", here: "Herfra",
         alt: "Høyde", spd: "Fart", pos: "Posisjon", over: "Over", sun: "Sollys", orbit: "Omløp nr.", period: "Omløpstid", inc: "Inklinasjon",
         pa: "Lavest og høyest", pass: "Neste passering, Trondheim", trd: "Fra Trondheim", gspd: "Bakkefart", aboard: "Bemannet siden", sunrises: "Soloppganger per døgn",
         days: "Dager i bane", lon: "Lengdegrad", launched: "Skutt opp", op: "Operatør", shown: "Satellitter vist", lst: "Lokal tid under", rate: "Omløp per døgn",
@@ -423,6 +432,45 @@
     const sh = shadowChange(name, ms);
     const lst = ((ms / 36e5 + g.lon / 15) % 24 + 24) % 24;
     return { s, r, v, alt: g.h, g, el, orbitNo, sh, gspd: v * RE / r, lst };
+  }
+  // The Moon's phase angle, 0 at new Moon, 180 at full, rising about 12° a day.
+  const moonAng = ms => {
+    const m = norm(moonEci(ms)), sun = sunEci(ms), e = deg(Math.acos(Math.max(-1, Math.min(1, dot(m, sun)))));
+    return dot(cross(sun, m), ECL_N) > 0 ? e : 360 - e;
+  };
+  // the next time the phase angle passes a value (180 full, 0 new), to about a minute
+  function nextPhase(ms, target) {
+    const g = t => (moonAng(t) - target + 360) % 360;   // just under 360 before, just over 0 after
+    let prev = g(ms);
+    for (let i = 1; i <= 260; i++) {
+      const t1 = ms + i * 3 * 36e5, cur = g(t1);
+      if (cur < prev - 180) {
+        let a = t1 - 3 * 36e5, b = t1;
+        for (let k = 0; k < 16; k++) { const m = (a + b) / 2; if (g(m) > 180) a = m; else b = m; }
+        return b;
+      }
+      prev = cur;
+    }
+    return null;
+  }
+  // the next closest and farthest points of the Moon's orbit
+  function moonExtremes(ms) {
+    const r = t => len(moonEci(t)), out = {};
+    let p = r(ms - 2 * 36e5), c = r(ms);
+    for (let i = 1; i <= 400 && !(out.near && out.far); i++) {
+      const t = ms + i * 2 * 36e5, n = r(t);
+      if (!out.near && c < p && c <= n) out.near = { t: t - 2 * 36e5, d: c };
+      if (!out.far && c > p && c >= n) out.far = { t: t - 2 * 36e5, d: c };
+      p = c; c = n;
+    }
+    return out;
+  }
+  let moonEvents = null;
+  function moonMore(ms) {
+    if (!moonEvents || Math.abs(ms - moonEvents.at) > 36e5) moonEvents = { at: ms, full: nextPhase(ms, 180), fresh: nextPhase(ms, 0), ...moonExtremes(ms) };
+    const m = moonEci(ms);
+    return { ...moonEvents, age: moonAng(ms) / 360 * 29.530589, sky: lookFrom(TRD.lat, TRD.lon, m, ms),
+      speed: len(sub(moonEci(ms + 30000), moonEci(ms - 30000))) / 60, earth: 2 * deg(Math.asin(RE / len(m))) };
   }
   function moonNumbers(ms) {
     const m = moonEci(ms), sun = sunEci(ms), d = len(m), md = mul(m, 1 / d);
@@ -719,12 +767,15 @@
   let moonAxes = null;                 // the hero view's up and right, to turn the Moon around
   // The Moon turned by dragging, like spinning a globe: around the view's up
   // axis for left and right, around its right axis for up and down. The
-  // sunlight stays where it is.
+  // sunlight turns with it (spinSun) while you're at the Moon, so the lit
+  // side stays on the same ground, as if you were flying round the Moon.
+  const moonTurn = (v, w = 1) => rotAround(rotAround(v, moonAxes.U, moonLook.az * w), moonAxes.R, moonLook.el * w);
   function spinMoon(mf) {
     if (!moonAxes || (!moonLook.az && !moonLook.el)) return mf;
-    const turn = v => rotAround(rotAround(v, moonAxes.U, moonLook.az), moonAxes.R, moonLook.el);
-    return { ...mf, mx: turn(mf.mx), my: turn(mf.my), mz: turn(mf.mz) };
+    return { ...mf, mx: moonTurn(mf.mx), my: moonTurn(mf.my), mz: moonTurn(mf.mz) };
   }
+  // w: how much of the view is the Moon stop; elsewhere the Sun is where it really is
+  const spinSun = (sun, w) => (!moonAxes || w <= 0 || (!moonLook.az && !moonLook.el) ? sun : norm(moonTurn(sun, w)));
   const ride = { yaw: 0, pitch: null, tyaw: 0, tpitch: null, preset: 0 };
   const RIDE_DIST = 2600, RIDE_PITCH = 0.8;
 
@@ -1518,7 +1569,12 @@
     if (stopIdx === 0) {
       const m = moonNumbers(ms);
       sub2 = s.moonShown;
-      body = rows([[k.dist, `${fmtKm(m.d)} km`], [k.lit, `${Math.round(m.lit * 100)} %`], [k.phase, s.phases[m.idx]], [k.light, `${fmtN(m.light, 3)} s`], [k.size, `${fmtN(m.size, 3)}°`]]);
+      const x = moonMore(ms), en = C.lang === "en";
+      body = rows([[k.dist, `${fmtKm(m.d)} km`], [k.lit, pct(Math.round(m.lit * 100))], [k.phase, s.phases[m.idx]], [k.light, `${fmtN(m.light, 2)} s`],
+        [k.age, `${fmtN(x.age, 1)} ${en ? "days" : "dager"}`], x.full && [k.full, fmtWhen(x.full)], x.fresh && [k.fresh, fmtWhen(x.fresh)],
+        [k.fromTrd, skyText(x.sky)], [k.spd, `${fmtN(x.speed, 2)} km/s`],
+        x.near && [k.nearNext, `${fmtKm(x.near.d)} km, ${fmtWhen(x.near.t)}`], x.far && [k.farNext, `${fmtKm(x.far.d)} km, ${fmtWhen(x.far.t)}`],
+        [k.size, `${fmtN(m.size, 2)}°`], [k.earthSize, `${fmtN(x.earth, 2)}°`]]);
     } else if (stopIdx === 1) {
       const el = elements("ASBM-1");
       const a = satNumbers("ASBM-1", ms), b = satNumbers("ASBM-2", ms);
@@ -1527,10 +1583,18 @@
         a && ["ASBM-1", `${fmtKm(a.alt)} km, ${sa && sa.active ? Lb.on : Lb.off}`], b && ["ASBM-2", `${fmtKm(b.alt)} km, ${sb && sb.active ? Lb.on : Lb.off}`],
         sa && [k.active + " 1", sa.active ? Lb.onFor(sa.minutes) : Lb.offFor(sa.minutes)], sb && [k.active + " 2", sb.active ? Lb.onFor(sb.minutes) : Lb.offFor(sb.minutes)],
         [k.cover, C.lang === "en" ? "North of 65° N, 24/7" : "Nord for 65° N, hele døgnet"],
-        el && [k.pa, rangeText("ASBM-1", ms)], el && [k.period, fmtMin(el.period)], el && [k.inc, `${fmtN(el.inc, 1)}°`], [k.launched, "12 Aug 2024"]]);
+        el && [k.pa, rangeText("ASBM-1", ms)], el && [k.period, fmtMin(el.period)], el && [k.inc, `${fmtN(el.inc, 1)}°`], [k.launched, C.lang === "en" ? "12 Aug 2024" : "12. aug. 2024"],
+        ...[["ASBM-1", a], ["ASBM-2", b]].flatMap(([nm, n]) => n ? [
+          [`${nm}, ${lc(k.spd)}`, `${fmtN(n.v, 2)} km/s`], [`${nm}, ${lc(k.over)}`, placeName(n.g.lat, n.g.lon)],
+          [`${nm}, ${lc(k.fromTrd)}`, skyText(lookFrom(TRD.lat, TRD.lon, n.s.r, ms))]] : [])]);
     } else if (stopIdx === 2) {
       const t = satNumbers("THOR 7", ms);
-      body = rows([[k.alt, "35,786 km"], [k.period, "23 h 56 min"], t && ["Thor 7", `${fmtN(Math.abs(t.g.lon), 2)}° ${t.g.lon >= 0 ? "E" : s.west}`], [k.shown, String(GEO_SATS.length)], [k.spd, "3.07 km/s"]]);
+      const lt = t && lookFrom(TRD.lat, TRD.lon, t.s.r, ms), et = elements("THOR 7"), en = C.lang === "en";
+      body = rows([[k.alt, `${fmtKm(35786)} km`], [k.period, "23 h 56 min"], t && ["Thor 7", `${fmtN(Math.abs(t.g.lon), 2)}° ${t.g.lon >= 0 ? (en ? "E" : "Ø") : s.west}`], [k.spd, `${fmtN(3.07, 2)} km/s`],
+        lt && [k.dish, skyText(lt)], lt && [k.trdThor, `${fmtKm(lt.range)} km`],
+        lt && [k.upDown, `${fmtKm(2 * lt.range / 299.792458)} ms`], lt && [k.ping, `${fmtKm(4 * lt.range / 299.792458)} ms`],
+        [k.radius, `${fmtKm(42164)} km`], [k.ring, `${fmtKm(2 * Math.PI * 42164)} km`],
+        et && [k.swing, `±${fmtKm(42164 * Math.sin(rad(et.inc)))} km`], [k.shown, String(GEO_SATS.length)]]);
     } else if (stopIdx === 3) {
       const sky = gpsSky(ms);
       const nearest = sky.vis.length ? sky.vis.reduce((a, b) => a.l.range < b.l.range ? a : b) : null;
@@ -1541,7 +1605,13 @@
         nearest && [k.delay, `${fmtN(nearest.l.range / 299.792458, 1)} ms`],
         gel && [k.period, fmtMin(gel.period)], [k.incl, "56°"], [C.lang === "en" ? "E1 and E5a" : "E1 og E5a", `1575.42 ${C.lang === "en" ? "and" : "og"} 1176.45 MHz`],
         [C.lang === "en" ? "Free accuracy" : "Gratis nøyaktighet", C.lang === "en" ? "≈ 20 cm with the High Accuracy Service" : "≈ 20 cm med High Accuracy Service"],
-        [C.lang === "en" ? "Signal at the ground" : "Signal ved bakken", C.lang === "en" ? "≈ −128 dBm, below the noise" : "≈ −128 dBm, under støyen"]]);
+        [C.lang === "en" ? "Signal at the ground" : "Signal ved bakken", C.lang === "en" ? "≈ −128 dBm, below the noise" : "≈ −128 dBm, under støyen"],
+        ...(() => {
+          if (!sky.vis.length) return [];
+          const top = sky.vis.reduce((a, b) => a.l.el > b.l.el ? a : b), n = satNumbers(top.n, ms);
+          return [[k.highest, `${galName(top.n)}, ${fmtN(top.l.el, 1)}° ${C.lang === "en" ? "up" : "opp"}`], top !== nearest && [k.delay + ` (${galName(top.n)})`, `${fmtN(top.l.range / 299.792458, 1)} ms`],
+            n && [k.spd + ` (${galName(top.n)})`, `${fmtN(n.v, 2)} km/s`], n && n.orbitNo && [k.orbit + ` (${galName(top.n)})`, fmtKm(n.orbitNo)]];
+        })()]);
     } else if (stopIdx === 5) {
       body = rows(fsRows(ms));
       // the live line from the same numbers as the rows, so they always agree
@@ -1585,8 +1655,8 @@
   function extrasRows(name, ms) {
     const k = C.S().k, x = orbitExtras(name, ms), en = C.lang === "en";
     if (!x) return [];
-    return [[k.beta, `${fmtN(x.beta, 1)}°`], [k.shadowPct, `${Math.round(x.shadow * 100)} %`], [k.sink, `${fmtN(x.sink, 0)} m/${en ? "day" : "døgn"}`],
-      [k.horizon, `${fmtKm(x.horizon)} km`], [k.seen, `${fmtN(x.seen * 100, 1)} %`]];
+    return [[k.beta, `${fmtN(x.beta, 1)}°`], [k.shadowPct, pct(Math.round(x.shadow * 100))], [k.sink, `${fmtN(x.sink, 0)} m/${en ? "day" : "døgn"}`],
+      [k.horizon, `${fmtKm(x.horizon)} km`], [k.seen, pct(fmtN(x.seen * 100, 1))]];
   }
   function fsRows(ms) {
     const s = C.S(), k = s.k, n = satNumbers("FRAMSAT-1", ms);
@@ -1721,7 +1791,7 @@
   /* ---------- pointer: drag to look, hover to learn ---------- */
   let curStop = 0, dragging = null, mouse = null;
   const draggable = () => curStop === 0 || curStop === 5;
-  const blocked = el => el.closest("a, button, input, .hud, .drawer, .top, .side, .col p, .col h1, .col h2, .col h3, .col li, .who");
+  const blocked = el => el && el.closest && el.closest("a, button, input, .hud, .drawer, .top, .side, .col p, .col h1, .col h2, .col h3, .col li, .who");
   window.addEventListener("pointerdown", e => {
     if (!draggable() || document.body.classList.contains("tracker-open") || blocked(e.target)) return;
     if (e.pointerType === "touch" && (curStop !== 5 || e.clientY > VH())) return;
@@ -1827,7 +1897,7 @@
     document.body.classList.toggle("riding", rideW > 0.6);
     const U = norm(sub(cam.U, mul(cam.F, dot(cam.U, cam.F))));
     const R = cross(cam.F, U);
-    const sun = sunEci(ms), mf = spinMoon(moonFrame(ms));
+    const sun = spinSun(sunEci(ms), weights[0]), mf = spinMoon(moonFrame(ms));
     const camFull = { posKm: cam.pos, F: cam.F, U, R, tanH: Math.tan(rad(cam.half)), shift: cam.shift, sun, moonKm: mf.moon, mf,
       mode: rideW > 0.98 ? "ride" : "", cube: smooth((rideW - 0.35) / 0.5), sat: cam.sat };
     if (field) {
