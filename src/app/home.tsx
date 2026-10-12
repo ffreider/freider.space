@@ -44,6 +44,9 @@ export const timeline: Entry[] = [
     org: same("NASA HUNCH Norge"),
     short: same("NASA HUNCH"),
     href: "https://nasahunch.no",
+    photos: [
+      { src: "artemis-earth", w: 1600, h: 1067, caption: { en: "Earth beyond the edge of the Moon, from NASA’s Artemis programme. Photo: NASA", no: "Jorden bak kanten av Månen, fra NASAs Artemis-program. Foto: NASA" } },
+    ],
     roles: [{ start: [2025, 8], title: { en: "Chair of the board", no: "Styreleder" } }],
   },
   {
@@ -63,6 +66,8 @@ export const timeline: Entry[] = [
     short: same("Summit"),
     href: "https://norstec.no/summit",
     photos: [
+      { src: "summit-stage", w: 1600, h: 1066, caption: { en: "A full hall for the main stage.", no: "Full sal foran hovedscenen." } },
+      { src: "summit-floor", w: 1600, h: 1066, caption: { en: "The student organizations’ stands between talks.", no: "Studentorganisasjonenes stands mellom foredragene." } },
       { src: "summit-wennesland", w: 1600, h: 1066, caption: { en: "With state secretary Wennesland, after we’d been on stage together.", no: "Med statssekretær Wennesland, etter at vi hadde vært på scenen sammen." } },
     ],
     description: {
@@ -198,6 +203,8 @@ export const TEXT = {
     ],
     finishing: "Working on it... Finishing soon ish.",
     aboutCaption: "Trying on a spacesuit from Nåva Space.",
+    framsatCaption: "FramSat-1 before launch.",
+    andoyaCaption: "A Spectrum launch arcing out over Andøya.",
     launchCaption: "Spectrum lifting off from Andøya on its second flight, with FramSat-1 on board. Photo: Isar Aerospace",
     joining: "Joining FramSat-1",
     whyHtml:
@@ -227,6 +234,8 @@ export const TEXT = {
     ],
     finishing: "Jobber med saken... Ferdig snart, sånn ca.",
     aboutCaption: "Prøver en romdrakt fra Nåva Space.",
+    framsatCaption: "FramSat-1 før oppskytingen.",
+    andoyaCaption: "En Spectrum-oppskyting i bue ut over Andøya.",
     launchCaption: "Spectrum letter fra Andøya på sin andre ferd, med FramSat-1 om bord. Foto: Isar Aerospace",
     joining: "Slår følge med FramSat-1",
     whyHtml:

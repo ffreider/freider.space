@@ -192,6 +192,7 @@ p { margin: 0; }
 .photo .shot { box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .7); }
 .photo .shot img { aspect-ratio: auto; }
 .photo figcaption { font-size: 13.5px; line-height: 1.5; color: var(--ink-3); max-width: 60ch; }
+.shots.pair { max-width: 560px; grid-template-columns: 1fr 1fr; margin-top: 16px; }
 .article .src { font: 500 14px/1 var(--f-body); color: var(--ink-3); }
 .article:hover { background: rgba(var(--haze), .75); }
 .article h3 { font-family: var(--f-display); font-weight: 800; letter-spacing: -0.02em; font-size: clamp(24px, 2.4vw, 32px); line-height: 1.08; margin-block: 0; overflow-wrap: break-word; text-wrap: balance; }
@@ -433,9 +434,19 @@ export const DESCENT_BODY = String.raw`
       <h2 data-t="joining"></h2>
       <p class="bio" data-h="whyHtml"></p>
       <figure class="photo">
-        <button class="shot" type="button" data-full="/descent/photos/launch-1600.jpg" data-pw="1920" data-ph="1281"><img src="/descent/photos/launch-1600.jpg" alt="__LAUNCH_ALT__" width="1920" height="1281" loading="lazy" decoding="async"></button>
-        <figcaption data-t="launchCaption"></figcaption>
+        <button class="shot" type="button" data-full="/descent/photos/framsat-1-1600.jpg" data-pw="1600" data-ph="1200"><img src="/descent/photos/framsat-1-1600.jpg" alt="__FRAMSAT_ALT__" width="1600" height="1200" loading="lazy" decoding="async"></button>
+        <figcaption data-t="framsatCaption"></figcaption>
       </figure>
+      <div class="shots pair">
+        <figure>
+          <button class="shot" type="button" data-full="/descent/photos/launch-1600.jpg" data-pw="1920" data-ph="1281"><img src="/descent/photos/launch-640.jpg" alt="__LAUNCH_ALT__" width="1920" height="1281" loading="lazy" decoding="async"></button>
+          <figcaption data-t="launchCaption"></figcaption>
+        </figure>
+        <figure>
+          <button class="shot" type="button" data-full="/descent/photos/andoya-trail-1600.jpg" data-pw="1600" data-ph="1068"><img src="/descent/photos/andoya-trail-640.jpg" alt="__ANDOYA_ALT__" width="1600" height="1068" loading="lazy" decoding="async"></button>
+          <figcaption data-t="andoyaCaption"></figcaption>
+        </figure>
+      </div>
     </div>
     <div class="view"><div class="slot" data-slot="5"></div></div>
   </section>

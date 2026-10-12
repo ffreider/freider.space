@@ -106,6 +106,14 @@ function fill(text: (typeof TEXT)["en"], timeline: Entry[], lang: Lang) {
         lang === "no" ? "Freider i en hvit romdrakt med hjelm, mellom to folk fra Nåva Space" : "Freider in a white spacesuit and helmet, between two people from Nåva Space",
       )
       .replace(
+        "__FRAMSAT_ALT__",
+        lang === "no" ? "FramSat-1, en liten kubeformet satellitt med solcellepaneler, på en antistatisk pose med røde Orbit NTNU-merkelapper" : "FramSat-1, a small cube-shaped satellite with solar panels, on an anti-static bag with red Orbit NTNU tags",
+      )
+      .replace(
+        "__ANDOYA_ALT__",
+        lang === "no" ? "En lysende rakettbane i bue opp fra Andøya i blå skumring, over vann og fjell" : "A rocket’s glowing trail arcing up from Andøya in blue twilight, over water and mountains",
+      )
+      .replace(
         "__LAUNCH_ALT__",
         lang === "no"
           ? "Isar Aerospaces Spectrum-rakett letter fra oppskytningsrampen på Andøya i flammer og røyk"
