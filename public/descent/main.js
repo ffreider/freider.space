@@ -791,13 +791,11 @@
     if (i === 0) {
       // The real phase: the camera looks at the Moon along the line from
       // Earth, so it's lit as it is in tonight's sky (a thin crescent near new
-      // Moon, a full disc at full Moon). The view is turned so the sunlit
-      // side is at the top. Dragging turns the Moon itself (spinMoon).
+      // Moon, a full disc at full Moon). North is up, as on a Moon map, so the
+      // N and S markers sit top and bottom. Dragging turns the Moon itself (spinMoon).
       const M = moonEci(ms), sun = sunEci(ms), D = 7900 + drift * 400;
       const toMoon = norm(M);
-      let Uv = sub(sun, mul(toMoon, dot(sun, toMoon)));
-      if (len(Uv) < 1e-3) Uv = sub(ECL_N, mul(toMoon, dot(ECL_N, toMoon)));   // exactly new or full: ecliptic north up
-      Uv = norm(Uv);
+      const Uv = norm(sub(ECL_N, mul(toMoon, dot(ECL_N, toMoon))));   // the Moon's axis is within 1.5° of the ecliptic pole
       const F = norm(sub(mul(toMoon, Math.cos(rad(4))), mul(Uv, Math.sin(rad(4)))));   // the Moon a little above centre
       const pos = sub(M, mul(toMoon, D));
       const U = norm(sub(Uv, mul(F, dot(Uv, F))));
@@ -1344,6 +1342,28 @@
           [[s.k.side, nearSide ? L.near : L.far], [s.k.sunNow, L.sunAlt(sunAlt)], dia ? [en ? "Across, as seen from Earth" : "Bredde sett fra Jorden", `${fmtN(deg(dia / len(mf.moon)) * 3600, 0)}″`] : null]) });
       }
     });
+    // The poles, so you can tell which way is up as you turn it: N and S
+    // just outside the disc, in the direction of each pole, with a short
+    // tick from the pole itself when it's on this side (dashed from the rim
+    // when it's round the back).
+    const c = project(cam, mf.moon);
+    if (c) {
+      const Rpx = RM / len(sub(mf.moon, cam.posKm)) / cam.tanH * VH() / 2;
+      for (const [p, letter] of [[mf.mz, "N"], [mul(mf.mz, -1), "S"]]) {
+        const base = add(mf.moon, mul(p, RM)), sb = project(cam, base); if (!sb) continue;
+        const front = dot(p, norm(sub(cam.posKm, base))) > 0;
+        let dx = sb[0] - c[0], dy = sb[1] - c[1]; const dl = Math.hypot(dx, dy);
+        if (dl < 4) continue;                                          // pole straight at you: no direction to show
+        dx /= dl; dy /= dl;
+        const from = front ? sb : [c[0] + dx * Rpx, c[1] + dy * Rpx], to = [c[0] + dx * (Rpx + 16), c[1] + dy * (Rpx + 16)];
+        og.globalAlpha = w * (front ? 1 : 0.6);
+        og.strokeStyle = "rgba(255,255,255,0.9)"; og.lineWidth = 1.2; og.setLineDash(front ? [] : [3, 3]);
+        og.beginPath(); og.moveTo(from[0], from[1]); og.lineTo(to[0], to[1]); og.stroke(); og.setLineDash([]);
+        og.font = `600 13px ${MONO}`; const tw = og.measureText(letter).width;
+        haloText(letter, to[0] + dx * 10 - tw / 2, to[1] + dy * 10 + 4.5, "#ffffff", `600 13px ${MONO}`);
+        og.globalAlpha = 1;
+      }
+    }
   }
 
   // cone from a satellite down to its service area, the cap north of 65° N
