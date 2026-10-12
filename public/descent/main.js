@@ -1867,7 +1867,8 @@
       img.alt = small.alt; img.width = shot.dataset.pw; img.height = shot.dataset.ph;
       const big = new Image(); big.onload = () => { if (lightbox.open) img.src = big.src; }; big.src = shot.dataset.full;
       const cap = shot.closest("figure") && shot.closest("figure").querySelector("figcaption");
-      lightbox.querySelector("p").textContent = cap ? cap.textContent : small.alt;
+      const p = lightbox.querySelector("p");
+      if (cap) p.innerHTML = cap.innerHTML; else p.textContent = small.alt;   // keeps the caption's links
       lightbox.showModal();
       return;
     }

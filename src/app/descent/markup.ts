@@ -174,15 +174,25 @@ p { margin: 0; }
 .shot { all: unset; cursor: zoom-in; display: block; border-radius: 8px; overflow: hidden; }
 .shot:focus-visible { outline: 2px solid rgba(169, 214, 255, .85); outline-offset: 3px; }
 .shot img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; transition: transform .6s var(--ease), filter .3s var(--ease); filter: saturate(.9); }
-.shot:hover img { transform: scale(1.03); filter: none; }
-.shots figcaption { font-size: 13px; line-height: 1.45; color: var(--ink-3); }
-.shots figcaption a { color: var(--ink-2); text-decoration-color: var(--fs); white-space: nowrap; }
+.shot:hover img { transform: scale(1.03); }
+/* captions stay out of the way until you hover (or tab to) a photo, then
+   fade up over its lower edge; on touch screens they show in the opened view */
+.shots figure, .photo { position: relative; }
+.shots figcaption, .photo figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0; margin: 0; max-width: none; padding: 28px 12px 10px; border-radius: 0 0 8px 8px;
+  font-size: 13px; line-height: 1.45; color: var(--ink); background: linear-gradient(rgba(4, 8, 16, 0), rgba(4, 8, 16, .82) 55%);
+  opacity: 0; transform: translateY(4px); transition: opacity .3s var(--ease), transform .3s var(--ease); pointer-events: none; }
+.shots figcaption a, .photo figcaption a { color: var(--ink); text-decoration-color: var(--fs); white-space: nowrap; pointer-events: auto; }
+.shots figure:hover figcaption, .shots figure:focus-within figcaption, .photo:hover figcaption, .photo:focus-within figcaption { opacity: 1; transform: none; }
+.shot:hover img { filter: brightness(.92); }
+@media (hover: none) { .shots figure:hover figcaption, .photo:hover figcaption { opacity: 0; } }
 .lightbox { border: 0; padding: 0; background: none; max-width: min(1200px, 92vw); color: var(--ink); overflow: visible; }
 .lightbox::backdrop { background: rgba(4, 8, 16, .86); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .lightbox[open] { animation: lb-in var(--t) var(--ease); }
 @keyframes lb-in { from { opacity: 0; transform: scale(.98); } }
 .lightbox img { display: block; width: min(1200px, 92vw); height: auto; max-height: 82vh; object-fit: contain; margin: 0 auto; border-radius: 8px; }
 .lightbox p { margin: 12px auto 0; max-width: 70ch; font-size: 14px; line-height: 1.5; color: var(--ink-2); text-align: center; }
+.lightbox p a { color: var(--ink); text-decoration-color: var(--fs); }
 .lightbox .btn { position: absolute; top: 12px; right: 12px; z-index: 1; color: var(--ink); background: rgba(var(--haze), .75); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 
 .article { display: grid; gap: 12px; text-decoration: none; background: var(--panel); border-radius: 12px; overflow: hidden; padding: 0 0 22px; max-width: 480px; }
@@ -192,7 +202,7 @@ p { margin: 0; }
 .photo { margin: 32px 0 0; max-width: 560px; display: grid; gap: 10px; }
 .photo .shot { box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .7); }
 .photo .shot img { aspect-ratio: auto; }
-.photo figcaption { font-size: 13.5px; line-height: 1.5; color: var(--ink-3); max-width: 60ch; }
+
 .shots.pair { max-width: 560px; grid-template-columns: 1fr 1fr; margin-top: 16px; }
 .article .src { font: 500 14px/1 var(--f-body); color: var(--ink-3); }
 .article:hover { background: rgba(var(--haze), .75); }
