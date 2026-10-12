@@ -738,19 +738,21 @@
     const aspect = VW() / VH();
     const sh = narrow() ? 0 : 0.22 * aspect;
     if (i === 0) {
-      // Framed around the Sun: the camera looks at the Moon with the Sun just
-      // past its top edge (clear of the name and the route list), so the Moon is lit from behind, whatever
-      // the phase: near new Moon its face is the night side in earthshine
-      // with the Sun's corona flaring round the rim, otherwise a thin bright
-      // crescent along that edge. Dragging turns the Moon itself (spinMoon).
+      // Lit from above: the camera looks at the Moon from about 55° off the
+      // line to the Sun, so the top of the Moon is a thick sunlit crescent
+      // (about a fifth of the face, whatever the real phase) and the rest is
+      // night side in earthshine. The Sun sits just above the frame, up and a
+      // touch left. Dragging turns the Moon itself (spinMoon).
       const M = moonEci(ms), sun = sunEci(ms), D = 7900 + drift * 400;
       let U0 = sub(ECL_N, mul(sun, dot(ECL_N, sun)));
       U0 = len(U0) < 1e-3 ? norm(cross(sun, [1, 0, 0])) : norm(U0);
-      const off = norm(sub(mul(U0, 0.97), mul(cross(sun, U0), 0.26)));   // where the Sun sits from the Moon's centre: up, a touch left
-      const a = Math.asin(RM / D) * 1.04;                              // just past the edge
-      const F = norm(sub(mul(sun, Math.cos(a)), mul(off, Math.sin(a))));
-      const pos = sub(M, mul(F, D));
-      const U = norm(sub(U0, mul(F, dot(U0, F))));
+      const up = norm(sub(mul(U0, 0.97), mul(cross(sun, U0), 0.26)));   // towards the Sun, across the sky
+      const B = rad(55);
+      const toMoon = norm(sub(mul(sun, Math.cos(B)), mul(up, Math.sin(B))));
+      const Uv = norm(add(mul(up, Math.cos(B)), mul(sun, Math.sin(B))));
+      const F = norm(sub(mul(toMoon, Math.cos(rad(4))), mul(Uv, Math.sin(rad(4)))));   // the Moon a little above centre
+      const pos = sub(M, mul(toMoon, D));
+      const U = norm(sub(Uv, mul(F, dot(Uv, F))));
       moonAxes = { U, R: cross(F, U) };
       // The way out: back away from the Moon so it shrinks ahead of you,
       // then curve in towards Earth. The view turns round on the way (blend).
