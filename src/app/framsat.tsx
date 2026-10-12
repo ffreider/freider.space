@@ -88,7 +88,7 @@ const T = {
     orbits: (n: string) => `${n} orbits`,
     travelled: "Travelled",
     travelledValue: (km: string, days: number) => `${km} million km in ${days} days`,
-    stateVector: "State vector · TEME frame",
+    stateVector: "State vector (TEME frame)",
     lookAngles: "Look angles from Trondheim",
     azimuth: "Azimuth",
     elevation: "Elevation",
@@ -172,7 +172,7 @@ const T = {
     orbits: (n: string) => `${n} runder`,
     travelled: "Tilbakelagt",
     travelledValue: (km: string, days: number) => `${km} millioner km på ${days} dager`,
-    stateVector: "Tilstandsvektor · TEME-ramme",
+    stateVector: "Tilstandsvektor (TEME-ramme)",
     lookAngles: "Retning fra Trondheim",
     azimuth: "Asimut",
     elevation: "Elevasjon",
@@ -466,7 +466,7 @@ function Telemetry({ tick, f }: { tick: SatTick; f: Format }) {
           title={t.radio}
           rows={[
             [t.frequency, `${f.fixed(DOWNLINK_HZ / 1e6, 3)} MHz`],
-            [t.mode, "FSK 9k6 · AX.25 G3RUH"],
+            [t.mode, "FSK 9k6, AX.25 G3RUH"],
             [t.doppler, `${f.signed(shift / 1000, 2)} kHz`],
             [t.tuneTo, `${f.fixed((DOWNLINK_HZ + shift) / 1e6, 4)} MHz`],
           ]}

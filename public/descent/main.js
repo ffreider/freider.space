@@ -99,8 +99,8 @@
     "METEOSAT 11": ["EUMETSAT", "European weather satellite (MSG-4).", "Europeisk værsatellitt (MSG-4)."],
     "METEOSAT 10": ["EUMETSAT", "European weather satellite (MSG-3).", "Europeisk værsatellitt (MSG-3)."],
     "ASTRA 1N": ["SES", "Direct-to-home TV for Europe from the Astra 19.2° E position.", "TV rett hjem for Europa fra Astra-posisjonen 19,2° øst."],
-    "EUTELSAT 9B": ["Eutelsat · ESA", "Carries EDRS-A, the first node of Europe’s laser data-relay network.", "Bærer EDRS-A, første node i Europas laserbaserte datarelénett."],
-    "EDRS-C": ["ESA · Airbus", "Second node of the European Data Relay System, relaying Sentinel data by laser.", "Andre node i European Data Relay System, videresender Sentinel-data med laser."],
+    "EUTELSAT 9B": ["Eutelsat, ESA", "Carries EDRS-A, the first node of Europe’s laser data-relay network.", "Bærer EDRS-A, første node i Europas laserbaserte datarelénett."],
+    "EDRS-C": ["ESA, Airbus", "Second node of the European Data Relay System, relaying Sentinel data by laser.", "Andre node i European Data Relay System, videresender Sentinel-data med laser."],
     "TDRS 13": ["NASA", "Tracking and Data Relay Satellite, relaying links for spacecraft in low orbit.", "Tracking and Data Relay Satellite, videresender forbindelser for romfartøy i lav bane."],
     "INMARSAT 5-F1": ["Inmarsat (Viasat)", "Global Xpress Ka-band broadband for ships and aircraft.", "Global Xpress Ka-bånd-bredbånd for skip og fly."],
     "ELEKTRO-L 2": ["Roscosmos", "Russian weather satellite.", "Russisk værsatellitt."],
@@ -237,16 +237,16 @@
         ["FramSat-1", d => `Orbit NTNU’s 1U CubeSat, about 1 kg, testing a Norwegian sun sensor from Eidsvoll Electronics. It went up on Isar Aerospace’s second Spectrum rocket from Andøya, the first satellite launched into orbit from continental Europe.`],
       ],
       route: ["Moon", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1"],
-      labels: { moon: "Moon", fs: "FramSat-1 · 1U CubeSat", sensor: "Sun sensor (EIDEL)", gps: "GPS planes", gal: "Galileo planes", apo: "Apogee", peri: "Perigee", trd: "Trondheim", n65: "65° N · round-the-clock coverage", on: "on", off: "off", near: "Near side", far: "Far side", lit: "Sunlit", dark: "Night", kinds: { crater: "Crater", mare: "Mare", basin: "Impact basin", site: "Landing site" }, offFor: m => `switches on in ${fmtMin(m)}`, onFor: m => `on for another ${fmtMin(m)}`, sunAlt: a => a > 0 ? `${Math.round(a)}° above the horizon` : "below the horizon", visNow: "usable now", grav: "Plane", galTip: "Galileo satellite, part of the EU’s navigation system, run by EUSPA. Each carries hydrogen-maser and rubidium clocks and a search-and-rescue transponder that can tell a distress beacon that help is on the way." },
+      labels: { moon: "Moon", fs: "FramSat-1, 1U CubeSat", sensor: "Sun sensor (EIDEL)", gps: "GPS planes", gal: "Galileo planes", apo: "Apogee", peri: "Perigee", trd: "Trondheim", n65: "65° N, round-the-clock coverage", on: "on", off: "off", near: "Near side", far: "Far side", lit: "Sunlit", dark: "Night", kinds: { crater: "Crater", mare: "Mare", basin: "Impact basin", site: "Landing site" }, offFor: m => `switches on in ${fmtMin(m)}`, onFor: m => `on for another ${fmtMin(m)}`, sunAlt: a => a > 0 ? `${Math.round(a)}° above the horizon` : "below the horizon", visNow: "usable now", grav: "Plane", galTip: "Galileo satellite, part of the EU’s navigation system, run by EUSPA. Each carries hydrogen-maser and rubidium clocks and a search-and-rescue transponder that can tell a distress beacon that help is on the way." },
       k: { dist: "Distance", lit: "Illuminated", phase: "Phase", light: "Light time", size: "Size seen from Earth", here: "From here",
         alt: "Altitude", spd: "Speed", pos: "Position", over: "Over", sun: "Sunlight", orbit: "Orbit no.", period: "Period", inc: "Inclination",
-        pa: "Perigee · apogee", pass: "Next pass, Trondheim", trd: "From Trondheim", gspd: "Ground speed", aboard: "Crewed since", sunrises: "Sunrises a day",
+        pa: "Lowest and highest", pass: "Next pass, Trondheim", trd: "From Trondheim", gspd: "Ground speed", aboard: "Crewed since", sunrises: "Sunrises a day",
         days: "Days in orbit", lon: "Longitude", launched: "Launched", op: "Operator", shown: "Satellites shown", lst: "Local time below", rate: "Orbits a day",
         beta: "Sun angle to orbit (β)", shadowPct: "Time in shadow per orbit", sink: "Sinking from air drag", horizon: "Distance to horizon", seen: "Earth visible from here",
         fromTrd: "Seen from Trondheim", delay: "Signal delay", incl: "Inclination", swing: "Daily north–south swing", active: "Payload", cover: "Coverage",
         visible: "Usable from Trondheim", dop: "Geometry (PDOP)", nearest: "Nearest", side: "Side", sunNow: "Sun there now", type: "Type",
         payloads: "Payloads", ground: "Control", dist: "Distance" },
-      sunlit: m => `Sunlit · shadow in ${fmtMin(m)}`, dark: m => `In Earth’s shadow · sunrise in ${fmtMin(m)}`,
+      sunlit: m => `Sunlit, shadow in ${fmtMin(m)}`, dark: m => `In Earth’s shadow, sunrise in ${fmtMin(m)}`,
       sunlitNow: "Sunlit", darkNow: "In Earth’s shadow",
       passFmt: (t, el, vis) => `${t}, ${el}° high${vis ? ", visible" : ""}`, noPass2: "None in 24 h",
       phases: ["New moon", "Waxing crescent", "First quarter", "Waxing gibbous", "Full moon", "Waning gibbous", "Last quarter", "Waning crescent"],
@@ -270,16 +270,16 @@
         ["FramSat-1", d => `Orbit NTNUs 1U-CubeSat på rundt 1 kg, som tester en norsk solsensor fra Eidsvoll Electronics. Den gikk opp med Isar Aerospaces andre Spectrum-rakett fra Andøya, den første satellitten skutt opp i bane fra det kontinentale Europa.`],
       ],
       route: ["Månen", "ASBM", "GEO", "Galileo", "ISS", "FramSat-1"],
-      labels: { moon: "Månen", fs: "FramSat-1 · 1U-CubeSat", sensor: "Solsensor (EIDEL)", gps: "GPS-plan", gal: "Galileo-plan", apo: "Apogeum", peri: "Perigeum", trd: "Trondheim", n65: "65° N · dekning hele døgnet", on: "på", off: "av", near: "Forsiden", far: "Baksiden", lit: "I sollys", dark: "Natt", kinds: { crater: "Krater", mare: "Hav", basin: "Nedslagsbasseng", site: "Landingssted" }, offFor: m => `slås på om ${fmtMin(m)}`, onFor: m => `på i ${fmtMin(m)} til`, sunAlt: a => a > 0 ? `${Math.round(a)}° over horisonten` : "under horisonten", visNow: "brukbar nå", grav: "Plan", galTip: "Galileo-satellitt, del av EUs navigasjonssystem, drevet av EUSPA. Hver har hydrogenmaser- og rubidiumklokker og en søk-og-redning-transponder som kan si fra til en nødpeilesender at hjelp er på vei." },
+      labels: { moon: "Månen", fs: "FramSat-1, 1U-CubeSat", sensor: "Solsensor (EIDEL)", gps: "GPS-plan", gal: "Galileo-plan", apo: "Apogeum", peri: "Perigeum", trd: "Trondheim", n65: "65° N, dekning hele døgnet", on: "på", off: "av", near: "Forsiden", far: "Baksiden", lit: "I sollys", dark: "Natt", kinds: { crater: "Krater", mare: "Hav", basin: "Nedslagsbasseng", site: "Landingssted" }, offFor: m => `slås på om ${fmtMin(m)}`, onFor: m => `på i ${fmtMin(m)} til`, sunAlt: a => a > 0 ? `${Math.round(a)}° over horisonten` : "under horisonten", visNow: "brukbar nå", grav: "Plan", galTip: "Galileo-satellitt, del av EUs navigasjonssystem, drevet av EUSPA. Hver har hydrogenmaser- og rubidiumklokker og en søk-og-redning-transponder som kan si fra til en nødpeilesender at hjelp er på vei." },
       k: { dist: "Avstand", lit: "Belyst", phase: "Fase", light: "Lystid", size: "Størrelse sett fra Jorden", here: "Herfra",
         alt: "Høyde", spd: "Fart", pos: "Posisjon", over: "Over", sun: "Sollys", orbit: "Omløp nr.", period: "Omløpstid", inc: "Inklinasjon",
-        pa: "Perigeum · apogeum", pass: "Neste passering, Trondheim", trd: "Fra Trondheim", gspd: "Bakkefart", aboard: "Bemannet siden", sunrises: "Soloppganger per døgn",
+        pa: "Lavest og høyest", pass: "Neste passering, Trondheim", trd: "Fra Trondheim", gspd: "Bakkefart", aboard: "Bemannet siden", sunrises: "Soloppganger per døgn",
         days: "Dager i bane", lon: "Lengdegrad", launched: "Skutt opp", op: "Operatør", shown: "Satellitter vist", lst: "Lokal tid under", rate: "Omløp per døgn",
         beta: "Solvinkel mot banen (β)", shadowPct: "Tid i skygge per omløp", sink: "Synker av luftmotstand", horizon: "Avstand til horisonten", seen: "Synlig del av Jorden",
         fromTrd: "Sett fra Trondheim", delay: "Signalforsinkelse", incl: "Inklinasjon", swing: "Daglig svingning nord–sør", active: "Nyttelast", cover: "Dekning",
         visible: "Brukbare fra Trondheim", dop: "Geometri (PDOP)", nearest: "Nærmeste", side: "Side", sunNow: "Solen der nå", type: "Type",
         payloads: "Nyttelaster", ground: "Styring", dist: "Avstand" },
-      sunlit: m => `I sollys · skygge om ${fmtMin(m)}`, dark: m => `I jordskyggen · soloppgang om ${fmtMin(m)}`,
+      sunlit: m => `I sollys, skygge om ${fmtMin(m)}`, dark: m => `I jordskyggen, soloppgang om ${fmtMin(m)}`,
       sunlitNow: "I sollys", darkNow: "I jordskyggen",
       passFmt: (t, el, vis) => `${t}, ${el}° høyt${vis ? ", synlig" : ""}`, noPass2: "Ingen innen 24 t",
       phases: ["Nymåne", "Voksende månesigd", "Første kvarter", "Voksende måne", "Fullmåne", "Minkende måne", "Siste kvarter", "Minkende månesigd"],
@@ -414,7 +414,7 @@
     }
     return (rangeCache[key] = isFinite(lo) ? { lo, hi } : null);
   }
-  const rangeText = (name, ms) => { const r = altRange(name, ms); return r ? `${fmtKm(r.lo)} · ${fmtKm(r.hi)} km` : "–"; };
+  const rangeText = (name, ms) => { const r = altRange(name, ms); return r ? `${fmtKm(r.lo)} ${C.lang === "en" ? "to" : "til"} ${fmtKm(r.hi)} km` : "–"; };
   function satNumbers(name, ms) {
     const s = sv(name, ms); if (!s) return null;
     const el = elements(name), g = geodetic(s.r, ms), sun = sunEci(ms);
@@ -996,9 +996,9 @@
       if (!isHome && taken.some(t => box[0] < t[2] && box[2] > t[0] && box[1] < t[3] && box[3] > t[1])) continue;
       taken.push(box);
       og.globalAlpha = w * (isHome ? 1 : 0.9);
-      og.fillStyle = isHome ? "#ffb547" : "#f1f1ee";
+      og.fillStyle = isHome ? "#a9d6ff" : "#f1f1ee";
       og.beginPath(); og.arc(s[0], s[1], isHome ? 3 : 2, 0, Math.PI * 2); og.fill();
-      haloText(n, s[0] + 6, s[1] - 5, isHome ? "#ffb547" : "#f1f1ee", `500 10.5px ${MONO}`);
+      haloText(n, s[0] + 6, s[1] - 5, isHome ? "#a9d6ff" : "#f1f1ee", `500 10.5px ${MONO}`);
       if (w > 0.5) {
         const city = ALL_CITIES.find(x => x[0] === n), lk = lookFrom(city[1], city[2], c, ms), en = C.lang === "en";
         const sunUp = dot(norm(P), sunEci(ms)) > 0;
@@ -1020,19 +1020,19 @@
       pts.push(P);
       if (m > 0 && m % 5 === 0) ticks.push([P, m]);
     }
-    og.setLineDash([5, 5]); og.strokeStyle = "rgba(255,181,71,0.85)"; og.lineWidth = 1.4; og.globalAlpha = w;
+    og.setLineDash([5, 5]); og.strokeStyle = "rgba(169,214,255,0.85)"; og.lineWidth = 1.4; og.globalAlpha = w;
     og.beginPath(); let on = false;
     for (const P of pts) {
       const vis = dot(P, cam.posKm) > RE * RE * 1.0005, s = vis ? project(cam, P) : null;
       if (s) { on ? og.lineTo(s[0], s[1]) : og.moveTo(s[0], s[1]); on = true; } else on = false;
     }
     og.stroke(); og.setLineDash([]);
-    og.fillStyle = "#ffb547"; og.font = `500 10px ${MONO}`;
+    og.fillStyle = "#a9d6ff"; og.font = `500 10px ${MONO}`;
     for (const [P, m] of ticks) {
       if (dot(P, cam.posKm) <= RE * RE * 1.0005) continue;
       const s = project(cam, P); if (!s) continue;
       og.beginPath(); og.arc(s[0], s[1], 2.2, 0, Math.PI * 2); og.fill();
-      haloText(`+${m} min`, s[0] + 6, s[1] + 12, "#ffb547", `500 10px ${MONO}`);
+      haloText(`+${m} min`, s[0] + 6, s[1] + 12, "#a9d6ff", `500 10px ${MONO}`);
     }
     og.globalAlpha = 1;
   }
@@ -1169,12 +1169,12 @@
     const tw = og.measureText(lab).width;
     const lx = Math.max(12, r3.x - r3.px * 2.2 - 24 - tw), ly = r3.y - r3.px * 2.0 - 10;
     og.globalAlpha = w;
-    og.strokeStyle = "rgba(255,181,71,0.8)"; og.lineWidth = 1;
+    og.strokeStyle = "rgba(169,214,255,0.8)"; og.lineWidth = 1;
     og.beginPath(); og.moveTo(r3.x - r3.px * 0.8, r3.y - r3.px * 0.8); og.lineTo(lx + tw + 4, ly + 4); og.stroke();
-    haloText(lab, lx, ly, "#ffb547");
+    haloText(lab, lx, ly, "#a9d6ff");
     haloText(C.lang === "en" ? "Model: NASA generic 1U CubeSat" : "Modell: NASAs generiske 1U-CubeSat", lx, ly + 15, "rgba(241,241,238,.55)", `400 10px ${MONO}`);
     og.globalAlpha = 1;
-    if (w > 0.5) hovers.push({ x: r3.x, y: r3.y, r: r3.px * 1.4, html: tipHTML("FramSat-1", "Orbit NTNU · 1U CubeSat · 1 kg", C.S().whyShort,
+    if (w > 0.5) hovers.push({ x: r3.x, y: r3.y, r: r3.px * 1.4, html: tipHTML("FramSat-1", "Orbit NTNU, 1U CubeSat, 1 kg", C.S().whyShort,
       [[C.S().k.payloads, C.lang === "en" ? "Experimental sun sensor (EIDEL)" : "Eksperimentell solsensor (EIDEL)"], [C.S().k.sun, r3.sunlit ? C.S().sunlitNow : C.S().darkNow]]) });
   }
   function drawCubeFlat(cam, w, t) {
@@ -1250,11 +1250,11 @@
     const anchor = P(world([0, 0, 0])), lab = C.S().labels.fs;
     const px = size / cam.tanH * VH() / 2;
     const lx = anchor[0] + px * 2.2 + 20, ly = anchor[1] - px * 1.8 - 10;
-    og.strokeStyle = "rgba(255,181,71,0.8)"; og.lineWidth = 1;
+    og.strokeStyle = "rgba(169,214,255,0.8)"; og.lineWidth = 1;
     og.beginPath(); og.moveTo(anchor[0] + px * 0.6, anchor[1] - px * 0.6); og.lineTo(lx - 4, ly + 4); og.stroke();
-    haloText(lab, lx, ly, "#ffb547");
+    haloText(lab, lx, ly, "#a9d6ff");
     og.globalAlpha = 1;
-    if (w > 0.5) hovers.push({ x: anchor[0], y: anchor[1], r: px * 1.2, html: tipHTML("FramSat-1", "Orbit NTNU · 1U CubeSat · 1 kg", C.S().whyShort,
+    if (w > 0.5) hovers.push({ x: anchor[0], y: anchor[1], r: px * 1.2, html: tipHTML("FramSat-1", "Orbit NTNU, 1U CubeSat, 1 kg", C.S().whyShort,
       [[C.S().k.payloads, C.lang === "en" ? "Experimental sun sensor (EIDEL)" : "Eksperimentell solsensor (EIDEL)"], [C.S().k.sun, sunlit ? C.S().sunlitNow : C.S().darkNow]]) });
   }
 
@@ -1279,17 +1279,17 @@
       const [name, la, lo, dia, kind, ten, tno] = o.f;
       const a = w * Math.min(1, (o.facing - 0.08) * 4);
       og.globalAlpha = a;
-      og.strokeStyle = kind === "site" ? "#ffb547" : "rgba(255,255,255,0.9)"; og.lineWidth = 1.2;
+      og.strokeStyle = kind === "site" ? "#a9d6ff" : "rgba(255,255,255,0.9)"; og.lineWidth = 1.2;
       if (kind === "site") { og.beginPath(); og.moveTo(o.sp[0], o.sp[1] - 5); og.lineTo(o.sp[0] + 5, o.sp[1]); og.lineTo(o.sp[0], o.sp[1] + 5); og.lineTo(o.sp[0] - 5, o.sp[1]); og.closePath(); og.stroke(); }
       else if (kind === "crater") { og.strokeStyle = "rgba(0,0,0,0.6)"; og.lineWidth = 3; og.beginPath(); og.arc(o.sp[0], o.sp[1], o.rpx, 0, Math.PI * 2); og.stroke(); og.strokeStyle = "rgba(255,255,255,0.9)"; og.lineWidth = 1.2; og.stroke(); }
       else { og.fillStyle = "#fff"; og.beginPath(); og.arc(o.sp[0], o.sp[1], 2.5, 0, Math.PI * 2); og.fill(); }
-      if (k < 9) haloText(name, o.sp[0] + Math.max(7, o.rpx * 0.75) + 3, o.sp[1] + 4, kind === "site" ? "#ffb547" : "#ffffff", `500 12px ${MONO}`);
+      if (k < 9) haloText(name, o.sp[0] + Math.max(7, o.rpx * 0.75) + 3, o.sp[1] + 4, kind === "site" ? "#a9d6ff" : "#ffffff", `500 12px ${MONO}`);
       og.globalAlpha = 1;
       if (w > 0.5) {
         const sunAlt = deg(Math.asin(Math.max(-1, Math.min(1, dot(o.n, sun)))));
         const nearSide = dot(o.n, norm(mul(mf.moon, -1))) > 0;
         hovers.push({ x: o.sp[0], y: o.sp[1], r: Math.max(10, Math.min(30, o.rpx)), html: tipHTML(name,
-          `${L.kinds[kind]}${dia ? ` · ${fmtKm(dia)} km` : ""} · ${fmtN(Math.abs(la), 2)}° ${la >= 0 ? "N" : "S"}, ${fmtN(Math.abs(lo), 2)}° ${lo >= 0 ? (en ? "E" : "Ø") : s.west}`,
+          `${L.kinds[kind]}${dia ? `, ${fmtKm(dia)} km` : ""}, ${fmtN(Math.abs(la), 2)}° ${la >= 0 ? "N" : "S"}, ${fmtN(Math.abs(lo), 2)}° ${lo >= 0 ? (en ? "E" : "Ø") : s.west}`,
           en ? ten : tno,
           [[s.k.side, nearSide ? L.near : L.far], [s.k.sunNow, L.sunAlt(sunAlt)], dia ? [en ? "Across, as seen from Earth" : "Bredde sett fra Jorden", `${fmtN(deg(dia / len(mf.moon)) * 3600, 0)}″`] : null]) });
       }
@@ -1354,12 +1354,12 @@
     const wA = Math.max(weights[1], 0.12 * (weights[0] + weights[2]));
     if (weights[1] > 0.02) {
       const lat65 = RING65;
-      polyline(cam, lat65, "#ffb547", 1.2, weights[1], [4, 4]);
+      polyline(cam, lat65, "#a9d6ff", 1.2, weights[1], [4, 4]);
       const lp = lat65.map(p => [p, project(cam, p)]).filter(([p, q]) => q && dot(p, cam.posKm) > RE * RE).sort((a, b) => a[1][1] - b[1][1]);
-      if (lp.length) { og.globalAlpha = weights[1]; haloText(L.n65, lp[lp.length - 1][1][0] + 8, lp[lp.length - 1][1][1] + 16, "#ffb547"); og.globalAlpha = 1; }
+      if (lp.length) { og.globalAlpha = weights[1]; haloText(L.n65, lp[lp.length - 1][1][0] + 8, lp[lp.length - 1][1][1] + 16, "#a9d6ff"); og.globalAlpha = 1; }
       for (const n of ["ASBM-1", "ASBM-2"]) {
         const st = sv(n, ms), state = asbmState(n, ms);
-        if (st && state && state.active) cone(cam, st.r, weights[1], "rgba(255,181,71,1)");
+        if (st && state && state.active) cone(cam, st.r, weights[1], "rgba(169,214,255,1)");
       }
     }
     for (const n of ["ASBM-1", "ASBM-2"]) {
@@ -1367,8 +1367,8 @@
       const st = sv(n, ms);
       if (st) {
         const g = geodetic(st.r, ms), state = asbmState(n, ms), lk = lookFrom(TRD.lat, TRD.lon, st.r, ms);
-        marker(cam, st.r, `${n} · ${state && state.active ? L.on : L.off}`, wA, state && state.active ? "#ffb547" : "#f1f1ee", `${fmtKm(altOf(st.r, ms))} km`,
-          tipHTML(n, `Space Norway · HEOSAT · ${en ? "launched 12 Aug 2024" : "skutt opp 12. aug. 2024"}`,
+        marker(cam, st.r, `${n}, ${state && state.active ? L.on : L.off}`, wA, state && state.active ? "#a9d6ff" : "#f1f1ee", `${fmtKm(altOf(st.r, ms))} km`,
+          tipHTML(n, `Space Norway, HEOSAT, ${en ? "launched 12 Aug 2024" : "skutt opp 12. aug. 2024"}`,
             en ? "Highly elliptical 16-hour orbit. It spends most of its time high over the Arctic, giving ships, planes and the military broadband where geostationary satellites are too low on the horizon."
                : "Svært elliptisk bane på 16 timer. Den tilbringer mesteparten av tiden høyt over Arktis og gir skip, fly og forsvaret bredbånd der geostasjonære satellitter står for lavt.",
             [[K.alt, `${fmtKm(altOf(st.r, ms))} km`], [K.spd, `${fmtN(len(st.v), 2)} km/s`], [K.pos, latlon(g.lat, g.lon)],
@@ -1383,8 +1383,8 @@
       if (el && pts.length) {
         let ap = pts[0], pe = pts[0];
         for (const p of pts) { if (len(p) > len(ap)) ap = p; if (len(p) < len(pe)) pe = p; }
-        marker(cam, ap, `${L.apo} · ${fmtKm(el.apogee)} km`, weights[1] * 0.8, "rgba(241,241,238,.7)", "", null, 1.5);
-        marker(cam, pe, `${L.peri} · ${fmtKm(el.perigee)} km`, weights[1] * 0.8, "rgba(241,241,238,.7)", "", null, 1.5);
+        marker(cam, ap, `${L.apo} ${fmtKm(el.apogee)} km`, weights[1] * 0.8, "rgba(241,241,238,.7)", "", null, 1.5);
+        marker(cam, pe, `${L.peri} ${fmtKm(el.perigee)} km`, weights[1] * 0.8, "rgba(241,241,238,.7)", "", null, 1.5);
       }
     }
     // GEO
@@ -1395,13 +1395,13 @@
       const g = geodetic(st.r, ms), info = GEO_INFO[n], el = elements(n);
       const isThor = n.startsWith("THOR");
       const pretty = n.replace("METEOSAT", "Meteosat").replace("HIMAWARI", "Himawari").replace("ELEKTRO", "Elektro").replace("EUTELSAT", "Eutelsat").replace("INMARSAT", "Inmarsat").replace("ASTRA", "Astra");
-      const label = weights[2] > 0.5 ? (isThor ? (n === "THOR 7" ? "Thor 5 · 6 · 7" : "") : narrow() ? "" : pretty) : "";   // phones: only Norway's own names
+      const label = weights[2] > 0.5 ? (isThor ? (n === "THOR 7" ? "Thor 5, 6, 7" : "") : narrow() ? "" : pretty) : "";   // phones: only Norway's own names
       const sp0 = project(cam, st.r), textLimit = narrow() ? 0 : Math.min(innerWidth * 0.55, 720);
       const lk = lookFrom(TRD.lat, TRD.lon, st.r, ms);
       const lonTxt = `${fmtN(Math.abs(g.lon), 2)}° ${g.lon >= 0 ? (en ? "E" : "Ø") : s.west}`;
       const swing = el ? (RE + 35786) * Math.sin(rad(el.inc)) : 0;
-      marker(cam, st.r, sp0 && sp0[0] < textLimit ? "" : label, wG * (weights[2] > 0.5 ? 1 : 0.5), isThor ? "#ffb547" : "#f1f1ee", "",
-        tipHTML(pretty, `${info[0]} · ${en ? "launched" : "skutt opp"} ${launchYear(n)}`, en ? info[1] : info[2],
+      marker(cam, st.r, sp0 && sp0[0] < textLimit ? "" : label, wG * (weights[2] > 0.5 ? 1 : 0.5), isThor ? "#a9d6ff" : "#f1f1ee", "",
+        tipHTML(pretty, `${info[0]}, ${en ? "launched" : "skutt opp"} ${launchYear(n)}`, en ? info[1] : info[2],
           [[K.lon, lonTxt], [K.alt, `${fmtKm(altOf(st.r, ms))} km`],
            el && [K.incl, `${fmtN(el.inc, 2)}°`], el && el.inc > 0.3 ? [K.swing, `± ${fmtKm(swing)} km`] : null,
            [K.fromTrd, skyText(lk)], lk.el > 0 ? [K.delay, `${fmtN(lk.range / 299.792458, 0)} ms`] : null]), 2.4);
@@ -1419,16 +1419,16 @@
         const lk = lookFrom(TRD.lat, TRD.lon, st.r, ms), el = elements(n), vis = visSet.has(n);
         if (vis) {
           const a = project(cam, trd), b = project(cam, st.r);
-          if (a && b && !hidden(cam, trd)) { og.globalAlpha = wM * 0.85; og.strokeStyle = "#ffb547"; og.lineWidth = 1; og.beginPath(); og.moveTo(a[0], a[1]); og.lineTo(b[0], b[1]); og.stroke(); og.globalAlpha = 1; }
+          if (a && b && !hidden(cam, trd)) { og.globalAlpha = wM * 0.85; og.strokeStyle = "#a9d6ff"; og.lineWidth = 1; og.beginPath(); og.moveTo(a[0], a[1]); og.lineTo(b[0], b[1]); og.stroke(); og.globalAlpha = 1; }
         }
         const short = galName(n);
-        marker(cam, st.r, vis ? short : "", wM * (vis ? 1 : 0.55), vis ? "#ffb547" : "rgba(160,200,255,1)", "",
-          tipHTML(short, `EU · EUSPA · ${en ? "launched" : "skutt opp"} ${launchYear(n)}`, L.galTip,
+        marker(cam, st.r, vis ? short : "", wM * (vis ? 1 : 0.55), vis ? "#a9d6ff" : "rgba(241,241,238,.75)", "",
+          tipHTML(short, `EU, EUSPA, ${en ? "launched" : "skutt opp"} ${launchYear(n)}`, L.galTip,
             [[K.alt, `${fmtKm(altOf(st.r, ms))} km`], [K.spd, `${fmtN(len(st.v), 2)} km/s`], el && [K.incl, `${fmtN(el.inc, 1)}°`], el && [K.period, fmtMin(el.period)],
              [K.fromTrd, skyText(lk)], [K.delay, `${fmtN(lk.range / 299.792458, 1)} ms`]]), vis ? 2.6 : 2);
       }
       const tp = project(cam, trd);
-      if (tp && !hidden(cam, trd)) { og.globalAlpha = wM; og.fillStyle = "#ffb547"; og.beginPath(); og.arc(tp[0], tp[1], 3.5, 0, Math.PI * 2); og.fill(); haloText("Trondheim", tp[0] + 9, tp[1] + 4, "#ffb547"); og.globalAlpha = 1; }
+      if (tp && !hidden(cam, trd)) { og.globalAlpha = wM; og.fillStyle = "#a9d6ff"; og.beginPath(); og.arc(tp[0], tp[1], 3.5, 0, Math.PI * 2); og.fill(); haloText("Trondheim", tp[0] + 9, tp[1] + 4, "#a9d6ff"); og.globalAlpha = 1; }
     }
     // ground lines while low
     geoLines(cam, ms, Math.max(weights[4] * 0.6, rideW));
@@ -1439,14 +1439,14 @@
     if (iss) {
       const lk = lookFrom(TRD.lat, TRD.lon, iss.r, ms), ex = orbitExtras("ISS", ms);
       marker(cam, iss.r, "ISS", wI, "#f1f1ee", `${fmtKm(altOf(iss.r, ms))} km`,
-        tipHTML("ISS", en ? "International Space Station · NASA, Roscosmos, ESA, JAXA, CSA" : "Den internasjonale romstasjonen · NASA, Roscosmos, ESA, JAXA, CSA",
+        tipHTML("ISS", en ? "International Space Station, NASA, Roscosmos, ESA, JAXA, CSA" : "Den internasjonale romstasjonen, NASA, Roscosmos, ESA, JAXA, CSA",
           en ? "Crewed without a break since 2 November 2000. About the size of a football field and roughly 420 tonnes." : "Bemannet uten opphold siden 2. november 2000. Omtrent like stor som en fotballbane og rundt 420 tonn.",
           [[K.alt, `${fmtKm(altOf(iss.r, ms))} km`], [K.spd, `${fmtKm(len(iss.v) * 3600)} km/h`], ex && [K.sink, `${fmtN(ex.sink, 0)} m/${en ? "day" : "døgn"}`], [K.fromTrd, skyText(lk)]]));
     }
     // FramSat-1
     const fs = sv("FRAMSAT-1", ms);
-    polyline(cam, orbit("FRAMSAT-1", ms), "rgba(255,181,71,0.75)", 1.2, weights[4] * 0.7 + (cam.mode !== "ride" ? weights[5] : 0));
-    if (fs && cam.mode !== "ride" && cam.cube < 0.15) marker(cam, fs.r, "FramSat-1", Math.max(weights[4], weights[5]) * (1 - cam.cube / 0.15), "#ffb547", `${fmtKm(altOf(fs.r, ms))} km`, tipHTML("FramSat-1", "Orbit NTNU · 1U CubeSat", s.whyShort, []));
+    polyline(cam, orbit("FRAMSAT-1", ms), "rgba(169,214,255,0.75)", 1.2, weights[4] * 0.7 + (cam.mode !== "ride" ? weights[5] : 0));
+    if (fs && cam.mode !== "ride" && cam.cube < 0.15) marker(cam, fs.r, "FramSat-1", Math.max(weights[4], weights[5]) * (1 - cam.cube / 0.15), "#a9d6ff", `${fmtKm(altOf(fs.r, ms))} km`, tipHTML("FramSat-1", "Orbit NTNU, 1U CubeSat", s.whyShort, []));
     groundTrack(cam, ms, rideW);
     drawCube(cam, cam.cube, t);
   }
@@ -1525,7 +1525,7 @@
       const a = satNumbers("ASBM-1", ms), b = satNumbers("ASBM-2", ms);
       const sa = asbmState("ASBM-1", ms), sb = asbmState("ASBM-2", ms), Lb = s.labels;
       body = rows([
-        a && ["ASBM-1", `${fmtKm(a.alt)} km · ${sa && sa.active ? Lb.on : Lb.off}`], b && ["ASBM-2", `${fmtKm(b.alt)} km · ${sb && sb.active ? Lb.on : Lb.off}`],
+        a && ["ASBM-1", `${fmtKm(a.alt)} km, ${sa && sa.active ? Lb.on : Lb.off}`], b && ["ASBM-2", `${fmtKm(b.alt)} km, ${sb && sb.active ? Lb.on : Lb.off}`],
         sa && [k.active + " 1", sa.active ? Lb.onFor(sa.minutes) : Lb.offFor(sa.minutes)], sb && [k.active + " 2", sb.active ? Lb.onFor(sb.minutes) : Lb.offFor(sb.minutes)],
         [k.cover, C.lang === "en" ? "North of 65° N, 24/7" : "Nord for 65° N, hele døgnet"],
         el && [k.pa, rangeText("ASBM-1", ms)], el && [k.period, fmtMin(el.period)], el && [k.inc, `${fmtN(el.inc, 1)}°`], [k.launched, "12 Aug 2024"]]);
@@ -1535,12 +1535,12 @@
     } else if (stopIdx === 3) {
       const sky = gpsSky(ms);
       const nearest = sky.vis.length ? sky.vis.reduce((a, b) => a.l.range < b.l.range ? a : b) : null;
-      const dopTxt = sky.pdop ? `${fmtN(sky.pdop, 1)} · ${sky.pdop < 2 ? (C.lang === "en" ? "excellent" : "utmerket") : sky.pdop < 4 ? (C.lang === "en" ? "good" : "god") : (C.lang === "en" ? "fair" : "middels")}` : "–";
+      const dopTxt = sky.pdop ? `${fmtN(sky.pdop, 1)}, ${sky.pdop < 2 ? (C.lang === "en" ? "excellent" : "utmerket") : sky.pdop < 4 ? (C.lang === "en" ? "good" : "god") : (C.lang === "en" ? "fair" : "middels")}` : "–";
       const gel = elements(GAL_SATS[0]);
       body = rows([[k.visible, `${sky.vis.length} ${C.lang === "en" ? "of" : "av"} ${GAL_SATS.length} ${C.lang === "en" ? "shown" : "vist"}`], [k.dop, dopTxt],
-        nearest && [k.nearest, `${galName(nearest.n)} · ${fmtKm(nearest.l.range)} km`],
+        nearest && [k.nearest, `${galName(nearest.n)}, ${fmtKm(nearest.l.range)} km`],
         nearest && [k.delay, `${fmtN(nearest.l.range / 299.792458, 1)} ms`],
-        gel && [k.period, fmtMin(gel.period)], [k.incl, "56°"], ["E1 · E5a", "1575.42 · 1176.45 MHz"],
+        gel && [k.period, fmtMin(gel.period)], [k.incl, "56°"], [C.lang === "en" ? "E1 and E5a" : "E1 og E5a", `1575.42 ${C.lang === "en" ? "and" : "og"} 1176.45 MHz`],
         [C.lang === "en" ? "Free accuracy" : "Gratis nøyaktighet", C.lang === "en" ? "≈ 20 cm with the High Accuracy Service" : "≈ 20 cm med High Accuracy Service"],
         [C.lang === "en" ? "Signal at the ground" : "Signal ved bakken", C.lang === "en" ? "≈ −128 dBm, below the noise" : "≈ −128 dBm, under støyen"]]);
     } else if (stopIdx === 5) {
@@ -1557,8 +1557,8 @@
         const lk = look("ISS", ms);
         const crewDays = Math.floor((ms - Date.UTC(2000, 10, 2)) / 864e5);
         body = rows([
-          [k.alt, `${fmtKm(n.alt)} km`], [k.over, placeName(n.g.lat, n.g.lon)], [k.pass, passText("ISS", ms)], [k.aboard, `2 Nov 2000 · ${fmtKm(crewDays)} ${C.lang === "en" ? "days" : "dager"}`],
-          [k.spd, `${fmtN(n.v, 2)} km/s · ${fmtKm(n.v * 3600)} km/h`], [k.pos, latlon(n.g.lat, n.g.lon)],
+          [k.alt, `${fmtKm(n.alt)} km`], [k.over, placeName(n.g.lat, n.g.lon)], [k.pass, passText("ISS", ms)], [k.aboard, `2 Nov 2000, ${fmtKm(crewDays)} ${C.lang === "en" ? "days" : "dager"}`],
+          [k.spd, `${fmtN(n.v, 2)} km/s (${fmtKm(n.v * 3600)} km/h)`], [k.pos, latlon(n.g.lat, n.g.lon)],
           [k.sun, sunText(n, ms)], [k.lst, `${String(Math.floor(n.lst)).padStart(2, "0")}:${String(Math.floor((n.lst % 1) * 60)).padStart(2, "0")}`],
           n.orbitNo && [k.orbit, fmtKm(n.orbitNo)], n.el && [k.rate, fmtN(n.el.revPerDay, 2)], n.el && [k.pa, rangeText("ISS", ms)],
           n.el && [k.inc, `${fmtN(n.el.inc, 2)}°`], lk && [k.trd, `${fmtKm(lk.range)} km`],
@@ -1649,7 +1649,7 @@
     mg.lineWidth = 1.5 * dpr;
     for (let i = 1; i < pts.length; i++) {
       if (Math.abs(pts[i][0] - pts[i - 1][0]) > W / 2) continue;
-      mg.strokeStyle = pts[i][2] <= 0 ? "rgba(255,181,71,0.3)" : "rgba(255,181,71,0.95)";
+      mg.strokeStyle = pts[i][2] <= 0 ? "rgba(169,214,255,0.3)" : "rgba(169,214,255,0.95)";
       mg.beginPath(); mg.moveTo(pts[i - 1][0], pts[i - 1][1]); mg.lineTo(pts[i][0], pts[i][1]); mg.stroke();
     }
     mg.font = `500 ${10 * dpr}px ${MONO}`;
@@ -1660,7 +1660,7 @@
       const g = geodetic(s0.r, ms);
       // footprint radius on the ground, for 0° elevation
       const lam = deg(Math.acos(RE / len(s0.r)));
-      mg.strokeStyle = "rgba(255,181,71,0.6)"; mg.lineWidth = 1 * dpr; mg.beginPath();
+      mg.strokeStyle = "rgba(169,214,255,0.6)"; mg.lineWidth = 1 * dpr; mg.beginPath();
       for (let i = 0; i <= 64; i++) {
         const th = i / 64 * 2 * Math.PI;
         const la2 = deg(Math.asin(Math.sin(rad(g.lat)) * Math.cos(rad(lam)) + Math.cos(rad(g.lat)) * Math.sin(rad(lam)) * Math.cos(th)));
@@ -1669,8 +1669,8 @@
         i ? mg.lineTo(x, y) : mg.moveTo(x, y);
       }
       mg.stroke();
-      mg.fillStyle = "rgba(255,181,71,0.25)"; mg.beginPath(); mg.arc(X(g.lon), Y(g.lat), 7 * dpr, 0, Math.PI * 2); mg.fill();
-      dot2(g.lon, g.lat, "#ffb547", 3.5, name === "ISS" ? "ISS" : "FramSat-1");
+      mg.fillStyle = "rgba(169,214,255,0.25)"; mg.beginPath(); mg.arc(X(g.lon), Y(g.lat), 7 * dpr, 0, Math.PI * 2); mg.fill();
+      dot2(g.lon, g.lat, "#a9d6ff", 3.5, name === "ISS" ? "ISS" : "FramSat-1");
     }
   }
   function buildViews() {
@@ -1704,8 +1704,8 @@
     landColor: h => `rgba(241,241,238,${0.35 + 0.5 * h})`,
     ocean: ["#0b0f1c", "#030408"],
     atmosphere: [[0, "rgba(120,160,255,0.28)"], [0.35, "rgba(40,80,170,0.10)"], [1, "rgba(0,0,0,0)"]],
-    trackColor: f => [1, 0.71 + 0.1 * f, 0.28],
-    satGlow: "rgba(255,181,71,0.55)", footprint: "rgba(255,181,71,0.5)", footprintFill: "rgba(255,181,71,0.05)",
+    trackColor: f => [0.66 - 0.06 * f, 0.84, 1],
+    satGlow: "rgba(169,214,255,0.55)", footprint: "rgba(169,214,255,0.5)", footprintFill: "rgba(169,214,255,0.05)",
     font: MONO, alwaysText: true,
   });
   const drawer = $("drawer");

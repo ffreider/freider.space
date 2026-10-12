@@ -6,7 +6,7 @@
 
 export const DESCENT_CSS = String.raw`
 /* Layout: a guided descent from the Moon to FramSat-1. Rendered Earth and Moon fill the screen; content sits on a polar-night haze on the left; a short route list on the right names each stop.
-   Text layer: one family, Schibsted Grotesk (drawn for the Norwegian media group Schibsted), hierarchy by size and weight, sentence case, tabular figures for numbers. One accent, the amber the descent uses for FramSat-1. Corners: panels 12px, media inside them 8px, buttons fully round. */
+   Text layer: one family, Schibsted Grotesk (drawn for the Norwegian media group Schibsted), hierarchy by size and weight, sentence case, tabular figures for numbers. One accent, a pale glacier blue, for FramSat-1 and Norway’s own satellites. Corners: panels 12px, media inside them 8px, buttons fully round. */
 :root {
   --void: #000000;
   --haze: 10, 18, 32;                       /* polar night, as r, g, b for the haze's alpha steps */
@@ -15,7 +15,7 @@ export const DESCENT_CSS = String.raw`
   --ink-3: #93a4b4;
   --ink-4: rgba(147, 164, 180, 0.6);
   --rule: rgba(147, 164, 180, 0.2);
-  --fs: #ffb547;
+  --fs: #a9d6ff;
   --panel: rgba(var(--haze), 0.6);
   --f-display: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
   --f-body: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
@@ -190,13 +190,13 @@ body.live-lock footer { visibility: hidden; }
 .views { display: flex; flex-wrap: wrap; gap: 4px; }
 .views button { font: 500 13.5px/1 var(--f-body); color: var(--ink-2); background: var(--panel); border: 1px solid var(--rule); border-radius: 999px; padding: 8px 12px; cursor: pointer; }
 .views button:hover { color: var(--ink); }
-.views button[aria-pressed="true"] { color: #140b00; background: var(--ink); border-color: var(--ink); }
+.views button[aria-pressed="true"] { color: #0a1220; background: var(--ink); border-color: var(--ink); }
 .live { font-size: 18px; line-height: 1.45; min-height: 3em; color: var(--ink); text-shadow: 0 1px 12px rgba(0,0,0,.8); }
 .hud-row { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 15px/1.3 var(--f-data); color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .hud-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
 .hud-actions .hint { margin: 0; }
-.primary { font: 600 15px/1 var(--f-body); color: #1a0f00; background: var(--fs); border: 0; border-radius: 999px; padding: 14px 20px; cursor: pointer; }
-.primary:hover { background: #ffc875; }
+.primary { font: 600 15px/1 var(--f-body); color: #0a2440; background: var(--fs); border: 0; border-radius: 999px; padding: 14px 20px; cursor: pointer; }
+.primary:hover { background: #c6e4ff; }
 
 /* tracker drawer */
 .drawer {
