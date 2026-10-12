@@ -63,6 +63,14 @@ function rolesHtml(timeline: Entry[], lang: Lang) {
         });
         html += `</ul>`;
       }
+      if (e.photos?.length) {
+        html += `<div class="shots">`;
+        for (const p of e.photos) {
+          const cap = escape(p.caption[lang]);
+          html += `<figure><button class="shot" type="button" data-full="/descent/photos/${p.src}-1600.jpg" data-pw="${p.w}" data-ph="${p.h}"><img src="/descent/photos/${p.src}-640.jpg" width="${p.w}" height="${p.h}" loading="lazy" decoding="async" alt="${cap}"></button><figcaption>${cap}</figcaption></figure>`;
+        }
+        html += `</div>`;
+      }
       return html + `</li>`;
     })
     .join("");

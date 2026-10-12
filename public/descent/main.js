@@ -1841,6 +1841,22 @@
     document.querySelectorAll(".view-btns").forEach(v => [...v.children].forEach((b, k) => b.setAttribute("aria-pressed", String(k === i))));
   }
 
+  /* ---------- photos, opened large ---------- */
+  const lightbox = $("lightbox");
+  document.addEventListener("click", e => {
+    const shot = e.target.closest && e.target.closest(".shot");
+    if (shot) {
+      const img = lightbox.querySelector("img"), small = shot.querySelector("img");
+      img.src = small.currentSrc || small.src;                      // the small one at once, then the large
+      img.alt = small.alt; img.width = shot.dataset.pw; img.height = shot.dataset.ph;
+      const big = new Image(); big.onload = () => { if (lightbox.open) img.src = big.src; }; big.src = shot.dataset.full;
+      lightbox.querySelector("p").textContent = small.alt;
+      lightbox.showModal();
+      return;
+    }
+    if (lightbox.open && (e.target === lightbox || e.target.closest(".lightbox .btn"))) lightbox.close();
+  });
+
   /* ---------- tracker drawer ---------- */
   const globe = C.createGlobe({
     canvas: $("globe"),

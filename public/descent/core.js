@@ -211,6 +211,19 @@ window.Core = (() => {
         });
         li.append(sub);
       }
+      // photos, as on the server: a small one in the list, the large one when opened
+      if (e.photos && e.photos.length) {
+        const shots = el("div", "shots");
+        for (const p of e.photos) {
+          const make = t => document.createElement(t);
+          const fig = make("figure"), btn = make("button"), img = make("img"), cap = p.caption[lang];
+          btn.className = "shot";
+          btn.type = "button"; btn.dataset.full = `/descent/photos/${p.src}-1600.jpg`; btn.dataset.pw = p.w; btn.dataset.ph = p.h;   // not data-h: that marks text to fill in
+          Object.assign(img, { src: `/descent/photos/${p.src}-640.jpg`, width: p.w, height: p.h, loading: "lazy", decoding: "async", alt: cap });
+          btn.append(img); fig.append(btn, el("figcaption", null, cap)); shots.append(fig);
+        }
+        li.append(shots);
+      }
       return li;
     }));
   }

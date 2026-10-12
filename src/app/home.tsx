@@ -22,7 +22,12 @@ export type Entry = {
   // Newest first. Each role runs until the next one starts, and the last
   // until the entry's end.
   roles: Role[];
+  // Shown under the entry: public/descent/photos/<src>-640.jpg in the list,
+  // -1600.jpg when opened. w and h are the large file's size.
+  photos?: Photo[];
 };
+
+export type Photo = { src: string; w: number; h: number; caption: L };
 
 const same = (text: string): L => ({ en: text, no: text });
 
@@ -44,6 +49,9 @@ export const timeline: Entry[] = [
   {
     org: same("Spacepodden"),
     href: "https://open.spotify.com/show/7ofO8qm8tRBk2llQEMK8JB",
+    photos: [
+      { src: "spacepodden-minister", w: 1600, h: 1067, caption: { en: "Recording an episode with the Minister of Trade and Industry.", no: "Opptak av en episode med næringsministeren." } },
+    ],
     description: {
       en: "A weekly Norwegian-language podcast about space.",
       no: "En ukentlig norskspråklig podkast om verdensrommet.",
@@ -54,6 +62,9 @@ export const timeline: Entry[] = [
     org: same("NORSTEC Summit"),
     short: same("Summit"),
     href: "https://norstec.no/summit",
+    photos: [
+      { src: "summit-wennesland", w: 1600, h: 1066, caption: { en: "With state secretary Wennesland, after we’d been on stage together.", no: "Med statssekretær Wennesland, etter at vi hadde vært på scenen sammen." } },
+    ],
     description: {
       en: "Norway's annual space conference. First held March 2026 in Trondheim.",
       no: "Norges årlige romfartskonferanse. Arrangert første gang i mars 2026 i Trondheim.",
@@ -68,6 +79,9 @@ export const timeline: Entry[] = [
   {
     org: same("NORSTEC"),
     href: "https://norstec.no",
+    photos: [
+      { src: "norstec-napkin", w: 1600, h: 1067, caption: { en: "NORSTEC’s co-founders. I’m holding the napkin we signed in 2023.", no: "NORSTECs medgründere. Jeg holder servietten vi signerte i 2023." } },
+    ],
     description: {
       en: "The Norwegian Space Technology Collective, an umbrella organization for 10 student space and rocketry organizations with 550+ members.",
       no: "Norwegian Space Technology Collective, en paraplyorganisasjon for 10 studentorganisasjoner innen romfart og rakett, med over 550 medlemmer.",
@@ -114,6 +128,11 @@ export const timeline: Entry[] = [
     end: [2026, 5],
     org: same("Orbit NTNU"),
     href: "https://orbitntnu.com/",
+    photos: [
+      { src: "selfiesat", w: 1600, h: 1202, caption: { en: "SelfieSat in orbit.", no: "SelfieSat i bane." } },
+      { src: "orbit-team", w: 1600, h: 969, caption: { en: "The Orbit NTNU team.", no: "Orbit NTNU-gjengen." } },
+      { src: "framsat-gala", w: 1600, h: 1092, caption: { en: "Playing at the FramSat-1 gala in Banksalen, Trondheim.", no: "Spiller på FramSat-1-gallaen i Banksalen i Trondheim." } },
+    ],
     description: {
       en: "The student satellite program behind SelfieSat, FramSat-1/1.5 and BioSat.",
       no: "Studentsatellittprogrammet bak SelfieSat, FramSat-1/1.5 og BioSat.",

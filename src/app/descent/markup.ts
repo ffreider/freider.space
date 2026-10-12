@@ -168,6 +168,21 @@ p { margin: 0; }
 .sub li { font-size: 16px; color: var(--ink-2); }
 .sub .row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
 .sub .note { color: var(--ink-3); font-size: 15px; display: block; }
+/* photos under an entry; click one to see it large */
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 14px; }
+.shots figure { margin: 0; display: grid; gap: 6px; align-content: start; }
+.shot { all: unset; cursor: zoom-in; display: block; border-radius: 8px; overflow: hidden; }
+.shot:focus-visible { outline: 2px solid rgba(169, 214, 255, .85); outline-offset: 3px; }
+.shot img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; transition: transform .6s var(--ease), filter .3s var(--ease); filter: saturate(.9); }
+.shot:hover img { transform: scale(1.03); filter: none; }
+.shots figcaption { font-size: 13px; line-height: 1.45; color: var(--ink-3); }
+.lightbox { border: 0; padding: 0; background: none; max-width: min(1200px, 92vw); color: var(--ink); overflow: visible; }
+.lightbox::backdrop { background: rgba(4, 8, 16, .86); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.lightbox[open] { animation: lb-in var(--t) var(--ease); }
+@keyframes lb-in { from { opacity: 0; transform: scale(.98); } }
+.lightbox img { display: block; width: min(1200px, 92vw); height: auto; max-height: 82vh; object-fit: contain; margin: 0 auto; border-radius: 8px; }
+.lightbox p { margin: 12px auto 0; max-width: 70ch; font-size: 14px; line-height: 1.5; color: var(--ink-2); text-align: center; }
+.lightbox .btn { position: absolute; top: 12px; right: 12px; z-index: 1; color: var(--ink); background: rgba(var(--haze), .75); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 
 .article { display: grid; gap: 12px; text-decoration: none; background: var(--panel); border-radius: 12px; overflow: hidden; padding: 0 0 22px; max-width: 480px; }
 .article > *:not(img) { margin-inline: 20px; }
@@ -346,6 +361,7 @@ export const DESCENT_BODY = String.raw`
 </aside>
 <div class="tip" id="tip" role="status"></div>
 <div class="drag-cue" id="dragCue" aria-hidden="true"></div>
+<dialog class="lightbox" id="lightbox"><button class="btn" type="button" data-t="close"></button><img alt=""><p></p></dialog>
 
 <main>
   <section class="hero" id="top" data-stop="0">
