@@ -1776,8 +1776,18 @@
   let colRight = 0;
   const measureCol = () => { const c = document.querySelector("main .band .col"); colRight = c ? c.getBoundingClientRect().right : 0; };
   window.addEventListener("resize", measureCol);
+  const hud = $("hud");
   function fadeUnderText(stopIdx, rideW) {
-    if (stopIdx === 0 || rideW > 0.5 || narrow()) return;     // phones: the text is below the scene
+    if (stopIdx === 0 || narrow()) return;     // phones: the scene fades down under text instead
+    if (rideW > 0.5) {
+      // riding: thin out the labels behind the closing panel
+      if (!document.body.classList.contains("live-lock")) return;
+      const r = hud.getBoundingClientRect(), cx = r.left + r.width * 0.45, cy = r.top + r.height * 0.55, R = Math.max(r.width, r.height) * 0.75;
+      const g = og.createRadialGradient(cx, cy, 0, cx, cy, R);
+      g.addColorStop(0, "rgba(0,0,0,.9)"); g.addColorStop(0.6, "rgba(0,0,0,.75)"); g.addColorStop(1, "rgba(0,0,0,0)");
+      og.save(); og.globalCompositeOperation = "destination-out"; og.fillStyle = g; og.fillRect(cx - R, cy - R, 2 * R, 2 * R); og.restore();
+      return;
+    }
     if (!colRight) measureCol();
     og.save();
     og.globalCompositeOperation = "destination-out";

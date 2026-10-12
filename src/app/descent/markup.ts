@@ -172,6 +172,12 @@ p { margin: 0; }
   opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .6s, transform .6s;
 }
 body.live-lock .hud { opacity: 1; transform: none; pointer-events: auto; cursor: auto; }
+/* a soft pool of polar night behind the panel, so it reads over the bright Earth */
+@media (min-width: 901px) {
+  .hud { isolation: isolate; overflow: visible; }
+  .hud::before { content: ""; position: absolute; z-index: -1; inset: -90px -140px -60px -120px; pointer-events: none;
+    background: radial-gradient(ellipse 60% 58% at 42% 55%, rgba(var(--haze), .82), rgba(var(--haze), .6) 48%, rgba(var(--haze), 0) 100%); }
+}
 .hud .k { display: flex; gap: 10px; align-items: center; font: 500 13px/1.3 var(--f-data); color: var(--fs); }
 .hud .k::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
 @keyframes pulse { 50% { opacity: .25; } }
