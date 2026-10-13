@@ -319,6 +319,18 @@ footer p { max-width: 60ch; }
   .hud, body.live-lock .hud { position: relative; z-index: 3; left: auto; bottom: auto; width: auto; max-height: none; overflow: visible; opacity: 1; transform: none; pointer-events: auto;
     padding: 14svh var(--gutter) calc(28px + env(safe-area-inset-bottom, 0px)); }
   .hud .why, .hud-actions .hint { display: none; }
+  /* photos: a row you swipe through, large, the next one peeking in at the
+     edge, captions underneath (there's no hover on a phone) */
+  .shots, .shots.pair { display: flex; gap: 10px; max-width: none; margin: 16px calc(-1 * var(--gutter)) 0; padding: 0 var(--gutter);
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); overscroll-behavior-x: contain; scrollbar-width: none; }
+  .shots::-webkit-scrollbar { display: none; }
+  .shots figure { flex: 0 0 84%; scroll-snap-align: start; }
+  .shots figure:only-child { flex-basis: 100%; }
+  .shot img { aspect-ratio: 4 / 3; }
+  .shots figcaption, .photo figcaption, .shots figure:hover figcaption, .photo:hover figcaption {
+    position: static; opacity: 1; transform: none; padding: 8px 0 0; background: none; color: var(--ink-3); font-size: 13px; pointer-events: auto; }
+  .lightbox { max-width: 100vw; }
+  .lightbox img { width: 100vw; border-radius: 0; }
   footer, body.live-lock footer { display: none; }
 }
 }
@@ -328,6 +340,8 @@ footer p { max-width: 60ch; }
    when the first maps are in). Only transforms, so it costs next to nothing.
    Without JavaScript it steps aside on its own after a few seconds. */
 .cover { position: fixed; inset: 0; z-index: 20; pointer-events: none; animation: cover-gone 0s 6s forwards; }
+/* no scrolling while it's up: the page holds still until it opens */
+html:has(.cover:not(.open)), html:has(.cover:not(.open)) body { overflow: hidden; }
 .door { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; background: rgb(var(--haze)); transition: transform .9s cubic-bezier(.7, 0, .2, 1); }
 .door.up { top: 0; }
 .door.down { bottom: 0; }

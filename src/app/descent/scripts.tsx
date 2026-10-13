@@ -41,6 +41,22 @@ export function DescentScripts() {
     if (window.__descentStarted) return;
     window.__descentStarted = true;
 
+    // Hold the page still while the cover is up (CSS stops scrolling; this
+    // stops touch and wheel on browsers that scroll anyway). It lets go once
+    // main.js opens the cover, or after 6 s whatever happens.
+    const covered = () => {
+      const c = document.getElementById("cover");
+      return !!c && !c.classList.contains("open") && performance.now() < 6000;
+    };
+    const hold = (e: Event) => { if (covered()) e.preventDefault(); };
+    window.addEventListener("touchmove", hold, { passive: false });
+    window.addEventListener("wheel", hold, { passive: false });
+    const release = () => {
+      window.removeEventListener("touchmove", hold); window.removeEventListener("wheel", hold);
+      document.getElementById("cover")?.classList.add("open");   // in case nothing else opened it
+    };
+    setTimeout(release, 6500);
+
     (async () => {
       const [d3, topojson, satellite, THREE, { GLTFLoader }, world, iso] = await Promise.all([
         import("d3-geo"),
@@ -59,7 +75,10 @@ export function DescentScripts() {
       jsonScript("isoData", iso);
       await runScript("/descent/core.js");
       await runScript("/descent/main.js");
-    })().catch((err) => console.error(err));
+    })().catch((err) => {
+      console.error(err);
+      document.getElementById("cover")?.classList.add("open");   // never leave the page stuck under the cover
+    });
   }, []);
 
   return null;

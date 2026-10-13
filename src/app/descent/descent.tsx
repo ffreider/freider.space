@@ -137,6 +137,10 @@ export async function Descent({
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: DESCENT_CSS }} />
+      {/* without JavaScript the cover steps aside on its own, so scrolling must work */}
+      <noscript>
+        <style>{"html, body { overflow: auto !important; }"}</style>
+      </noscript>
       <div id="descent" data-lang={lang} dangerouslySetInnerHTML={{ __html: fill(text[lang], timeline, lang) }} />
       <script type="application/json" id="tleData" dangerouslySetInnerHTML={{ __html: json(tles) }} />
       <script type="application/json" id="timelineData" dangerouslySetInnerHTML={{ __html: json(timeline) }} />
