@@ -1,4 +1,4 @@
-// Shared by the contact page and its downloadable card.
+// Shared by the contact page (/contact) and its downloadable card.
 export const CONTACT = {
   name: "Freider Fløan",
   givenName: "Freider",

@@ -1,0 +1,82 @@
+/* The homepage's text layer on its own: black space, Schibsted Grotesk in
+   sentence case, one glacier-blue accent, panels 12px, buttons fully round.
+   Earth's limb glows faintly at the bottom, where the descent ends. */
+:global(html):has(.page), :global(body):has(.page) { background: #000; }
+
+.page {
+  --ink: #eef2f5;
+  --ink-2: rgba(238, 242, 245, 0.78);
+  --ink-3: #93a4b4;
+  --ink-4: rgba(147, 164, 180, 0.6);
+  --rule: rgba(147, 164, 180, 0.2);
+  --fs: #a9d6ff;
+  color-scheme: dark;
+  text-shadow: none;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  background:
+    radial-gradient(140% 38% at 50% 118%, rgba(169, 214, 255, 0.16), rgba(169, 214, 255, 0.04) 55%, transparent 75%),
+    #000;
+  color: var(--ink);
+  font-family: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.col { width: 100%; max-width: 380px; }
+
+.top { display: flex; justify-content: space-between; align-items: center; }
+.site { font-size: 15px; font-weight: 600; line-height: 1; color: var(--ink); text-decoration: none; padding: 8px 0; }
+.moon { display: block; }
+
+.header { margin: 44px 0 32px; }
+.portrait { display: block; width: 96px; height: 96px; object-fit: cover; object-position: center 30%; border-radius: 50%; margin-bottom: 22px; }
+.name { margin: 0; font-size: clamp(36px, 10vw, 46px); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
+.intro { margin: 12px 0 0; font-size: 17px; line-height: 1.5; color: var(--ink-2); }
+
+.save {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 56px; border-radius: 999px;
+  background: var(--fs); color: #0a1220;
+  font-size: 17px; font-weight: 600; text-decoration: none;
+  transition: background .2s, transform .15s;
+}
+.save:hover { background: #c8e5ff; }
+.save:active { transform: scale(0.98); }
+
+.ways {
+  margin-top: 16px;
+  background: rgba(10, 18, 32, 0.6);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+}
+.way {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  padding: 18px; color: var(--ink); text-decoration: none;
+  transition: background .2s;
+}
+.way + .way { border-top: 1px solid var(--rule); }
+.way:first-child { border-radius: 12px 12px 0 0; }
+.way:last-child { border-radius: 0 0 12px 12px; }
+.way:hover { background: rgba(238, 242, 245, 0.03); }
+.label { font-size: 16px; font-weight: 500; }
+.value { font-size: 15px; color: var(--ink-3); text-align: right; overflow-wrap: anywhere; }
+.way:hover .value { color: var(--ink-2); }
+
+.more { margin: 28px 0 0; text-align: center; font-size: 15px; color: var(--ink-3); }
+.more a { color: var(--ink-2); text-decoration: underline; text-decoration-color: var(--ink-4); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.more a:hover { color: var(--ink); text-decoration-color: var(--ink); }
+
+.page a:focus-visible { outline: 2px solid var(--fs); outline-offset: 4px; border-radius: 12px; }
+.page .save:focus-visible { border-radius: 999px; }
+
+@media (max-height: 700px) {
+  .header { margin: 28px 0 24px; }
+  .portrait { width: 76px; height: 76px; margin-bottom: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .save, .way { transition: none; }
+  .save:active { transform: none; }
+}
