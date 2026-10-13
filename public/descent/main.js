@@ -252,9 +252,9 @@
         pa: "Lowest and highest", pass: "Next pass, Trondheim", trd: "From Trondheim", gspd: "Ground speed", aboard: "Crewed since", sunrises: "Sunrises a day",
         days: "Days in orbit", lon: "Longitude", launched: "Launched", op: "Operator", shown: "Satellites shown", lst: "Local time below", rate: "Orbits a day",
         beta: "Sun angle to orbit (β)", shadowPct: "Time in shadow per orbit", sink: "Sinking from air drag", horizon: "Distance to horizon", seen: "Earth visible from here",
-        fromTrd: "Seen from Trondheim", delay: "Signal delay", incl: "Inclination", swing: "Daily north–south swing", active: "Payload", cover: "Coverage",
+        fromTrd: "Seen from Trondheim", delay: "Signal delay", incl: "Inclination", swing: "Daily north–south swing", active: "Broadband", cover: "Coverage",
         visible: "Usable from Trondheim", dop: "Geometry (PDOP)", nearest: "Nearest", side: "Side", sunNow: "Sun there now", type: "Type",
-        payloads: "Payloads", ground: "Control", dist: "Distance" },
+        payloads: "On board", ground: "Control", dist: "Distance" },
       sunlit: m => `Sunlit, shadow in ${fmtMin(m)}`, dark: m => `In Earth’s shadow, sunrise in ${fmtMin(m)}`,
       sunlitNow: "Sunlit", darkNow: "In Earth’s shadow",
       passFmt: (t, el, vis) => `${t}, ${el}° high${vis ? ", visible" : ""}`, noPass2: "None in 24 h",
@@ -288,9 +288,9 @@
         pa: "Lavest og høyest", pass: "Neste passering, Trondheim", trd: "Fra Trondheim", gspd: "Bakkefart", aboard: "Bemannet siden", sunrises: "Soloppganger per døgn",
         days: "Dager i bane", lon: "Lengdegrad", launched: "Skutt opp", op: "Operatør", shown: "Satellitter vist", lst: "Lokal tid under", rate: "Omløp per døgn",
         beta: "Solvinkel mot banen (β)", shadowPct: "Tid i skygge per omløp", sink: "Synker av luftmotstand", horizon: "Avstand til horisonten", seen: "Synlig del av Jorden",
-        fromTrd: "Sett fra Trondheim", delay: "Signalforsinkelse", incl: "Inklinasjon", swing: "Daglig svingning nord–sør", active: "Nyttelast", cover: "Dekning",
+        fromTrd: "Sett fra Trondheim", delay: "Signalforsinkelse", incl: "Inklinasjon", swing: "Daglig svingning nord–sør", active: "Bredbånd", cover: "Dekning",
         visible: "Brukbare fra Trondheim", dop: "Geometri (PDOP)", nearest: "Nærmeste", side: "Side", sunNow: "Solen der nå", type: "Type",
-        payloads: "Nyttelaster", ground: "Styring", dist: "Avstand" },
+        payloads: "Om bord", ground: "Styring", dist: "Avstand" },
       sunlit: m => `I sollys, skygge om ${fmtMin(m)}`, dark: m => `I jordskyggen, soloppgang om ${fmtMin(m)}`,
       sunlitNow: "I sollys", darkNow: "I jordskyggen",
       passFmt: (t, el, vis) => `${t}, ${el}° høyt${vis ? ", synlig" : ""}`, noPass2: "Ingen innen 24 t",
@@ -1685,7 +1685,7 @@
       const sa = asbmState("ASBM-1", ms), sb = asbmState("ASBM-2", ms), Lb = s.labels;
       body = rows([
         a && ["ASBM-1", `${fmtKm(a.alt)} km, ${sa && sa.active ? Lb.on : Lb.off}`], b && ["ASBM-2", `${fmtKm(b.alt)} km, ${sb && sb.active ? Lb.on : Lb.off}`],
-        sa && [k.active + " 1", sa.active ? Lb.onFor(sa.minutes) : Lb.offFor(sa.minutes)], sb && [k.active + " 2", sb.active ? Lb.onFor(sb.minutes) : Lb.offFor(sb.minutes)],
+        sa && [`ASBM-1, ${lc(k.active)}`, sa.active ? Lb.onFor(sa.minutes) : Lb.offFor(sa.minutes)], sb && [`ASBM-2, ${lc(k.active)}`, sb.active ? Lb.onFor(sb.minutes) : Lb.offFor(sb.minutes)],
         [k.cover, C.lang === "en" ? "North of 65° N, 24/7" : "Nord for 65° N, hele døgnet"],
         el && [k.pa, rangeText("ASBM-1", ms)], el && [k.period, fmtMin(el.period)], el && [k.inc, `${fmtN(el.inc, 1)}°`], [k.launched, C.lang === "en" ? "12 Aug 2024" : "12. aug. 2024"],
         ...[["ASBM-1", a], ["ASBM-2", b]].flatMap(([nm, n]) => n ? [

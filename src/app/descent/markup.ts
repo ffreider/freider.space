@@ -67,6 +67,14 @@ body.can-drag main { -webkit-user-select: none; user-select: none; }
 .card.swap > :nth-child(n+6) { animation-delay: .08s; }
 @keyframes card-in { from { opacity: 0; transform: translateY(4px); } }
 .card dl.more:not([hidden]) { overflow: hidden; animation: more-in var(--t) var(--ease) both; }
+/* Expanded on desktop: the stop list steps aside and the description shrinks
+   to two lines, so all the numbers fit without scrolling inside the card. */
+@media (min-width: 901px) {
+  .side:has(.card[data-open="1"]) .route { display: none; }
+  .card[data-open="1"] .cdesc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card[data-open="1"] dl { gap: 3px 14px; }
+  .card[data-open="1"] dt, .card[data-open="1"] dd { font-size: 13px; }
+}
 @keyframes more-in { from { max-height: 0; opacity: 0; } to { max-height: 900px; opacity: 1; } }
 .card h4 { margin: 0; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font: 600 16px/1.3 var(--f-body); color: var(--ink); }
 .card h4 .lv { color: var(--fs); display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
