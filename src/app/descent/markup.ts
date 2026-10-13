@@ -414,7 +414,7 @@ export const DESCENT_BODY = String.raw`
       <h2 data-t="about"></h2>
       <p class="bio" data-t="bio"></p>
       <figure class="photo">
-        <button class="shot" type="button" data-full="/descent/photos/nava-spacesuit-1600.jpg" data-pw="1600" data-ph="1200"><img src="/descent/photos/nava-spacesuit-1600.jpg" alt="__ABOUT_ALT__" width="1600" height="1200" loading="lazy" decoding="async"></button>
+        <button class="shot" type="button" data-full="/descent/photos/nava-spacesuit-1600.webp" data-pw="1600" data-ph="1200"><img src="/descent/photos/nava-spacesuit-1000.webp" srcset="/descent/photos/nava-spacesuit-640.webp 640w, /descent/photos/nava-spacesuit-1000.webp 1000w, /descent/photos/nava-spacesuit-1600.webp 1600w" sizes="(max-width: 900px) 92vw, 540px" alt="__ABOUT_ALT__" width="1600" height="1200" loading="lazy" decoding="async"></button>
         <figcaption data-t="aboutCaption"></figcaption>
       </figure>
     </div>
@@ -434,7 +434,7 @@ export const DESCENT_BODY = String.raw`
     <div class="col">
       <p class="meta" data-t="featured" style="margin-bottom:14px"></p>
       <a class="article" href="https://trondheim.com/journal/the-extracurricular-that-left-earth" target="_blank" rel="noopener">
-        <img src="/descent/article.jpg" alt="Freider Fløan, photographed for Trondheim.com" width="1200" height="1200">
+        <img src="/descent/article-640.webp" srcset="/descent/article-640.webp 640w, /descent/article-1200.webp 1200w" sizes="(max-width: 900px) 92vw, 480px" alt="Freider Fløan, photographed for Trondheim.com" width="1200" height="1200" loading="lazy" decoding="async">
         <p class="src">trondheim.com</p>
         <h3>The extracurricular that left Earth</h3>
         <p class="meta" data-t="articleMeta"></p>
@@ -460,16 +460,16 @@ export const DESCENT_BODY = String.raw`
       <h2 data-t="joining"></h2>
       <p class="bio" data-h="whyHtml"></p>
       <figure class="photo">
-        <button class="shot" type="button" data-full="/descent/photos/framsat-1-1600.jpg" data-pw="1600" data-ph="1200"><img src="/descent/photos/framsat-1-1600.jpg" alt="__FRAMSAT_ALT__" width="1600" height="1200" loading="lazy" decoding="async"></button>
+        <button class="shot" type="button" data-full="/descent/photos/framsat-1-1600.webp" data-pw="1600" data-ph="1200"><img src="/descent/photos/framsat-1-1000.webp" srcset="/descent/photos/framsat-1-640.webp 640w, /descent/photos/framsat-1-1000.webp 1000w, /descent/photos/framsat-1-1600.webp 1600w" sizes="(max-width: 900px) 92vw, 540px" alt="__FRAMSAT_ALT__" width="1600" height="1200" loading="lazy" decoding="async"></button>
         <figcaption data-t="framsatCaption"></figcaption>
       </figure>
       <div class="shots pair">
         <figure>
-          <button class="shot" type="button" data-full="/descent/photos/launch-1600.jpg" data-pw="1920" data-ph="1281"><img src="/descent/photos/launch-640.jpg" alt="__LAUNCH_ALT__" width="1920" height="1281" loading="lazy" decoding="async"></button>
+          <button class="shot" type="button" data-full="/descent/photos/launch-1600.webp" data-pw="1920" data-ph="1281"><img src="/descent/photos/launch-640.webp" srcset="/descent/photos/launch-640.webp 640w, /descent/photos/launch-1000.webp 1000w" sizes="(max-width: 900px) 84vw, 270px" alt="__LAUNCH_ALT__" width="1920" height="1281" loading="lazy" decoding="async"></button>
           <figcaption data-t="launchCaption"></figcaption>
         </figure>
         <figure>
-          <button class="shot" type="button" data-full="/descent/photos/andoya-trail-1600.jpg" data-pw="1600" data-ph="1068"><img src="/descent/photos/andoya-trail-640.jpg" alt="__ANDOYA_ALT__" width="1600" height="1068" loading="lazy" decoding="async"></button>
+          <button class="shot" type="button" data-full="/descent/photos/andoya-trail-1600.webp" data-pw="1600" data-ph="1068"><img src="/descent/photos/andoya-trail-640.webp" srcset="/descent/photos/andoya-trail-640.webp 640w, /descent/photos/andoya-trail-1000.webp 1000w" sizes="(max-width: 900px) 84vw, 270px" alt="__ANDOYA_ALT__" width="1600" height="1068" loading="lazy" decoding="async"></button>
           <figcaption data-t="andoyaCaption"></figcaption>
         </figure>
       </div>

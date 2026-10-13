@@ -178,6 +178,9 @@ export const timeline: Entry[] = [
       en: "NATO Joint Warfare Centre. Led a team of eight smoke divers.",
       no: "NATOs Joint Warfare Centre. Ledet et lag på åtte røykdykkere.",
     },
+    photos: [
+      { src: "forsvaret-smokedivers", w: 1600, h: 1066, caption: { en: "Smoke divers at the NATO Joint Warfare Centre in Stavanger.", no: "Røykdykkere ved NATOs Joint Warfare Centre i Stavanger." } },
+    ],
     roles: [{ start: [2019, 7], title: { en: "Smoke diver and team leader", no: "Røykdykker og lagfører" } }],
   },
 ];
@@ -189,7 +192,7 @@ export const TEXT = {
     tagline: "I like starting things, mostly about space.",
     hint: "Everything on the way down is where it actually is right now, worked out from the latest orbit data. Hover anything to see what it is.",
     about: "About",
-    bio: "I’m Freider Fløan, a student of electronic systems design and space systems at NTNU in Trondheim, Norway. I co-founded NORSTEC, the Norwegian Space Technology Collective, led it as President for three years and now sit on its board. I also host the podcast Spacepodden (on a break for now) and chair NASA HUNCH Norge, and I’m working on a new startup, Meso Manufacturing.",
+    bio: "I’m Freider Fløan, a student of electronic systems design and space systems at NTNU in Trondheim, Norway. I co-founded NORSTEC, the Norwegian Space Technology Collective, led it as President for three years and now sit on its board. I also chair NASA HUNCH Norge, and I’m working on a new startup, Meso Manufacturing.",
     experience: "Experience",
     featured: "Featured",
     articleMeta: "Trondheim.com, 3 September 2026. A 6 minute read.",
@@ -220,7 +223,7 @@ export const TEXT = {
     tagline: "Jeg liker å starte ting, mest innen romfart.",
     hint: "Alt på veien ned er der det faktisk er akkurat nå, regnet ut fra de nyeste banedataene. Hold over noe for å se hva det er.",
     about: "Om meg",
-    bio: "Jeg heter Freider Fløan og studerer elektronisk systemdesign med fordypning i romsystemer ved NTNU i Trondheim. Jeg er medgründer av NORSTEC, Norwegian Space Technology Collective, som jeg ledet som president i tre år, og sitter nå i styret. I tillegg er jeg programleder for podkasten Spacepodden (på pause for nå) og styreleder i NASA HUNCH Norge, og jeg jobber med et nytt oppstartsselskap, Meso Manufacturing.",
+    bio: "Jeg heter Freider Fløan og studerer elektronisk systemdesign med fordypning i romsystemer ved NTNU i Trondheim. Jeg er medgründer av NORSTEC, Norwegian Space Technology Collective, som jeg ledet som president i tre år, og sitter nå i styret. I tillegg er jeg styreleder i NASA HUNCH Norge, og jeg jobber med et nytt oppstartsselskap, Meso Manufacturing.",
     experience: "Erfaring",
     featured: "Omtalt",
     articleMeta: "Trondheim.com, 3. september 2026. Seks minutter, på engelsk.",

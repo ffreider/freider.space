@@ -441,6 +441,21 @@
     const m = norm(moonEci(ms)), sun = sunEci(ms), e = deg(Math.acos(Math.max(-1, Math.min(1, dot(m, sun)))));
     return dot(cross(sun, m), ECL_N) > 0 ? e : 360 - e;
   };
+  // The tab icon is tonight's Moon. The server redraws it every 6 hours, but
+  // browsers keep favicons for days, so the page draws the phase itself:
+  // lit on the right while waxing, as seen from Norway.
+  function moonFavicon() {
+    const c = document.createElement("canvas"); c.width = c.height = 64;
+    const g = c.getContext("2d"), cx = 32, cy = 32, r = 28;
+    const phase = moonAng(Date.now()) / 360, k = Math.cos(phase * 2 * Math.PI), waxing = phase < 0.5;
+    g.fillStyle = "#26324a"; g.beginPath(); g.arc(cx, cy, r, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = "#eef2f5"; g.beginPath();
+    g.arc(cx, cy, r, -Math.PI / 2, Math.PI / 2, !waxing);                                 // the sunlit limb
+    g.ellipse(cx, cy, Math.abs(k) * r, r, 0, Math.PI / 2, -Math.PI / 2, waxing ? k > 0 : k <= 0);   // back along the terminator
+    g.fill();
+    const href = c.toDataURL("image/png");
+    document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]').forEach(l => { l.href = href; l.type = "image/png"; });
+  }
   // the next time the phase angle passes a value (180 full, 0 new), to about a minute
   function nextPhase(ms, target) {
     const g = t => (moonAng(t) - target + 360) % 360;   // just under 360 before, just over 0 after
@@ -688,7 +703,10 @@
       const moonFirst = curStop === 0;
       const order = [...MAPS].sort((a, b) => (a[1].startsWith("moon") === moonFirst ? -1 : 1) - (b[1].startsWith("moon") === moonFirst ? -1 : 1));
       for (const [name, file, unit, channels, largest] of order) {
-        const w = Math.min(sharpest, largest);
+        // on phones the clouds and the Moon's relief stay at 2K: no visible
+        // difference at that size, and about 1.8 MB less to download
+        const w = Math.min(sharpest, largest, C.coarse && /clouds|tilt/.test(file) ? 2048 : Infinity);
+        if (w <= 2048) continue;                                // already have it
         const img = await bitmap(mapUrl(file, w)).catch(() => null);
         if (!img) continue;
         await calm();
@@ -704,7 +722,11 @@
      and bathymetry, about 1 km per pixel; 48 tiles, 36 x 27 degrees) and
      blended over the world map. It's rebuilt as the spacecraft moves on. */
   const GIBS = "https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/BlueMarble_ShadedRelief_Bathymetry/default/500m";
-  const DETAIL_LEVEL = 6, TILE_DEG = 4.5, TILE_COLS = 80, TILE_ROWS = 40, BOX_COLS = 8, BOX_ROWS = 6;
+  // Phones take one zoom level down: 12 tiles over the same area instead of 48,
+  // a quarter of the data and the memory, and still sharp at phone size.
+  const PHONE_TILES = !!C.coarse;
+  const DETAIL_LEVEL = PHONE_TILES ? 5 : 6, TILE_DEG = PHONE_TILES ? 9 : 4.5, TILE_COLS = PHONE_TILES ? 40 : 80, TILE_ROWS = PHONE_TILES ? 20 : 40;
+  const BOX_COLS = PHONE_TILES ? 4 : 8, BOX_ROWS = PHONE_TILES ? 3 : 6;
   const detail = { box: null, sat: null, loading: false, fade: 0, ready: false };
   function subPoint(name, ms) {
     const s = sv(name, ms); if (!s) return null;
@@ -2057,6 +2079,7 @@
   const renderHtml = () => document.querySelectorAll("[data-h]").forEach(el => { el.innerHTML = nb(C.S()[el.dataset.h]); });
   C.onLang(() => { buildRoute(); stopTexts(Date.now()); lastCard = 0; renderHtml(); });
 
+  moonFavicon(); setInterval(moonFavicon, 36e5);
   C.render(); renderHtml();
   slotCards.forEach(([i, c]) => updateCard(i, Date.now(), c));   // filled before layout, so the page doesn't jump later
   layout(); onScroll(); yS = yT;

@@ -15,6 +15,10 @@ import { DESCENT_BODY, DESCENT_CSS } from "./markup";
 const escape = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+// Photo thumbnails: about a fifth of the text column on desktop, most of the
+// screen in the swipeable rows on phones.
+const THUMB_SIZES = "(max-width: 900px) 84vw, 200px";
+
 // A number never parts from its unit at a line break ("35,786 km").
 const keepUnits = (s: string) => s.replace(/(\d) (?=(km\/s|km|ms|kg|s|min|h|%)(?![\w]))/g, "$1\u00a0");
 
@@ -67,7 +71,7 @@ function rolesHtml(timeline: Entry[], lang: Lang) {
         html += `<div class="shots">`;
         for (const p of e.photos) {
           const cap = escape(p.caption[lang]);
-          html += `<figure><button class="shot" type="button" data-full="/descent/photos/${p.src}-1600.jpg" data-pw="${p.w}" data-ph="${p.h}"><img src="/descent/photos/${p.src}-640.jpg" width="${p.w}" height="${p.h}" loading="lazy" decoding="async" alt="${cap}"></button><figcaption>${cap}${p.link ? ` <a href="${p.link.href}" target="_blank" rel="noopener">${escape(p.link.text[lang])}</a>` : ""}</figcaption></figure>`;
+          html += `<figure><button class="shot" type="button" data-full="/descent/photos/${p.src}-1600.webp" data-pw="${p.w}" data-ph="${p.h}"><img src="/descent/photos/${p.src}-640.webp" srcset="/descent/photos/${p.src}-640.webp 640w, /descent/photos/${p.src}-1000.webp 1000w" sizes="${THUMB_SIZES}" width="${p.w}" height="${p.h}" loading="lazy" decoding="async" alt="${cap}"></button><figcaption>${cap}${p.link ? ` <a href="${p.link.href}" target="_blank" rel="noopener">${escape(p.link.text[lang])}</a>` : ""}</figcaption></figure>`;
         }
         html += `</div>`;
       }

@@ -218,8 +218,9 @@ window.Core = (() => {
           const make = t => document.createElement(t);
           const fig = make("figure"), btn = make("button"), img = make("img"), cap = p.caption[lang];
           btn.className = "shot";
-          btn.type = "button"; btn.dataset.full = `/descent/photos/${p.src}-1600.jpg`; btn.dataset.pw = p.w; btn.dataset.ph = p.h;   // not data-h: that marks text to fill in
-          Object.assign(img, { src: `/descent/photos/${p.src}-640.jpg`, width: p.w, height: p.h, loading: "lazy", decoding: "async", alt: cap });
+          btn.type = "button"; btn.dataset.full = `/descent/photos/${p.src}-1600.webp`; btn.dataset.pw = p.w; btn.dataset.ph = p.h;   // not data-h: that marks text to fill in
+          Object.assign(img, { src: `/descent/photos/${p.src}-640.webp`, srcset: `/descent/photos/${p.src}-640.webp 640w, /descent/photos/${p.src}-1000.webp 1000w`,
+            sizes: "(max-width: 900px) 84vw, 200px", width: p.w, height: p.h, loading: "lazy", decoding: "async", alt: cap });   // as on the server
           const fc = el("figcaption", null, cap);
           if (p.link) { const a = el("a", null, p.link.text[lang]); a.href = p.link.href; a.target = "_blank"; a.rel = "noopener"; fc.append(" ", a); }
           btn.append(img); fig.append(btn, fc); shots.append(fig);

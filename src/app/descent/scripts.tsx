@@ -41,6 +41,11 @@ export function DescentScripts() {
     if (window.__descentStarted) return;
     window.__descentStarted = true;
 
+    // A visit always starts at the Moon: no jumping back to where a refresh
+    // left off. A link to a section (#framsat) still goes there.
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    if (!location.hash) window.scrollTo(0, 0);
+
     // Hold the page still while the cover is up (CSS stops scrolling; this
     // stops touch and wheel on browsers that scroll anyway). It lets go once
     // main.js opens the cover, or after 6 s whatever happens.
