@@ -12,6 +12,7 @@
   --fs: #a9d6ff;
   color-scheme: dark;
   text-shadow: none;
+  width: 100%;
   min-height: 100svh;
   display: grid;
   place-items: center;
@@ -30,8 +31,8 @@
 .site { font-size: 15px; font-weight: 600; line-height: 1; color: var(--ink); text-decoration: none; padding: 8px 0; }
 .moon { display: block; }
 
-.header { margin: 44px 0 32px; }
-.portrait { display: block; width: 96px; height: 96px; object-fit: cover; object-position: center 30%; border-radius: 50%; margin-bottom: 22px; }
+.header { margin: 44px 0 32px; text-align: center; }
+.portrait { display: block; width: 96px; height: 96px; object-fit: cover; object-position: center 30%; border-radius: 50%; margin: 0 auto 22px; }
 .name { margin: 0; font-size: clamp(36px, 10vw, 46px); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
 .intro { margin: 12px 0 0; font-size: 17px; line-height: 1.5; color: var(--ink-2); }
 
