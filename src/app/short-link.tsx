@@ -29,7 +29,6 @@ export function shortLinkPage(slot: 1 | 2 | 3) {
             <p className={styles.intro}>on {app}</p>
           </header>
           <a href={target} className={styles.save}>Open {app}</a>
-          <p className={styles.more}>Opens in the {app} app if you have it.</p>
         </div>
       </main>
     );
