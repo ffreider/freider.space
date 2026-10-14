@@ -86,3 +86,10 @@
   .primary, .secondary { transition: none; }
   .primary:active, .secondary:active { transform: none; }
 }
+
+/* The packet counter and the packet's first bytes, flashing as each burst plays. */
+.counter { margin: 12px 0 0; font-size: 15px; font-weight: 600; color: var(--ink); min-height: 1.4em; }
+.bytes { margin: 4px 0 0; font-family: var(--font-plex-mono), ui-monospace, monospace; font-size: 14px; color: var(--fs); min-height: 1.4em; letter-spacing: 0.02em; }
+.flash { display: inline-block; animation: flash .6s ease-out; }
+@keyframes flash { from { color: var(--fs); transform: scale(1.06); } to { color: var(--ink); transform: none; } }
+@media (prefers-reduced-motion: reduce) { .flash { animation: none; } }

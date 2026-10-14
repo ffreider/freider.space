@@ -50,3 +50,12 @@ export function placeName(countries: Feature[] | null, lat: number, lon: number,
   const name = alpha2 && countryNames.getName(alpha2, lang === "no" ? "nb" : "en");
   return name || String(country.properties?.name ?? "");
 }
+
+// "in the United States", "in the Netherlands", "in Ukraine"
+export function inPlace(name: string) {
+  if (name === "United States of America") return "the United States";
+  if (/^(the |United |Netherlands|Czech Republic|Philippines|Bahamas|Gambia|Dominican Republic|Central African|Maldives)/.test(name)) {
+    return name.startsWith("the ") ? name : `the ${name}`;
+  }
+  return name;
+}

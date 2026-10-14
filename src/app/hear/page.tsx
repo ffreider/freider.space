@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { loadCountries, placeName } from "@/app/place-name";
+import { inPlace, loadCountries, placeName } from "@/app/place-name";
 import { framsatTle } from "@/lib/framsat-tle";
 import { latestRecording } from "@/lib/satnogs";
 import { Hear } from "./hear";
@@ -19,15 +19,6 @@ export const viewport: Viewport = { themeColor: "#000000" };
 
 // SatNOGS is asked for a newer recording at most every 15 minutes.
 export const revalidate = 900;
-
-// "in the United States", "in the Netherlands", "in Ukraine"
-function inPlace(name: string) {
-  if (name === "United States of America") return "the United States";
-  if (/^(the |United |Netherlands|Czech Republic|Philippines|Bahamas|Gambia|Dominican Republic|Central African|Maldives)/.test(name)) {
-    return name.startsWith("the ") ? name : `the ${name}`;
-  }
-  return name;
-}
 
 export default async function HearPage() {
   const [tle, recording, countries] = await Promise.all([framsatTle(), latestRecording(), loadCountries()]);

@@ -3,6 +3,7 @@ import { stateAt } from "@/app/framsat-orbit";
 import { loadCountries, placeName } from "@/app/place-name";
 import { CONTACT, type Card } from "@/lib/contact";
 import { framsatTle } from "@/lib/framsat-tle";
+import { stampOf } from "@/lib/stamp";
 
 // The downloadable contact cards. Each is made fresh on download, so the
 // note can say when it was saved and where FramSat-1 was at that moment.
@@ -52,7 +53,10 @@ async function note(now: Date) {
 }
 
 export async function vcard(card: Card, request: Request) {
-  const [image, text] = await Promise.all([photo(request.url), note(new Date())]);
+  const now = new Date();
+  const [image, text] = await Promise.all([photo(request.url), note(now)]);
+  // A print of FramSat-1's radio signal from around the minute they saved it.
+  const postcard = `Your postcard from FramSat-1: ${CONTACT.website}/postcard/${stampOf(now)}`;
 
   const lines = [
     "BEGIN:VCARD",
@@ -70,7 +74,7 @@ export async function vcard(card: Card, request: Request) {
     `X-SOCIALPROFILE;TYPE=linkedin:${CONTACT.linkedin}`,
     `item1.URL:${CONTACT.signal}`,
     "item1.X-ABLabel:Signal",
-    `NOTE:${escape(text)}`,
+    `NOTE:${escape(`${text}\n\n${postcard}`)}`,
     `UID:${CONTACT.uid}`,
     ...(image ? [fold(`PHOTO;ENCODING=b;TYPE=JPEG:${image}`)] : []),
     "END:VCARD",
