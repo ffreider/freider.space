@@ -21,11 +21,13 @@ const EARTH_RADIUS_KM = 6378.135; // the value the SGP4 model uses
 const EARTH_MU = 398600.4418; // km³/s², Earth's gravitational parameter
 const LIGHT_KM_S = 299_792.458;
 const deg = Math.PI / 180;
-const observer = {
-  latitude: TRONDHEIM.lat * deg,
-  longitude: TRONDHEIM.lon * deg,
+type Observer = { latitude: number; longitude: number; height: number };
+const observerAt = (place: { lat: number; lon: number }): Observer => ({
+  latitude: place.lat * deg,
+  longitude: place.lon * deg,
   height: 0.05, // km
-};
+});
+const observer = observerAt(TRONDHEIM);
 
 type Vec = { x: number; y: number; z: number };
 
@@ -91,8 +93,8 @@ function eci(satrec: SatRec, date: Date) {
   return { position, velocity };
 }
 
-function look(position: Vec, date: Date) {
-  const angles = ecfToLookAngles(observer, eciToEcf(position, gstime(date)));
+function look(position: Vec, date: Date, from = observer) {
+  const angles = ecfToLookAngles(from, eciToEcf(position, gstime(date)));
   return {
     azimuth: angles.azimuth / deg,
     elevation: angles.elevation / deg,
@@ -130,19 +132,21 @@ export type Pass = {
   end: Date;
   peak: Date;
   maxElevation: number;
-  // Where it is in Trondheim's sky during the pass: [azimuth, elevation].
+  // Where it is in the observer's sky during the pass: [azimuth, elevation].
   sky: [number, number][];
 };
 
-// The next `count` passes over Trondheim (including one happening now) that
-// climb at least `minPeak` degrees, looking up to `days` ahead.
+// The next `count` passes over Trondheim, or `place` (including one happening
+// now), that climb at least `minPeak` degrees, looking up to `days` ahead.
 export function upcomingPasses(
   satrec: SatRec,
   from: Date,
   count = 5,
   minPeak = 5,
   days = 3,
+  place?: { lat: number; lon: number },
 ): Pass[] {
+  const at = place ? observerAt(place) : observer;
   const stepMs = 20_000;
   const endMs = from.getTime() + days * 86_400_000;
   const passes: Pass[] = [];
@@ -151,7 +155,7 @@ export function upcomingPasses(
   for (let t = from.getTime(); t < endMs && passes.length < count; t += stepMs) {
     const date = new Date(t);
     const state = eci(satrec, date);
-    const seen = state ? look(state.position, date) : null;
+    const seen = state ? look(state.position, date, at) : null;
     if (seen && seen.elevation > 0) {
       pass ??= { start: date, end: date, peak: date, maxElevation: -90, sky: [] };
       pass.end = date;

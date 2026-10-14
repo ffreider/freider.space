@@ -5,7 +5,7 @@
 export const SHORT_LINKS: Record<1 | 2 | 3, string> = {
   1: "https://www.linkedin.com/in/freider/",
   2: "/contact",
-  3: "", // the Meso pitch deck on Brieflink, link to come
+  3: "/hear", // hear FramSat-1; the Meso pitch deck could go here later
 };
 
 // Sites with an app that a redirect can't open: phones only hand a link to
