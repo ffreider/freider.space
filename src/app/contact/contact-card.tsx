@@ -43,6 +43,7 @@ export function ContactCard({ card }: { card: Card }) {
 
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <p className={styles.more}>More about me on <a href="/">freider.space</a></p>
+        <p className={styles.privacy}>Privacy: no cookies. Visits are counted anonymously with Vercel Web Analytics.</p>
       </div>
     </main>
   );

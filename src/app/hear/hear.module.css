@@ -93,3 +93,5 @@
 .flash { display: inline-block; animation: flash .6s ease-out; }
 @keyframes flash { from { color: var(--fs); transform: scale(1.06); } to { color: var(--ink); transform: none; } }
 @media (prefers-reduced-motion: reduce) { .flash { animation: none; } }
+
+.privacy { margin: 48px 0 0; font-size: 12px; line-height: 1.5; color: var(--ink-3); }

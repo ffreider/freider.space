@@ -61,6 +61,10 @@ export function Hear({ tle, recording }: { tle: Tle; recording: Source | null })
             <Cards />
           </div>
         )}
+        <p className={styles.privacy}>
+          Privacy: no cookies. Visits are counted anonymously with Vercel Web Analytics. The recording plays straight
+          from SatNOGS’s servers when you tap Hear it. Your location, if you share it, stays on your phone.
+        </p>
       </div>
     </main>
   );

@@ -64,3 +64,5 @@
   .primary, .secondary { transition: none; }
   .primary:active, .secondary:active { transform: none; }
 }
+
+.privacy { margin: 14px 0 0; max-width: 420px; text-align: center; font-size: 12px; line-height: 1.5; color: #4f4a3e; }

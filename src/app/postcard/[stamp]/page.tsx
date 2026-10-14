@@ -67,6 +67,7 @@ export default async function PostcardPage({ params }: Props) {
       </div>
       {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <p className={styles.more}><a href="/">freider.space</a></p>
+      <p className={styles.privacy}>Privacy: no cookies. Visits are counted anonymously with Vercel Web Analytics.</p>
     </main>
   );
 }
