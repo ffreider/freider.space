@@ -46,6 +46,18 @@
 .save:hover { background: #c8e5ff; }
 .save:active { transform: scale(0.98); }
 
+.actions { display: grid; gap: 10px; }
+.linkedin {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 56px; border-radius: 999px;
+  border: 1px solid rgba(169, 214, 255, 0.45); color: var(--ink);
+  font-size: 17px; font-weight: 600; text-decoration: none;
+  transition: background .2s, transform .15s;
+}
+.linkedin:hover { background: rgba(169, 214, 255, 0.08); }
+.linkedin:active { transform: scale(0.98); }
+.page .linkedin:focus-visible { border-radius: 999px; }
+
 .ways {
   margin-top: 16px;
   background: rgba(10, 18, 32, 0.6);
@@ -78,8 +90,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .save, .way { transition: none; }
-  .save:active { transform: none; }
+  .save, .way, .linkedin { transition: none; }
+  .save:active, .linkedin:active { transform: none; }
 }
 
 .privacy { margin: 20px 0 0; text-align: center; font-size: 12px; line-height: 1.5; color: var(--ink-3); }

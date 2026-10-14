@@ -3,9 +3,9 @@
 // here. Edit a target and push, and it's live in a minute. An empty target
 // leads to the homepage.
 export const SHORT_LINKS: Record<1 | 2 | 3, string> = {
-  1: "https://www.linkedin.com/in/freider/",
-  2: "/contact",
-  3: "/hear", // hear FramSat-1; the Meso pitch deck could go here later
+  1: "/contact", // kept for the Meso pitch deck, once it's ready
+  2: "/contact", // save my contact, or connect on LinkedIn
+  3: "/hear", // hear FramSat-1
 };
 
 // Sites with an app that a redirect can't open: phones only hand a link to
