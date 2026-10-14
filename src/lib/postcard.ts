@@ -85,7 +85,10 @@ const ridgesOf = unstable_cache(
 
 export async function postcardFor(moment: Date): Promise<Postcard> {
   const t = moment.getTime();
-  const found = await observations(t - WINDOW_MS, t + WINDOW_MS);
+  // Whole hours, so every minute in an hour shares one cached lookup (and
+  // trying lots of made-up minutes can't make lots of requests to SatNOGS).
+  const HOUR = 3600_000;
+  const found = await observations(Math.floor((t - WINDOW_MS) / HOUR) * HOUR, Math.ceil((t + WINDOW_MS) / HOUR) * HOUR);
   const inside = (o: Observation) => Date.parse(o.start) <= t && t <= Date.parse(o.end);
   const distance = (o: Observation) => (inside(o) ? 0 : Math.min(Math.abs(Date.parse(o.start) - t), Math.abs(Date.parse(o.end) - t)));
   // Closeness first, in steps: during the moment, within an hour, within
