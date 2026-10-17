@@ -1,0 +1,86 @@
+/* The 404 page. Same look as the homepage's descent: black space, Schibsted
+   Grotesk, the glacier-blue live accent, the frosted navy card and round
+   buttons. The waterfall fills the screen; the card waits for it to finish. */
+:global(html):has(.page), :global(body):has(.page) { background: #000; overflow: hidden; }
+
+.page {
+  --ink: #eef2f5;
+  --ink-2: rgba(238, 242, 245, 0.78);
+  --ink-3: #93a4b4;
+  --ink-4: rgba(147, 164, 180, 0.6);
+  --rule: rgba(147, 164, 180, 0.2);
+  --fs: #a9d6ff;
+  --gutter: clamp(16px, 2.6vw, 44px);
+  color-scheme: dark;
+  color: var(--ink);
+  font-family: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.page a { color: inherit; text-decoration: underline; text-decoration-color: var(--ink-4); text-underline-offset: 4px; }
+.page a:hover { text-decoration-color: var(--ink); }
+.page a:focus-visible { outline: 2px solid var(--fs); outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.waterfall { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+.top {
+  position: fixed; z-index: 6; display: flex; justify-content: space-between; align-items: center;
+  top: calc(16px + env(safe-area-inset-top, 0px)); left: var(--gutter); right: var(--gutter);
+}
+.page .mark { font-size: 15px; font-weight: 600; text-decoration: none; }
+.page .chip { font-size: 15px; font-weight: 500; color: var(--ink-2); text-decoration: none; padding: 8px 0; }
+
+.axis {
+  position: fixed; z-index: 2; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  display: flex; justify-content: space-between; padding-inline: var(--gutter);
+  font-size: 12.5px; color: var(--ink-4); font-variant-numeric: tabular-nums; pointer-events: none;
+}
+.centre { color: var(--fs); }
+.who { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); white-space: nowrap; color: var(--ink-3); }
+
+/* The homepage's live card, holding the decoded packet */
+.card {
+  position: fixed; z-index: 4; left: var(--gutter); bottom: calc(46px + env(safe-area-inset-bottom, 0px));
+  width: min(400px, calc(100vw - 2 * var(--gutter)));
+  padding: 16px; border-radius: 12px; display: grid; gap: 10px;
+  background: rgba(10, 18, 32, 0.6); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  opacity: 0; transform: translateY(8px); visibility: hidden;
+  transition: opacity .6s, transform .6s cubic-bezier(.2, .7, .2, 1), visibility 0s .6s;
+}
+.card.done { opacity: 1; transform: none; visibility: visible; transition: opacity .6s, transform .6s cubic-bezier(.2, .7, .2, 1); }
+.cardTitle { margin: 0; display: flex; justify-content: space-between; gap: 10px; font-size: 16px; font-weight: 600; line-height: 1.3; }
+.time { color: var(--fs); font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.time::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.message { margin: 0; font-size: 20.5px; line-height: 1.3; font-weight: 500; }
+.path { color: var(--fs); overflow-wrap: anywhere; }
+.why { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+/* The packet's bytes, as on /hear: one line, cut off at the edge */
+.hex {
+  margin: 0; padding: 8px 0; border-block: 1px solid var(--rule);
+  font-family: var(--font-plex-mono), ui-monospace, monospace; font-size: 13px; line-height: 1.5; color: var(--ink-3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.actions { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin-top: 4px; }
+.page .primary {
+  font: 600 15px/1 var(--font-schibsted), "Helvetica Neue", Arial, sans-serif; color: #0a2440; background: var(--fs);
+  border-radius: 999px; padding: 14px 20px; text-decoration: none;
+}
+.page .primary:hover { background: #c4e3ff; }
+.page .primary:focus-visible { border-radius: 999px; }
+.link { font-size: 16px; font-weight: 500; }
+.next { margin: 0; font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; min-height: 1.5em; }
+
+/* Phones: the 404 sits higher and the card drops the details, so the
+   waterfall keeps the top two thirds of the screen. */
+@media (max-width: 700px) {
+  .who { display: none; }
+  .card { bottom: calc(40px + env(safe-area-inset-bottom, 0px)); gap: 8px; }
+  .why { display: none; }
+  .message { font-size: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .card.done { transition: none; }
+}
