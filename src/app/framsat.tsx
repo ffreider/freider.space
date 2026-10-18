@@ -125,6 +125,7 @@ const T = {
       "The curve is FramSat-1’s signal sliding in frequency as it passes overhead: the Doppler effect. The short horizontal dashes are bursts of data.",
     waterfallAlt: (station: string) => `Waterfall of FramSat-1’s signal received by ${station}`,
     openOnSatnogs: "Open on SatNOGS",
+    logbook: { label: "Every reception since launch", href: "/framsat/log" },
     tleIntro: "The raw two-line element set everything here is computed from. Hover or tab through the fields.",
     tlePoint: "Point at a field to see what it means.",
     tleLocation: (line: number, cols: string) => `Line ${line}, columns ${cols}`,
@@ -209,6 +210,7 @@ const T = {
       "Kurven er signalet fra FramSat-1 som glir i frekvens mens den passerer over: dopplereffekten. De korte vannrette strekene er datapakker.",
     waterfallAlt: (station: string) => `Vannfallsdiagram av signalet fra FramSat-1, tatt opp av ${station}`,
     openOnSatnogs: "Åpne i SatNOGS",
+    logbook: { label: "Alle mottak siden oppskytingen", href: "/no/framsat/log" },
     tleIntro: "Det rå baneelementsettet (TLE) som alt her er beregnet fra. Hold over eller tab gjennom feltene.",
     tlePoint: "Pek på et felt for å se hva det betyr.",
     tleLocation: (line: number, cols: string) => `Linje ${line}, kolonne ${cols}`,
@@ -691,6 +693,9 @@ function Signals({ receptions, tick, f }: { receptions: Reception[]; tick: SatTi
         )}
         <a href={pick.url} className={`mt-3 inline-block text-xs text-fg-2 ${linkClass}`}>
           {t.openOnSatnogs}
+        </a>
+        <a href={t.logbook.href} className={`ml-4 mt-3 inline-block text-xs text-fg-2 ${linkClass}`}>
+          {t.logbook.label}
         </a>
       </div>
     </div>

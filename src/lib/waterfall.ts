@@ -42,8 +42,8 @@ function runs(n: number, white: (i: number) => boolean) {
   return out;
 }
 
-// The plot area as a grid of 0..1 values (top row = end of the recording).
-function readPlot(img: Image) {
+// Where the plot and its colour bar sit in the image, inside the white margins.
+function findPlot(img: Image) {
   const mid = Math.floor(img.height / 2);
   const cols = runs(img.width, (x) => isWhite(img, x, mid)).filter(([a, b]) => b - a > 8);
   if (cols.length < 2) throw new Error("No plot and colour bar found");
@@ -52,7 +52,89 @@ function readPlot(img: Image) {
     runs(img.height, (y) => isWhite(img, x, y)).sort((a, b) => b[1] - b[0] - (a[1] - a[0]))[0];
   const plotRows = longest(Math.floor((plotCols[0] + plotCols[1]) / 2));
   const bx = Math.floor((barCols[0] + barCols[1]) / 2);
-  const barRows = longest(bx);
+  const box = { x0: plotCols[0] + 2, x1: plotCols[1] - 1, y0: plotRows[0] + 1, y1: plotRows[1] };
+  return { box, bx, barRows: longest(bx) };
+}
+
+// The site's palette for thumbnails: night navy through blue to ice and white.
+const THUMB_STOPS: [number, number, number, number][] = [
+  [0, 10, 18, 32],
+  [0.45, 30, 70, 120],
+  [0.75, 169, 214, 255],
+  [1, 244, 250, 255],
+];
+
+function thumbColour(v: number): [number, number, number] {
+  const x = Math.max(0, Math.min(1, v));
+  let k = 0;
+  while (x > THUMB_STOPS[k + 1][0]) k++;
+  const [a, b] = [THUMB_STOPS[k], THUMB_STOPS[k + 1]];
+  const f = (x - a[0]) / (b[0] - a[0]);
+  return [a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f, a[3] + (b[3] - a[3]) * f];
+}
+
+// A small picture of just the plot, without axes, labels or colour bar: the
+// thumbnails in the logbook (/framsat/log). Shrinking ~1500 rows into a few
+// dozen by averaging would erase the packets (each is a thin bright line),
+// so each thumbnail pixel keeps the brightest point in its patch, measured
+// against the recording's own noise, and is drawn in the site's colours.
+export async function waterfallThumbnail(png: ArrayBuffer, width: number, height: number) {
+  const { data, info } = await sharp(Buffer.from(png)).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { box } = findPlot({ data, width: info.width, height: info.height });
+  const w = box.x1 - box.x0;
+  const h = box.y1 - box.y0;
+  // Brightness of each plot pixel (viridis gets brighter as power rises).
+  const lum = (x: number, y: number) => {
+    const i = ((y + box.y0) * info.width + x + box.x0) * 3;
+    return 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+  };
+  // Each row averaged across about one packet's width (~10 kHz of the ~58 kHz
+  // band), which quiets the noise and leaves packets as bright bars; then the
+  // brightest row in each thumbnail pixel's patch, so no packet is lost.
+  const k = Math.max(3, Math.round(w / 6));
+  const cells = new Float32Array(width * height);
+  const prefix = new Float64Array(w + 1);
+  const rowAt = new Float32Array(width);
+  for (let ty = 0; ty < height; ty++) {
+    const y0 = Math.floor((ty * h) / height);
+    const y1 = Math.max(y0 + 1, Math.floor(((ty + 1) * h) / height));
+    for (let y = y0; y < y1; y++) {
+      for (let x = 0; x < w; x++) prefix[x + 1] = prefix[x] + lum(x, y);
+      for (let tx = 0; tx < width; tx++) {
+        const c = Math.floor(((tx + 0.5) * w) / width);
+        const a = Math.max(0, c - (k >> 1));
+        const b = Math.min(w, a + k);
+        rowAt[tx] = (prefix[b] - prefix[a]) / (b - a);
+      }
+      for (let tx = 0; tx < width; tx++) {
+        const i = ty * width + tx;
+        cells[i] = y === y0 ? rowAt[tx] : Math.max(cells[i], rowAt[tx]);
+      }
+    }
+  }
+  // Take out the receiver's band shape (dark edges), column by column, so
+  // what's left is signal over each frequency's own noise.
+  for (let tx = 0; tx < width; tx++) {
+    const col = Float32Array.from({ length: height }, (_, ty) => cells[ty * width + tx]).sort();
+    const bg = col[Math.floor(height / 2)];
+    for (let ty = 0; ty < height; ty++) cells[ty * width + tx] -= bg;
+  }
+  // Scaled by the noise's own spread (median absolute deviation): noise
+  // stays dark, anything well above it turns bright.
+  const spread = Float32Array.from(cells, Math.abs).sort()[Math.floor(cells.length / 2)] || 1;
+  const out = Buffer.alloc(width * height * 3);
+  for (let i = 0; i < cells.length; i++) {
+    const [r, g, b] = thumbColour(0.28 + 0.72 * (cells[i] / (10 * spread)));
+    out[i * 3] = r;
+    out[i * 3 + 1] = g;
+    out[i * 3 + 2] = b;
+  }
+  return sharp(out, { raw: { width, height, channels: 3 } }).webp({ quality: 70 }).toBuffer();
+}
+
+// The plot area as a grid of 0..1 values (top row = end of the recording).
+function readPlot(img: Image) {
+  const { box, bx, barRows } = findPlot(img);
 
   // Colour bar: top = strongest. Exact colours are looked up directly; any
   // other colour (anti-aliasing) goes to the nearest colour on the bar.
@@ -85,10 +167,7 @@ function readPlot(img: Image) {
     return v!;
   };
 
-  const x0 = plotCols[0] + 2;
-  const x1 = plotCols[1] - 1;
-  const y0 = plotRows[0] + 1;
-  const y1 = plotRows[1];
+  const { x0, x1, y0, y1 } = box;
   const w = x1 - x0;
   const h = y1 - y0;
   const v = new Float32Array(w * h);
