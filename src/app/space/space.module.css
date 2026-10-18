@@ -1,5 +1,8 @@
-/* The space-age story: a dark sky with the globe held behind a long
-   column of text. The design pass (plan Task 7) refines this. */
+/* The space-age story: a dark sky with the globe held behind a long column
+   of text. One typeface (Schibsted Grotesk) on a scale of 14 / 15 / 18 /
+   21 / 30 / up to 76 px. Colour carries one meaning only: the three kinds of
+   object, the same on the globe, in the chart and in the key. On phones the
+   text sits on dark panels and the globe shows between beats. */
 :global(html):has(.page), :global(body):has(.page) { background: #04060b; }
 
 .page {
@@ -9,6 +12,7 @@
   --sat: #a9d6ff;
   --rb: #b8ab98;
   --deb: #5b6878;
+  --panel: rgb(4 6 11 / 0.8);
   color-scheme: dark;
   text-shadow: none;
   position: relative;
@@ -18,46 +22,98 @@
   font-family: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+.page a:focus-visible { outline: 2px solid var(--sat); outline-offset: 2px; border-radius: 2px; }
 
+/* The stage: globe and counter, fixed behind the story. */
 .stage { position: fixed; inset: 0; pointer-events: none; }
+.globe { position: absolute; inset: 0; }
+.globe canvas { display: block; width: 100%; height: 100%; }
+.fallback { position: absolute; right: 24px; top: 24px; max-width: 22rem; margin: 0; font-size: 14px; line-height: 1.5; color: var(--mute); text-align: right; }
 
 .counter {
   position: absolute;
-  right: max(24px, env(safe-area-inset-right));
-  bottom: max(24px, env(safe-area-inset-bottom));
-  display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+  right: max(28px, env(safe-area-inset-right));
+  bottom: max(28px, env(safe-area-inset-bottom));
+  width: 240px;
   font-variant-numeric: tabular-nums;
-  opacity: 0; transition: opacity .6s ease;
+  opacity: 0;
+  transition: opacity .6s ease;
 }
 .counter[data-ready] { opacity: 1; }
-.when { font-size: 15px; color: var(--ink); }
-.count { font-size: 13px; color: var(--mute); }
+.counter p { margin: 0; }
+.when { font-size: 18px; line-height: 1.3; color: var(--ink); }
+.total { font-size: 15px; line-height: 1.4; color: var(--mute); margin-bottom: 12px !important; }
 
+.chart { display: block; width: 100%; height: auto; overflow: visible; }
+.bandSat { fill: var(--sat); stroke: #04060b; stroke-width: 1; }
+.bandRb { fill: var(--rb); stroke: #04060b; stroke-width: 1; }
+.bandDeb { fill: var(--deb); stroke: #04060b; stroke-width: 1; }
+.chartAxis { stroke: var(--faint); stroke-width: 1; }
+.chartCursor { stroke: var(--ink); stroke-width: 1; opacity: .6; }
+.chartLabel { font-size: 10px; fill: var(--faint); }
+
+.legend { list-style: none; margin: 10px 0 0; padding: 0; font-size: 14px; line-height: 1.6; color: var(--mute); }
+.legend li { display: flex; align-items: center; gap: 8px; }
+.legend span { margin-left: auto; color: var(--ink); }
+.legend i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.keySat { background: var(--sat); }
+.keyRb { background: var(--rb); }
+.keyDeb { background: var(--deb); }
+
+/* The story. */
 .story {
   position: relative;
   width: min(100% - 32px, 34rem);
-  margin-left: max(16px, 8vw);
-  padding: 22svh 0 30svh;
+  margin-left: max(16px, 7vw);
+  padding: 24svh 0 30svh;
 }
 
-.opening { min-height: 80svh; }
-.chapter { color: var(--mute); font-size: 15px; margin: 0 0 12px; }
-.opening h1 { font-size: clamp(40px, 7vw, 76px); line-height: 1.02; letter-spacing: -0.02em; font-weight: 600; margin: 0 0 28px; }
-.lede { font-size: 20px; line-height: 1.5; margin: 0 0 24px; }
-.note { font-size: 14px; line-height: 1.55; color: var(--mute); margin: 0; }
+.opening { min-height: 86svh; }
+.chapter { color: var(--mute); font-size: 15px; margin: 0 0 14px; }
+.opening h1 { font-size: clamp(48px, 7.5vw, 76px); line-height: 1; letter-spacing: -0.025em; font-weight: 600; margin: 0 0 30px; }
+.lede { font-size: 21px; line-height: 1.5; margin: 0 0 28px; }
+.note { font-size: 15px; line-height: 1.6; color: var(--mute); margin: 0; padding-left: 16px; border-left: 1px solid var(--faint); }
 
-.beat { margin: 0 0 70svh; }
-.kicker { color: var(--sat); font-size: 15px; margin: 0 0 8px; }
-.beat h2 { font-size: 30px; line-height: 1.15; font-weight: 600; margin: 0 0 16px; }
-.beat p { font-size: 18px; line-height: 1.6; margin: 0 0 14px; }
-.beat em { font-style: italic; }
+.beat { margin: 0 0 75svh; }
+.kicker { color: var(--sat); font-size: 15px; margin: 0 0 10px; font-variant-numeric: tabular-nums; }
+.beat h2 { font-size: 30px; line-height: 1.15; letter-spacing: -0.01em; font-weight: 600; margin: 0 0 18px; }
+.beat p { font-size: 18px; line-height: 1.65; margin: 0 0 16px; }
+.beat p:last-child { margin-bottom: 0; }
+.beat em, .note em { font-style: italic; }
 
-.sources { font-size: 14px; line-height: 1.55; color: var(--mute); }
-.sources h2 { font-size: 18px; color: var(--ink); font-weight: 600; margin: 0 0 12px; }
-.sources ol { padding-left: 1.2em; margin: 0 0 16px; }
+.sources { font-size: 14px; line-height: 1.6; color: var(--mute); }
+.sources h2 { font-size: 21px; color: var(--ink); font-weight: 600; margin: 0 0 14px; }
+.sources ol { padding-left: 1.2em; margin: 0 0 18px; }
+.sources li { margin-bottom: 6px; }
 .sources a { color: var(--ink); text-decoration-color: var(--faint); text-underline-offset: 3px; }
 .sources a:hover { text-decoration-color: var(--ink); }
 
-.globe { position: absolute; inset: 0; }
-.globe canvas { display: block; width: 100%; height: 100%; }
-.fallback { position: absolute; right: 24px; bottom: 72px; max-width: 22rem; margin: 0; font-size: 13px; color: var(--mute); text-align: right; }
+/* Phones and narrow windows: text and globe take turns. */
+@media (max-width: 899px) {
+  .story { margin: 0 auto; padding-top: 14svh; }
+  .opening, .beat, .sources {
+    background: var(--panel);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-radius: 6px;
+    padding: 22px 20px;
+    margin-left: -4px;
+    margin-right: -4px;
+  }
+  .opening { min-height: 0; margin-bottom: 75svh; }
+  .opening h1 { font-size: clamp(40px, 12vw, 56px); }
+  .lede { font-size: 19px; }
+  .beat h2 { font-size: 26px; }
+  .beat p { font-size: 17px; }
+
+  .counter { left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); width: auto; display: grid; grid-template-columns: 1fr 120px; column-gap: 16px; align-items: end; }
+  .when { font-size: 16px; }
+  .total { font-size: 14px; margin-bottom: 0 !important; }
+  .counter .chart { grid-column: 2; grid-row: 1 / span 2; }
+  .legend { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 0 14px; font-size: 13px; margin-top: 6px; }
+  .legend span { margin-left: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .counter { transition: none; }
+}

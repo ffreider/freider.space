@@ -15,7 +15,11 @@ import styles from "./space.module.css";
 const RE = 6378.137; // km
 const SPEED = 60; // story seconds per second on screen
 const SPIN = 7.2921159e-5; // Earth's rotation, rad/s
-const DISTANCE = 17; // camera distance in Earth radii: geostationary orbit (6.6) fits
+// Camera distance in Earth radii: close while everything is in low orbit,
+// far enough for geostationary orbit (6.6) once Syncom 2 is up.
+const NEAR = 7;
+const FAR = 17;
+const WIDE_FROM = 2121; // 26 July 1963, days since Sputnik
 const NEVER = 1e9; // decay day for objects still up
 const rad = (deg: number) => (deg * Math.PI) / 180;
 
@@ -36,18 +40,17 @@ function declination(day: number) {
 export function Globe({ objs, day, focus, highlight }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const want = useRef({ day, focus, highlight });
-  want.current = { day, focus, highlight };
+  useEffect(() => {
+    want.current = { day, focus, highlight };
+  });
   const [engine, setEngine] = useState<{ setObjects(objs: SpaceObject[]): void; setHighlight(ids: number[]): void } | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let stop = () => {};
     let dead = false;
-    if (new URLSearchParams(location.search).has("nogl")) {
-      setFailed(true);
-      return;
-    }
     (async () => {
+      if (new URLSearchParams(location.search).has("nogl")) return setFailed(true);
       const THREE = await import("three");
       const el = host.current;
       if (dead || !el) return;
@@ -91,12 +94,14 @@ export function Globe({ objs, day, focus, highlight }: Props) {
       const dotsMat = dotMaterial(1, 0);
       const ringMat = dotMaterial(5, 1);
 
+      // three.js is untyped here (src/types/three.d.ts); these are the parts used.
+      type Drawn = { geometry: { dispose(): void }; visible: boolean };
       let all: SpaceObject[] = [];
-      let dots: any = null;
-      let rings: any = null;
-      const lines: { line: any; launch: number; decay: number }[] = [];
+      let dots: Drawn | null = null;
+      let rings: Drawn | null = null;
+      const lines: { line: Drawn; launch: number; decay: number }[] = [];
 
-      const pointsFor = (list: SpaceObject[], mat: any) => {
+      const pointsFor = (list: SpaceObject[], mat: unknown): Drawn => {
         const n = list.length;
         const orbA = new Float32Array(n * 4), orbB = new Float32Array(n * 4), life = new Float32Array(n * 2);
         list.forEach((o, k) => {
@@ -118,16 +123,28 @@ export function Globe({ objs, day, focus, highlight }: Props) {
       const api = {
         setObjects(list: SpaceObject[]) {
           all = list;
-          if (dots) sky.remove(dots), dots.geometry.dispose();
+          if (dots) {
+            sky.remove(dots);
+            dots.geometry.dispose();
+          }
           dots = pointsFor(list, dotsMat);
           sky.add(dots);
         },
         setHighlight(ids: number[]) {
-          if (rings) sky.remove(rings), rings.geometry.dispose();
-          for (const l of lines.splice(0)) sky.remove(l.line), l.line.geometry.dispose();
+          if (rings) {
+            sky.remove(rings);
+            rings.geometry.dispose();
+          }
+          for (const l of lines.splice(0)) {
+            sky.remove(l.line);
+            l.line.geometry.dispose();
+          }
           const pick = new Set(ids);
           const list = all.filter((o) => pick.has(o.norad));
-          if (!list.length) return (rings = null);
+          if (!list.length) {
+            rings = null;
+            return;
+          }
           rings = pointsFor(list, ringMat);
           sky.add(rings);
           // Each named object's orbit, drawn once round.
@@ -162,7 +179,7 @@ export function Globe({ objs, day, focus, highlight }: Props) {
       resize();
 
       // The camera's place above the ground, eased toward each beat's focus.
-      const look = { lat: 20, lon: 40 };
+      const look = { lat: 20, lon: 40, distance: NEAR };
       let simTime = 0;
       let last = performance.now();
       let frame = 0;
@@ -181,8 +198,10 @@ export function Globe({ objs, day, focus, highlight }: Props) {
           look.lat += (target.lat - look.lat) * k;
           look.lon += dl * k;
         }
+        const far = d >= WIDE_FROM ? FAR : NEAR;
+        look.distance += (far - look.distance) * (reduce.matches ? 1 : 1 - Math.exp(-dt * 1.2));
         const [cx, cy, cz] = toward(look.lat, look.lon);
-        camera.position.set(cx * DISTANCE, cy * DISTANCE, cz * DISTANCE);
+        camera.position.set(cx * look.distance, cy * look.distance, cz * look.distance);
         camera.lookAt(0, 0, 0);
 
         // Earth spins under the orbits; the sun keeps to the afternoon side
