@@ -36,7 +36,7 @@ const untilDate = longDate(snapshot.until);
 export function Story({ beats }: { beats: Beat[] }) {
   return (
     <main className={styles.page}>
-      <Stage marks={beats.map(({ date, focus, highlight }) => ({ date, focus, highlight }))} />
+      <Stage marks={beats.map(({ id, date, focus, highlight }) => ({ id, date, focus, highlight }))} />
       <article className={styles.story}>
         <header className={styles.opening}>
           <p className={styles.chapter}>Chapter 1 of 3, 1957 to 2019</p>

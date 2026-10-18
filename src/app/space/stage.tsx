@@ -10,7 +10,7 @@ import { useStoryDate } from "./scroll";
 import styles from "./space.module.css";
 
 // Only what the stage needs from each beat; the text stays on the server.
-export type Mark = Pick<Beat, "date" | "focus" | "highlight">;
+export type Mark = Pick<Beat, "id" | "date" | "focus" | "highlight">;
 
 // What stays on screen behind the story: the globe, and a quiet panel with
 // the date, how many objects are in orbit on it, a chart of how that number
