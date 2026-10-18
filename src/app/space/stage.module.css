@@ -1,0 +1,7 @@
+/* The stage gives way to the cold open's map: globe and counter fade out
+   together and back. No fade under reduced motion; it just switches. */
+.fade { transition: opacity .8s ease; }
+.faded { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .fade { transition: none; }
+}
