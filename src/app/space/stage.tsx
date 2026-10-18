@@ -4,10 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import { decodeCatalogue, EPOCH, type SpaceObject } from "@/lib/space/catalogue";
 import { countAt } from "@/lib/space/counts";
 import type { Beat } from "./chapter1";
+import { Globe } from "./globe";
 import { useStoryDate } from "./scroll";
 import styles from "./space.module.css";
 
-// What stays on screen behind the story: the globe (Task 4) and a quiet
+// What stays on screen behind the story: the globe and a quiet
 // counter of the date and of how many objects are in orbit on it. Without
 // JavaScript the story still reads in full; this part just isn't there.
 
@@ -15,7 +16,8 @@ const month = (day: number) =>
   new Date(EPOCH + Math.floor(day) * 86_400_000).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
 
 export function Stage({ beats }: { beats: Beat[] }) {
-  const { day } = useStoryDate(beats);
+  const { day, beat } = useStoryDate(beats);
+  const now = beats[Math.max(0, beat)];
   const [objs, setObjs] = useState<SpaceObject[] | null>(null);
 
   useEffect(() => {
@@ -34,6 +36,7 @@ export function Stage({ beats }: { beats: Beat[] }) {
 
   return (
     <div className={styles.stage} aria-hidden="true">
+      <Globe objs={objs} day={day} focus={now.focus} highlight={beat < 0 ? undefined : now.highlight} />
       <div className={styles.counter} data-ready={counts ? "" : undefined}>
         <span className={styles.when}>{month(day)}</span>
         <span className={styles.count}>{counts ? `${counts.total.toLocaleString("en-GB")} objects in orbit` : " "}</span>
