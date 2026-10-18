@@ -948,18 +948,21 @@
     const s = sections[5];
     lockY = s.offsetTop + s.offsetHeight - innerHeight * 0.75;
   }
-  // Phones: a stop holds while its view is on screen; the moves between
-  // stops happen while the text is on screen and the scene is faded down.
+  // Phones: a stop holds from when its text reaches the middle of the screen
+  // until its view's card has passed it; the move to the next stop happens
+  // in the open sky after the card, with the scene at full strength.
   let textBlocks = [];
   function layoutPhone() {
     const H = innerHeight, views = [...document.querySelectorAll(".view")];
     const span = el => { const top = el.getBoundingClientRect().top + scrollY; return [top, top + el.offsetHeight]; };
     holds = views.map((v, i) => {
-      const [top, bottom] = span(v);
-      const a = top - 0.3 * H + H / 2, b = Math.max(a, bottom - 0.7 * H + H / 2);
-      return [i === 0 ? 0 : a, i === 5 ? Infinity : b];
+      const col = sections[i].querySelector(".col");
+      const a = i === 0 ? 0 : span(col || v)[0];
+      const slot = v.querySelector(".slot");
+      const end = slot && slot.offsetHeight ? span(slot)[1] : span(v)[1] - 0.7 * H + H / 2;
+      return [a, i === 5 ? Infinity : Math.max(a, end)];
     });
-    lockY = holds[5][0] + 0.3 * H;
+    lockY = span(views[5])[0] + 0.5 * H;
     textBlocks = [...document.querySelectorAll("main .col, .hud")].map(span);
   }
   // how much of the screen is text: the scene fades down to a glow behind it
@@ -2076,6 +2079,13 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", () => { sizeOverlay(); layout(); onScroll(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layout(); onScroll(); });
+  // Cards move into their slots, photos and live numbers fill in: whenever the
+  // page's blocks change size, the stops and text spans are measured again.
+  if ("ResizeObserver" in window) {
+    let pending = 0;
+    const ro = new ResizeObserver(() => { cancelAnimationFrame(pending); pending = requestAnimationFrame(() => { layout(); onScroll(); }); });
+    ["main", "#hud"].forEach(sel => { const el = document.querySelector(sel); if (el) ro.observe(el); });
+  }
   const renderHtml = () => document.querySelectorAll("[data-h]").forEach(el => { el.innerHTML = nb(C.S()[el.dataset.h]); });
   C.onLang(() => { buildRoute(); stopTexts(Date.now()); lastCard = 0; renderHtml(); });
 

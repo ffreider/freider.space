@@ -50,6 +50,7 @@ export const timeline: Entry[] = [
     roles: [{ start: [2025, 8], title: { en: "Chair of the board", no: "Styreleder" } }],
   },
   {
+    end: [2026, 9],
     org: same("Spacepodden"),
     href: "https://open.spotify.com/show/7ofO8qm8tRBk2llQEMK8JB",
     photos: [

@@ -319,7 +319,12 @@ footer p { max-width: 60ch; }
   .name { font-size: clamp(52px, 15vw, 96px); margin-bottom: 22px; }
   .hint { margin-top: 28px; }
   h2 { font-size: clamp(36px, 10vw, 56px); }
-  .view { display: block; padding: 82svh var(--gutter) 6svh; }
+  /* after each view's card, about a screen of open sky: the camera flies
+     to the next stop there, in full view (main.js), before its text comes */
+  .view { display: block; padding: 82svh var(--gutter) 110svh; }
+  /* the end: FramSat-1 alone for a long stretch, no card; the panel after */
+  .arrival .view { padding: 170svh 0 0; }
+  .arrival .view .slot { display: none; }
   .view .slot { display: block; }
   .side { display: none; }
   .slot .card { margin: 0; overflow: visible; background: rgba(var(--haze), .9); border: 1px solid var(--rule); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
