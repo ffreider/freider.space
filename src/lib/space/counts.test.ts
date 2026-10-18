@@ -15,16 +15,16 @@ test("at the end of 1957 two objects were up: Sputnik 1 and 2", () => {
 });
 
 test("at the end of 1965", () => {
-  assert.deepEqual(countAt(objs, dayOf(new Date("1965-12-31T00:00Z"))), { satellites: 208, rocketBodies: 100, debris: 1477, unknown: 0, total: 1785 });
+  assert.deepEqual(countAt(objs, dayOf(new Date("1965-12-31T00:00Z"))), { satellites: 208, rocketBodies: 100, debris: 1134, unknown: 0, total: 1442 });
 });
 
-test("at the end of 2019", () => {
-  assert.deepEqual(countAt(objs, dayOf(new Date("2019-12-31T00:00Z"))), { satellites: 5325, rocketBodies: 2060, debris: 15968, unknown: 34, total: 23387 });
+test("on the day the first Starlinks launched, where the chapter ends", () => {
+  assert.deepEqual(countAt(objs, dayOf(new Date("2019-05-24T00:00Z"))), { satellites: 5072, rocketBodies: 2026, debris: 12252, unknown: 28, total: 19378 });
 });
 
 test("the Fengyun-1C cloud appears with the 2007 test, not the 1999 launch", () => {
-  assert.deepEqual(countAt(objs, dayOf(new Date("2007-01-10T00:00Z"))), { satellites: 3406, rocketBodies: 1624, debris: 11225, unknown: 1, total: 16256 });
-  assert.deepEqual(countAt(objs, dayOf(new Date("2007-12-31T00:00Z"))), { satellites: 3479, rocketBodies: 1660, debris: 14781, unknown: 1, total: 19921 });
+  assert.deepEqual(countAt(objs, dayOf(new Date("2007-01-10T00:00Z"))), { satellites: 3406, rocketBodies: 1624, debris: 5105, unknown: 1, total: 10136 });
+  assert.deepEqual(countAt(objs, dayOf(new Date("2007-12-31T00:00Z"))), { satellites: 3479, rocketBodies: 1660, debris: 8703, unknown: 1, total: 13843 });
 });
 
 test("the chart's series agrees with countAt on every sampled day", () => {

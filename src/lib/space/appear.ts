@@ -4,10 +4,12 @@
 // otherwise appear in 1999, when the satellite went up. So debris from a
 // break-up we have a date for appears on that date (NASA's History of
 // On-orbit Satellite Fragmentations, CelesTrak; see docs/space/research),
-// and all other debris appears when it was catalogued. The catalogue
-// doesn't record that date either, but numbers are handed out in order: a
-// number had been given out by the time any payload numbered after it
-// launched. Never before the parent's launch.
+// and all other debris appears no earlier than it can have been
+// catalogued. The catalogue doesn't record that date either, but numbers
+// are handed out in order, so a number can't have been given out before
+// every satellite and rocket stage numbered below it had launched. (Old
+// objects numbered late don't disturb this; they only ever sit below the
+// latest launch.) Never before the parent's launch.
 
 export type Row = { norad: number; intl: string; name: string; kind: number; launchDay: number };
 
@@ -29,20 +31,21 @@ const BREAKUPS: { intl: string; name?: string; date: string }[] = [
   { intl: "1993-036", name: "COSMOS 2251 DEB", date: "2009-02-10" },
 ];
 
-// For each catalogue number, the earliest launch day of any satellite or
-// rocket stage numbered at or after it: by then the number had been given out.
+// For each catalogue number, the latest launch day of any satellite or
+// rocket stage numbered at or below it: the number can't have been given
+// out before then.
 export function cataloguedBy(rows: Row[]): (norad: number) => number | null {
   const firm = rows.filter((r) => r.kind !== 2).sort((a, b) => a.norad - b.norad);
-  const after = new Array<number>(firm.length);
-  for (let k = firm.length - 1, low = Infinity; k >= 0; k--) after[k] = low = Math.min(low, firm[k].launchDay);
+  const upTo = new Array<number>(firm.length);
+  for (let k = 0, high = -Infinity; k < firm.length; k++) upTo[k] = high = Math.max(high, firm[k].launchDay);
   return (norad) => {
     let lo = 0, hi = firm.length;
     while (lo < hi) {
       const mid = (lo + hi) >> 1;
-      if (firm[mid].norad < norad) lo = mid + 1;
+      if (firm[mid].norad <= norad) lo = mid + 1;
       else hi = mid;
     }
-    return lo < firm.length ? after[lo] : null;
+    return lo > 0 ? upTo[lo - 1] : null;
   };
 }
 

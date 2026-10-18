@@ -21,10 +21,22 @@ test("debris from a dated break-up appears on the day of the break-up", () => {
   assert.equal(appearDay(rows[4], by), day("2009-02-10"));
 });
 
-test("other debris appears when it was catalogued, not when its parent launched", () => {
-  // SL-8 DEB 22700 shares Cosmos 2251's designator but isn't collision debris;
-  // the next payload numbered after it launched in January 1994.
-  assert.equal(appearDay(rows[3], cataloguedBy(rows)), day("1994-01-20"));
+test("other debris appears no earlier than it can have been catalogued", () => {
+  // Debris numbered 30500 was given its number after satellite 30000
+  // launched (November 2006), whatever its parent's launch date. An old
+  // satellite numbered late (31000, launched 1962) must not pull that back.
+  const late: Row[] = [
+    ...rows,
+    { norad: 31000, intl: "1962-099A", name: "OLD SAT CATALOGUED LATE", kind: 0, launchDay: day("1962-10-02") },
+    { norad: 30500, intl: "1993-050C", name: "SOME SAT DEB", kind: 2, launchDay: day("1994-01-20") },
+  ];
+  assert.equal(appearDay(late[late.length - 1], cataloguedBy(late)), day("2006-11-01"));
+});
+
+test("debris that shares a designator with a dated break-up but isn't from it keeps its own date", () => {
+  // SL-8 DEB 22700 shares Cosmos 2251's designator; only satellites numbered
+  // below it constrain it, and the latest of those launched with it.
+  assert.equal(appearDay(rows[3], cataloguedBy(rows)), day("1993-06-16"));
 });
 
 test("satellites and rocket stages appear on their launch day", () => {

@@ -94,7 +94,7 @@ export const CHAPTER1: Beat[] = [
       "Sputnik 1, Sputnik 2 and Explorer 1 have all come down. Vanguard 1 has not. It is the oldest object made by people that is still in orbit, and its third stage, launched with it, is the oldest rocket body. Vanguard 1's orbit is expected to last about 240 years.",
     ],
     focus: CANAVERAL,
-    highlight: [5, 16, 1576, 69999],
+    highlight: [5, 16, 1576],
     sources: [
       { label: "NASA NSSDCA: Vanguard 1", url: NSSDCA("1958-002B") },
       { label: "J. Uri, 60 Years Ago: Vanguard Fails to Reach Orbit (NASA)", url: "https://www.nasa.gov/history/60-years-ago-vanguard-fails-to-reach-orbit/" },

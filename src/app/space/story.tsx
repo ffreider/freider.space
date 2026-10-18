@@ -29,12 +29,14 @@ const prose = (text: string) =>
     .split(/\*([^*]+)\*/)
     .map((part, k) => (k % 2 ? <em key={k}>{part}</em> : <Fragment key={k}>{part}</Fragment>));
 
-const snapshotDate = new Date(`${snapshot.date}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+const longDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+const snapshotDate = longDate(snapshot.date);
+const untilDate = longDate(snapshot.until);
 
 export function Story({ beats }: { beats: Beat[] }) {
   return (
     <main className={styles.page}>
-      <Stage beats={beats} />
+      <Stage marks={beats.map(({ date, focus, highlight }) => ({ date, focus, highlight }))} />
       <article className={styles.story}>
         <header className={styles.opening}>
           <p className={styles.chapter}>Chapter 1 of 3, 1957 to 2019</p>
@@ -46,10 +48,11 @@ export function Story({ beats }: { beats: Beat[] }) {
           </p>
           <p className={styles.note}>
             Every dot is a real object from the public satellite catalogue, as CelesTrak published it on {snapshotDate}.
-            Its height and the tilt of its orbit are real. Where it is along that orbit, and which way the orbit faces, the
-            catalogue doesn&rsquo;t say, so those are spread out evenly. Blue is a satellite, working or not; warm grey is a
+            Its height and the tilt of its orbit are real; for objects that have since fallen, it is the orbit they were
+            first tracked in, not the one they decayed from. Where each is along its orbit, and which way the orbit faces,
+            the catalogue doesn&rsquo;t say, so those are spread out evenly. Blue is a satellite, working or not; warm grey is a
             spent rocket stage; the faint dots are debris. The catalogue doesn&rsquo;t record when a piece of debris was
-            made, so fragments from the major break-ups appear on the day of the break-up, and the rest on about the day
+            made, so fragments from the major break-ups appear on the day of the break-up, and the rest from roughly when
             they were first catalogued, which can be years later.
           </p>
         </header>
@@ -88,7 +91,12 @@ export function Story({ beats }: { beats: Beat[] }) {
             <a href="https://celestrak.org/satcat/" target="_blank" rel="noopener">
               CelesTrak
             </a>
-            , snapshot of {snapshotDate}, {snapshot.objects.toLocaleString("en-GB")} objects.
+            , snapshot of {snapshotDate}: the {snapshot.objects.toLocaleString("en-GB")} objects in it that were in orbit at
+            some point up to {untilDate}. Early orbits of objects that have since fallen: Jonathan McDowell&rsquo;s{" "}
+            <a href="https://planet4589.org/space/gcat/" target="_blank" rel="noopener">
+              GCAT
+            </a>{" "}
+            (CC BY 4.0).
           </p>
         </footer>
       </article>

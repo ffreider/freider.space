@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { dayOf } from "@/lib/space/catalogue";
-import type { Beat } from "./chapter1";
 
 // The story date, driven by the scroll. While a beat's text covers the
 // middle of the screen the date holds at that beat's date; in the gap
@@ -13,7 +12,7 @@ import type { Beat } from "./chapter1";
 
 const day = (iso: string) => dayOf(new Date(`${iso}T00:00:00Z`));
 
-export function useStoryDate(beats: Beat[]): { day: number; beat: number } {
+export function useStoryDate(beats: { date: string }[]): { day: number; beat: number } {
   const [state, setState] = useState(() => ({ day: day(beats[0].date) - 1, beat: -1 }));
 
   useEffect(() => {
