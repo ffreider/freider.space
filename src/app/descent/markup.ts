@@ -319,18 +319,17 @@ footer p { max-width: 60ch; }
   .name { font-size: clamp(52px, 15vw, 96px); margin-bottom: 22px; }
   .hint { margin-top: 28px; }
   h2 { font-size: clamp(36px, 10vw, 56px); }
-  /* after each view's card, about a screen of open sky: the camera flies
-     to the next stop there, in full view (main.js), before its text comes */
-  .view { display: block; padding: 82svh var(--gutter) 110svh; }
-  /* the end: FramSat-1 alone for a long stretch, no card; the panel after */
-  .arrival .view { padding: 170svh 0 0; }
-  .arrival .view .slot { display: none; }
+  .view { display: block; padding: 82svh var(--gutter) 6svh; }
+  /* the end: FramSat-1's card straight after its text, then FramSat-1 on
+     its own, so the page comes to rest on the satellite, not on text */
+  .arrival .view { padding: 6svh var(--gutter) 78svh; }
   .view .slot { display: block; }
   .side { display: none; }
   .slot .card { margin: 0; overflow: visible; background: rgba(var(--haze), .9); border: 1px solid var(--rule); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
   /* the end: the ride's panel is the last block of the page */
   .hud, body.live-lock .hud { position: relative; z-index: 3; left: auto; bottom: auto; width: auto; max-height: none; overflow: visible; opacity: 1; transform: none; pointer-events: auto;
-    padding: 14svh var(--gutter) calc(28px + env(safe-area-inset-bottom, 0px)); }
+    padding: 18svh var(--gutter) calc(28px + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, .78) 30%); }
   .hud .why, .hud-actions .hint { display: none; }
   /* photos: a row you swipe through, large, the next one peeking in at the
      edge, captions underneath (there's no hover on a phone) */

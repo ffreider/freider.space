@@ -948,22 +948,20 @@
     const s = sections[5];
     lockY = s.offsetTop + s.offsetHeight - innerHeight * 0.75;
   }
-  // Phones: a stop holds from when its text reaches the middle of the screen
-  // until its view's card has passed it; the move to the next stop happens
-  // in the open sky after the card, with the scene at full strength.
+  // Phones: a stop holds while its view is on screen; the moves between
+  // stops happen while the text is on screen and the scene is faded down.
   let textBlocks = [];
   function layoutPhone() {
     const H = innerHeight, views = [...document.querySelectorAll(".view")];
     const span = el => { const top = el.getBoundingClientRect().top + scrollY; return [top, top + el.offsetHeight]; };
     holds = views.map((v, i) => {
-      const col = sections[i].querySelector(".col");
-      const a = i === 0 ? 0 : span(col || v)[0];
-      const slot = v.querySelector(".slot");
-      const end = slot && slot.offsetHeight ? span(slot)[1] : span(v)[1] - 0.7 * H + H / 2;
-      return [a, i === 5 ? Infinity : Math.max(a, end)];
+      const [top, bottom] = span(v);
+      const a = top - 0.3 * H + H / 2, b = Math.max(a, bottom - 0.7 * H + H / 2);
+      return [i === 0 ? 0 : a, i === 5 ? Infinity : b];
     });
-    lockY = span(views[5])[0] + 0.5 * H;
-    textBlocks = [...document.querySelectorAll("main .col, .hud")].map(span);
+    lockY = holds[5][0] + 0.3 * H;
+    // the closing panel has its own dark backing, so it doesn't dim FramSat-1
+    textBlocks = [...document.querySelectorAll("main .col")].map(span);
   }
   // how much of the screen is text: the scene fades down to a glow behind it
   const sceneEls = ["field", "overlay", "cube"].map($);
@@ -1246,7 +1244,8 @@
       // a symbol at the satellite's true position (the real thing would be far smaller than a pixel)
       const d = sub(cam.sat, cam.posKm);
       T.holder.position.set(dot(d, cam.R), dot(d, cam.U), -dot(d, cam.F));
-      size = len(d) * 0.04 * cam.tanH * (0.55 + 0.45 * w);
+      // phones: three times larger, or it's a speck on a small screen
+      size = len(d) * 0.04 * cam.tanH * (0.55 + 0.45 * w) * (narrow() ? 3 : 1);
       T.camera3.near = 5; T.camera3.far = 2e5; T.camera3.updateProjectionMatrix();
     } else {
       size = 0.065 * cam.tanH * (0.55 + 0.45 * w);

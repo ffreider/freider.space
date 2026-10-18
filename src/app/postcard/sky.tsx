@@ -145,8 +145,9 @@ async function captions(card: Card, w: number, h: number, s: number) {
     (
       <div style={{ width: "100%", height: "100%", display: "flex", position: "relative", fontFamily: "Schibsted" }}>
         {line(`FramSat-1 over ${name}`, 32, "#dce6f2", 1520)}
-        {line(`${where ? `${where}, ` : ""}${date}, ${hhmm(start)} UTC`, 22, "#7c8c9e", 1566)}
-        {line("Each dash is a radio packet the station received", 19, "#4c5a6c", 1622)}
+        {line(`${where ? `${where[0].toUpperCase()}${where.slice(1)}, ` : ""}${date}, ${hhmm(start)} UTC`, 22, "#7c8c9e", 1566)}
+        {line("The real sky above the station as FramSat-1 passed:", 19, "#5f6e80", 1616)}
+        {line("its stars where they were, each dash a radio packet it received", 19, "#5f6e80", 1644)}
       </div>
     ),
     { width: w, height: h, fonts: [{ name: "Schibsted", data: font, weight: 500 }] },

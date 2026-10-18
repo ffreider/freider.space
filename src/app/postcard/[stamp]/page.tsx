@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { parseStamp } from "@/lib/postcard";
 import { loadPostcard } from "../load";
 import { CARD } from "../sky";
+import { CardImage } from "./card-image";
 import styles from "../postcard.module.css";
 
 // freider.space/postcard/20261014T0732Z: the sky over the radio station that
@@ -44,8 +45,7 @@ export default async function PostcardPage({ params }: Props) {
     <main className={styles.page}>
       <div className={styles.frame}>
         {card.card ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={`/postcard/${stamp}/card.png?v=2`} width={CARD.width} height={CARD.height} alt={card.label} className={styles.card} />
+          <CardImage src={`/postcard/${stamp}/card.png?v=3`} width={CARD.width} height={CARD.height} alt={card.label} />
         ) : (
           <div className={styles.blank}>
             <p className={styles.blankTitle}>{card.message?.[0]}</p>
@@ -57,7 +57,7 @@ export default async function PostcardPage({ params }: Props) {
       <div className={styles.actions}>
         {card.card && (
           <a href={`/postcard/${stamp}/print`} className={styles.primary} download={`framsat-1-postcard-${stamp}.png`}>
-            Save for printing
+            Save image
           </a>
         )}
         <a href="/hear" className={styles.secondary}>

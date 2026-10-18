@@ -27,7 +27,20 @@
   border-radius: 4px;
   overflow: hidden;
 }
-.card { display: block; width: 100%; height: auto; background: #04060b; }
+.cardWrap { position: relative; background: #04060b; }
+.card { display: block; width: 100%; height: auto; opacity: 0; transition: opacity .7s ease; }
+.card.shown { opacity: 1; }
+
+/* While the card is drawn: the empty horizon, breathing slowly, and one line. */
+.loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; color: var(--mute); font-size: 14px; }
+.loading p { margin: 0; }
+.horizon {
+  width: 62%; aspect-ratio: 1; border-radius: 50%;
+  border: 1px solid rgba(147, 164, 180, 0.22);
+  background: radial-gradient(circle, rgba(20, 36, 62, 0.35) 0%, rgba(4, 6, 11, 0) 70%);
+  animation: breathe 2.6s ease-in-out infinite;
+}
+@keyframes breathe { 50% { border-color: rgba(169, 214, 255, 0.45); transform: scale(1.015); } }
 
 .blank {
   aspect-ratio: 1240 / 1748;
@@ -61,6 +74,8 @@
 .more a { color: var(--mute); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
 
 @media (prefers-reduced-motion: reduce) {
+  .horizon { animation: none; }
+  .card { transition: none; }
   .primary, .secondary { transition: none; }
   .primary:active, .secondary:active { transform: none; }
 }
