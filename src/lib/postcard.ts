@@ -1,13 +1,13 @@
 import { unstable_cache } from "next/cache";
 import { PERIOD_S, type Ridges, ridgesFromWaterfall } from "./waterfall";
-import { LAUNCH } from "./stamp";
 
 export { LAUNCH, parseStamp, stampOf } from "./stamp";
 
 // A postcard is a moment, to the minute: freider.space/postcard/20261014T0732Z.
-// It shows the clearest SatNOGS reception of FramSat-1 near that moment as
-// ridge lines. Nothing is stored about anyone: the link itself is the
-// postcard, and the same link always draws the same plate.
+// It shows the clearest SatNOGS reception of FramSat-1 near that moment: the
+// sky over that station, with the pass drawn as dashes of light. Nothing is
+// stored about anyone: the link itself is the postcard, and the same link
+// always draws the same card.
 
 const WINDOW_MS = 12 * 3600_000; // look this far either side of the moment
 const MIN_HEARD = 3; // fewer packets than this and it's just noise
@@ -18,9 +18,6 @@ const DEVELOPING_MS = 12 * 3600_000;
 
 const OBSERVATIONS = "https://network.satnogs.org/api/observations/";
 
-// The plate number: minutes since launch, so every minute has its own.
-export const plateNumber = (moment: Date) => Math.floor((moment.getTime() - LAUNCH) / 60_000);
-
 type Observation = {
   id: number;
   start: string;
@@ -28,8 +25,11 @@ type Observation = {
   station_name: string | null;
   station_lat: number | null;
   station_lng: number | null;
+  station_alt?: number | null;
   waterfall: string | null;
   demoddata?: unknown[];
+  tle1?: string | null; // the orbit the station tracked with
+  tle2?: string | null;
 };
 
 export type Pass = {
@@ -38,6 +38,9 @@ export type Pass = {
   lat: number | null;
   lon: number | null;
   start: string; // ISO
+  end: string; // ISO
+  altitudeM: number; // the station's height
+  tle: { line1: string; line2: string } | null;
   durationS: number;
   url: string;
   ridges: Ridges;
@@ -127,6 +130,9 @@ export async function postcardFor(moment: Date): Promise<Postcard> {
       lat: Number.isFinite(o.station_lat) ? o.station_lat : null,
       lon: Number.isFinite(o.station_lng) ? o.station_lng : null,
       start: o.start,
+      end: o.end,
+      altitudeM: Number.isFinite(o.station_alt) ? Number(o.station_alt) : 0,
+      tle: typeof o.tle1 === "string" && typeof o.tle2 === "string" ? { line1: o.tle1, line2: o.tle2 } : null,
       durationS,
       url: `https://network.satnogs.org/observations/${o.id}/`,
       ridges,
