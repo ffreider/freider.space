@@ -21,6 +21,8 @@
   background: radial-gradient(120% 80% at 70% 40%, #0b1220 0%, #04060b 70%);
   font-family: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* The full-bleed blocks are 100vw wide, which includes the scrollbar. */
+  overflow-x: clip;
 }
 .page a:focus-visible { outline: 2px solid var(--sat); outline-offset: 2px; border-radius: 2px; }
 
@@ -75,6 +77,7 @@
 .note { font-size: 15px; line-height: 1.6; color: var(--mute); margin: 0; padding-left: 16px; border-left: 1px solid var(--faint); }
 
 .beat { margin: 0 0 75svh; }
+.beatText { position: relative; }
 .kicker { color: var(--sat); font-size: 15px; margin: 0 0 10px; font-variant-numeric: tabular-nums; }
 .beat h2 { font-size: 30px; line-height: 1.15; letter-spacing: -0.01em; font-weight: 600; margin: 0 0 18px; }
 .beat p { font-size: 18px; line-height: 1.65; margin: 0 0 16px; }
@@ -88,10 +91,160 @@
 .sources a { color: var(--ink); text-decoration-color: var(--faint); text-underline-offset: 3px; }
 .sources a:hover { text-decoration-color: var(--ink); }
 
+
+/* Blocks that run the full width of the screen, beyond the text column:
+   photographs, comparisons, numbers, maps. The column starts 7vw in on
+   desktop and is centred on phones. */
+.bleed { width: 100vw; margin: 0 0 12svh calc(-1 * max(16px, 7vw)); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Captions and credits under a picture. */
+.mediaNote {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 0 0 max(16px, 7vw);
+  max-width: calc(max(16px, 7vw) + 40rem);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.mediaNote small { font-size: 14px; color: var(--mute); }
+.mediaNote a { color: var(--mute); text-decoration-color: var(--faint); text-underline-offset: 3px; }
+.mediaNote a:hover { color: var(--ink); text-decoration-color: var(--ink); }
+
+/* Archive: a photograph, edge to edge, drifting very slowly as it passes. */
+.archive { background: #04060b; }
+.archiveFrame { width: 100%; max-height: 100svh; overflow: hidden; background: #0b1220; }
+.archiveFrame img { display: block; width: 100%; height: 100%; max-height: 100svh; object-fit: cover; object-position: 50% 35%; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .archiveFrame img { animation: drift linear both; animation-timeline: view(); }
+  }
+}
+@keyframes drift { from { transform: scale(1.08) translateY(-1.5%); } to { transform: scale(1.02) translateY(1.5%); } }
+
+/* Compare: two pictures side by side; with JavaScript, one over the other
+   with a handle. The handle is a range input laid over both. */
+.compare { margin: 0; background: #04060b; }
+.compareStage { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.compareBefore, .compareAfter { position: relative; background: #0b1220; }
+.compareBefore img, .compareAfter img { display: block; width: 100%; height: auto; }
+.compareLabel { position: absolute; left: 12px; bottom: 12px; padding: 4px 10px; border-radius: 3px; font-size: 15px; line-height: 1.3; color: var(--ink); background: rgb(4 6 11 / 0.78); }
+.compare[data-live] .compareStage { position: relative; display: block; width: 100%; aspect-ratio: var(--ratio); max-height: 100svh; overflow: hidden; }
+.compare[data-live] .compareBefore, .compare[data-live] .compareAfter { position: absolute; inset: 0; }
+.compare[data-live] img { height: 100%; object-fit: cover; }
+.compare[data-live] .compareAfter { clip-path: inset(0 0 0 var(--pos)); }
+.compare[data-live] .compareAfter .compareLabel { left: auto; right: 12px; }
+.compareHandle { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 2px; margin-left: -1px; background: var(--ink); pointer-events: none; }
+.compareHandle::after { content: ""; position: absolute; top: 50%; left: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border: 2px solid var(--ink); border-radius: 50%; background: rgb(4 6 11 / 0.55); }
+.compareRange { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; touch-action: pan-y; }
+.compareStage:has(.compareRange:focus-visible) .compareHandle { outline: 2px solid var(--sat); outline-offset: 3px; }
+@media (max-width: 899px) {
+  .compare:not([data-live]) .compareStage { grid-template-columns: 1fr; }
+}
+
+/* Number: one black frame, one piece of arithmetic. */
+.numberBlock { margin-bottom: 12svh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: 0 max(16px, 7vw) 0 max(16px, 7vw); background: #000; }
+.numberBlock .numberFigure { margin: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 0.3em; font-size: clamp(54px, 11vw, 168px); line-height: 1.05; font-weight: 600; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--ink); }
+.numberArrow { color: var(--faint); font-weight: 400; }
+.numberTo { color: #fff; }
+.numberBlock figcaption { margin-top: 18px; max-width: 34rem; font-size: 21px; line-height: 1.4; color: var(--mute); }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .numberTo, .numberArrow { animation: arrive linear both; animation-timeline: view(); animation-range: entry 35% entry 85%; }
+  }
+}
+@keyframes arrive { from { opacity: 0; transform: translateX(-0.15em); } to { opacity: 1; transform: none; } }
+
+/* Maps: the block is tall, its picture sticks to the screen and --p, set
+   from the scroll (see scroll-progress.tsx), runs from 0 to 1 through it.
+   Without JavaScript --p stays 1: the finished map. */
+.mapBlock, .mapBlockLong { --p: 1; height: 220svh; }
+.mapBlockLong { height: 320svh; }
+.mapSticky { position: sticky; top: 0; height: 100svh; margin: 0; overflow: hidden; background: #04060b; }
+.mapWide, .mapTall { position: absolute; inset: 0; width: 100%; height: 100%; display: block; font-size: 16px; }
+.mapTall { display: none; font-size: 22px; }
+@media (max-aspect-ratio: 1/1) { .mapWide { display: none; } .mapTall { display: block; } }
+.mediaCaption { position: absolute; left: 0; right: 0; bottom: 0; margin: 0; padding: 60px max(16px, 7vw) 28px; font-size: 15px; line-height: 1.5; color: var(--ink); background: linear-gradient(to top, rgb(4 6 11 / 0.92) 40%, transparent); }
+@media (min-width: 900px) { .mediaCaption { padding-right: 300px; } }
+
+.mapLand { fill: #0d1622; stroke: #22324a; stroke-width: 1; stroke-linejoin: round; }
+.mapGrid { fill: none; stroke: #121b29; stroke-width: 1; }
+.mapLabel { font-size: inherit; fill: var(--mute); }
+.mapLabelStrong { font-size: inherit; fill: var(--ink); }
+.mapPoint { fill: var(--ink); }
+.mapCross { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; }
+.mapRadar { fill: none; stroke: var(--mute); stroke-width: 1.5; opacity: 0.55; }
+.mapRouteFaint { fill: none; stroke: var(--rb); stroke-width: 1.5; stroke-dasharray: 3 7; opacity: 0.55; }
+.mapRoute { fill: none; stroke: var(--rb); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--p)); }
+.mapSight { stroke: var(--mute); stroke-width: 1.5; stroke-dasharray: 2 6; opacity: 0.8; }
+.mapRocket { fill: var(--rb); stroke: #04060b; stroke-width: 2; }
+.mapReadout { font-size: 88px; font-weight: 600; letter-spacing: -0.02em; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.mapTall .mapReadout { font-size: 72px; }
+.mapBand { fill: var(--ink); opacity: 0.07; }
+.mapGuide { stroke: var(--faint); stroke-width: 1; stroke-dasharray: 4 6; fill: none; }
+.mapGround { stroke: var(--mute); stroke-width: 2; }
+.mapUp { fill: none; stroke: var(--rb); stroke-width: 3; stroke-linecap: round; }
+.mapLink { fill: none; stroke: var(--sat); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--p)); }
+.mapLinkFaint { fill: none; stroke: var(--sat); stroke-width: 1.5; stroke-dasharray: 3 7; opacity: 0.5; }
+.mapSatellite { fill: var(--sat); stroke: #04060b; stroke-width: 2; }
+.mapFootprint { fill: var(--sat); fill-opacity: 0.07; stroke: var(--sat); stroke-width: 1.5; stroke-dasharray: 6 6; transform-box: fill-box; transform-origin: center; transform: scale(calc(0.12 + 0.88 * var(--p))); }
+.mapRing { fill: var(--ink); fill-opacity: 0.18; stroke: var(--ink); stroke-width: 1.5; }
+
+/* The cold open: a winter morning over a dark map, before the title. */
+.coldOpen { position: relative; min-height: 100svh; display: grid; background: #04060b; }
+/* The map stays put while the text scrolls over it. */
+.coldMap { grid-area: 1 / 1; position: sticky; top: 0; height: 100svh; align-self: start; overflow: hidden; }
+.coldMap::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(4 6 11 / 0.9) 0%, rgb(4 6 11 / 0.55) 40%, transparent 62%); }
+.coldText { grid-area: 1 / 1; position: relative; z-index: 1; align-self: center; width: min(100% - 32px, 34rem); margin-left: max(16px, 7vw); padding: 9svh 0; }
+.coldKicker { margin: 0 0 22px; font-size: 15px; color: var(--sat); font-variant-numeric: tabular-nums; }
+.coldText p { margin: 0 0 16px; font-size: 19px; line-height: 1.55; }
+.coldText .coldKicker { font-size: 15px; }
+.coldText .coldTurn { margin: 34px 0 0; font-size: clamp(28px, 4vw, 40px); line-height: 1.2; font-weight: 600; letter-spacing: -0.015em; }
+.coldTurn em { font-style: italic; }
+
+/* Act cards: a full screen with the numeral large and one number. The globe
+   shows on the right; a scrim keeps the text readable. */
+.act { position: relative; min-height: 100svh; display: flex; align-items: center; margin-bottom: 40svh; background: linear-gradient(90deg, rgb(4 6 11 / 0.88) 0%, rgb(4 6 11 / 0.6) 50%, transparent 100%); }
+.actInner { width: min(100% - 32px, 34rem); margin-left: max(16px, 7vw); padding: 10svh 0; }
+.act h2 { margin: 0; display: flex; flex-direction: column; font-weight: 600; }
+.actNumeral { font-size: clamp(112px, 24vw, 280px); line-height: 0.82; letter-spacing: -0.04em; color: var(--ink); }
+.actTitle { margin-top: 22px; font-size: clamp(34px, 5vw, 52px); line-height: 1.08; letter-spacing: -0.02em; }
+.act p { margin: 0; }
+.actYears { margin-top: 12px !important; font-size: 18px; color: var(--mute); font-variant-numeric: tabular-nums; }
+.actNumber { margin-top: 44px !important; font-size: 18px; line-height: 1.4; color: var(--mute); }
+.actNumber strong { display: block; font-size: clamp(48px, 7vw, 76px); line-height: 1; letter-spacing: -0.025em; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.actWitness { margin-top: 28px !important; padding-left: 16px; border-left: 1px solid var(--faint); font-size: 18px; line-height: 1.55; color: var(--mute); }
+.actWitness em { font-style: italic; }
+
+/* Sound: a button, never autoplay. */
+.sound { margin: 0; padding: 0 0 0 max(16px, 7vw); }
+.soundButton { display: inline-flex; align-items: center; gap: 12px; padding: 12px 20px; border: 1px solid var(--faint); border-radius: 999px; background: transparent; color: var(--ink); font: inherit; font-size: 18px; cursor: pointer; }
+.soundButton:hover { border-color: var(--ink); }
+.soundButton:focus-visible { outline: 2px solid var(--sat); outline-offset: 3px; }
+.soundIcon { width: 0; height: 0; border-style: solid; border-width: 8px 0 8px 13px; border-color: transparent transparent transparent var(--ink); }
+.soundIcon[data-playing] { width: 14px; height: 14px; border: 0; background: var(--ink); }
+.sound .mediaNote { padding-left: 0; }
+
+/* The progress rail: five acts as segments down the right edge, a bar across
+   the top on phones. Right of the counter, so it never covers it. */
+.rail { position: fixed; inset: 0; z-index: 20; pointer-events: none; opacity: 0; transition: opacity .6s ease; }
+.rail[data-on] { opacity: 1; }
+.railBar { position: absolute; top: 24px; bottom: 24px; right: 12px; width: 3px; display: flex; flex-direction: column; gap: 6px; }
+.railSeg { position: relative; display: block; background: rgb(220 230 242 / 0.16); }
+.railFill { position: absolute; inset: 0; background: var(--ink); transform-origin: top; transform: scaleY(var(--f)); }
+.railNext { position: absolute; top: 20px; right: 28px; max-width: 16rem; margin: 0; display: flex; flex-direction: column; gap: 2px; text-align: right; font-size: 14px; line-height: 1.4; color: var(--mute); opacity: 0.85; }
+.railNext span:first-child:not(:last-child) { color: var(--faint); }
+
+.picturesHeading { margin-top: 28px !important; }
+.sources ul { padding-left: 1.2em; margin: 0 0 18px; }
+.sources li { margin-bottom: 6px; }
+
 /* Phones and narrow windows: text and globe take turns. */
 @media (max-width: 899px) {
   .story { margin: 0 auto; padding-top: 14svh; }
-  .opening, .beat, .sources {
+  .opening, .beatText, .sources {
     background: var(--panel);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
@@ -100,6 +253,21 @@
     margin-left: -4px;
     margin-right: -4px;
   }
+  .bleed { margin-left: calc(50% - 50vw); }
+  .mediaNote { padding-left: 16px; padding-right: 16px; max-width: none; }
+  .sound { padding-left: 0; }
+  .coldMap::after { background: linear-gradient(0deg, rgb(4 6 11 / 0.88) 0%, rgb(4 6 11 / 0.8) 100%); }
+  .coldText { margin: 0 auto; }
+  .actInner { margin: 0 auto; }
+  .act { margin-bottom: 30svh; background: none; }
+  .actInner { background: var(--panel); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: 6px; padding: 28px 20px; }
+  .numberBlock { padding-left: 16px; padding-right: 16px; }
+  .numberBlock .numberFigure { flex-direction: column; align-items: flex-start; font-size: clamp(54px, 18vw, 96px); }
+  .numberArrow { transform: rotate(90deg); display: inline-block; margin: 0.05em 0 0.05em 0.1em; }
+  .mediaCaption { padding-right: 16px; }
+  .railBar { top: 0; left: 0; right: 0; bottom: auto; width: auto; height: 3px; flex-direction: row; gap: 3px; }
+  .railFill { transform-origin: left; transform: scaleX(var(--f)); }
+  .railNext { display: none; }
   .opening { min-height: 0; margin-bottom: 75svh; }
   .opening h1 { font-size: clamp(40px, 12vw, 56px); }
   .lede { font-size: 19px; }
@@ -115,5 +283,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .counter { transition: none; }
+  .counter, .rail { transition: none; }
 }

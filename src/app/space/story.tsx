@@ -1,10 +1,16 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { Fragment } from "react";
-import { dayOf, decodeCatalogue } from "@/lib/space/catalogue";
-import { countAt, type Counts } from "@/lib/space/counts";
+import { decodeCatalogue } from "@/lib/space/catalogue";
+import { fillTokens } from "@/lib/space/tokens";
 import snapshot from "@/lib/space/snapshot.json";
 import type { Beat } from "./chapter1";
+import { ActCard } from "./act-card";
+import { ColdOpenSection } from "./cold-open";
+import { ACTS, COLD_OPEN } from "./acts";
+import { MEDIA } from "./media";
+import { MediaBlock } from "./media-blocks";
+import { Rail } from "./rail";
 import { Stage } from "./stage";
 import styles from "./space.module.css";
 
@@ -15,13 +21,7 @@ import styles from "./space.module.css";
 const file = readFileSync(path.join(process.cwd(), "public/space/catalogue.bin"));
 const objs = decodeCatalogue(file.buffer.slice(file.byteOffset, file.byteOffset + file.byteLength));
 
-// {count:1957-10-04} → the number of objects in orbit that day; a kind
-// after a second colon counts only that kind.
-const fill = (text: string) =>
-  text.replace(/\{count:(\d{4}-\d\d-\d\d)(?::(\w+))?\}/g, (_, iso: string, kind?: string) => {
-    const counts = countAt(objs, dayOf(new Date(`${iso}T00:00:00Z`)));
-    return counts[(kind ?? "total") as keyof Counts].toLocaleString("en-GB");
-  });
+const fill = (text: string) => fillTokens(text, objs);
 
 // *word* → <em>word</em>; nothing else is markup.
 const prose = (text: string) =>
@@ -33,10 +33,28 @@ const longDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateStrin
 const snapshotDate = longDate(snapshot.date);
 const untilDate = longDate(snapshot.until);
 
+// What an act card's one number counts, said in words from its token, so the
+// card can't claim something other than what was counted.
+const KINDS: Record<string, string> = { satellites: "satellites", rocketBodies: "rocket stages", debris: "pieces of debris", unknown: "objects of unknown kind" };
+function countLabel(token: string) {
+  const m = /^\{count:(\d{4}-\d\d-\d\d)(?::(\w+))?\}$/.exec(token);
+  if (!m) return "";
+  return `${m[2] ? KINDS[m[2]] : "objects"} in orbit on ${longDate(m[1])}`;
+}
+
+// The five acts of the chapter, each a card placed right before its first beat.
+const actBefore = new Map(ACTS.map((a) => [a.before, a]));
+
 export function Story({ beats }: { beats: Beat[] }) {
+  // Every credit printed in the story, once per beat, for the list at the end.
+  const pictures = beats.flatMap((beat) =>
+    (MEDIA[beat.id] ?? []).flatMap((m) => (m.kind === "number" || m.kind === "map" ? [] : [{ beat, credit: m.credit }])),
+  );
   return (
     <main className={styles.page}>
       <Stage marks={beats.map(({ id, date, focus, highlight }) => ({ id, date, focus, highlight }))} />
+      <Rail acts={ACTS.map(({ numeral, title, before }) => ({ numeral, title, before }))} beats={beats.map(({ id, title }) => ({ id, title }))} />
+      {COLD_OPEN && <ColdOpenSection kicker={COLD_OPEN.kicker} paragraphs={COLD_OPEN.paragraphs.map(prose)} turn={prose(COLD_OPEN.turn)} />}
       <article className={styles.story}>
         <header className={styles.opening}>
           <p className={styles.chapter}>Chapter 1 of 3, 1957 to 2019</p>
@@ -57,17 +75,28 @@ export function Story({ beats }: { beats: Beat[] }) {
           </p>
         </header>
 
-        {beats.map((b) => (
-          <section key={b.id} id={b.id} className={styles.beat} data-beat>
-            <p className={styles.kicker}>
-              <time dateTime={b.date}>{b.kicker}</time>
-            </p>
-            <h2>{b.title}</h2>
-            {b.body.map((p, k) => (
-              <p key={k}>{prose(p)}</p>
-            ))}
-          </section>
-        ))}
+        {beats.map((b) => {
+          const act = actBefore.get(b.id);
+          return (
+            <Fragment key={b.id}>
+              {act && <ActCard act={act} number={fill(act.count)} numberLabel={countLabel(act.count)} witness={prose(act.witness)} />}
+              <section id={b.id} className={styles.beat} data-beat>
+                {(MEDIA[b.id] ?? []).map((m, k) => (
+                  <MediaBlock key={k} media={m} fill={fill} />
+                ))}
+                <div className={styles.beatText}>
+                  <p className={styles.kicker}>
+                    <time dateTime={b.date}>{b.kicker}</time>
+                  </p>
+                  <h2>{b.title}</h2>
+                  {b.body.map((p, k) => (
+                    <p key={k}>{prose(p)}</p>
+                  ))}
+                </div>
+              </section>
+            </Fragment>
+          );
+        })}
 
         <footer className={styles.sources}>
           <h2>Sources</h2>
@@ -98,6 +127,21 @@ export function Story({ beats }: { beats: Beat[] }) {
             </a>{" "}
             (CC BY 4.0).
           </p>
+          {pictures.length > 0 && (
+            <>
+              <h2 className={styles.picturesHeading}>Pictures</h2>
+              <ul>
+                {pictures.map(({ beat, credit }) => (
+                  <li key={`${beat.id}-${credit.url}`}>
+                    <a href={`#${beat.id}`}>{beat.kicker}</a>:{" "}
+                    <a href={credit.url} target="_blank" rel="noopener">
+                      {credit.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </footer>
       </article>
     </main>
