@@ -1,0 +1,59 @@
+/* The space-age story: a dark sky with the globe held behind a long
+   column of text. The design pass (plan Task 7) refines this. */
+:global(html):has(.page), :global(body):has(.page) { background: #04060b; }
+
+.page {
+  --ink: #dce6f2;
+  --mute: #93a2b3;
+  --faint: #56677a;
+  --sat: #a9d6ff;
+  --rb: #b8ab98;
+  --deb: #5b6878;
+  color-scheme: dark;
+  text-shadow: none;
+  position: relative;
+  min-height: 100svh;
+  color: var(--ink);
+  background: radial-gradient(120% 80% at 70% 40%, #0b1220 0%, #04060b 70%);
+  font-family: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage { position: fixed; inset: 0; pointer-events: none; }
+
+.counter {
+  position: absolute;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0; transition: opacity .6s ease;
+}
+.counter[data-ready] { opacity: 1; }
+.when { font-size: 15px; color: var(--ink); }
+.count { font-size: 13px; color: var(--mute); }
+
+.story {
+  position: relative;
+  width: min(100% - 32px, 34rem);
+  margin-left: max(16px, 8vw);
+  padding: 22svh 0 30svh;
+}
+
+.opening { min-height: 80svh; }
+.chapter { color: var(--mute); font-size: 15px; margin: 0 0 12px; }
+.opening h1 { font-size: clamp(40px, 7vw, 76px); line-height: 1.02; letter-spacing: -0.02em; font-weight: 600; margin: 0 0 28px; }
+.lede { font-size: 20px; line-height: 1.5; margin: 0 0 24px; }
+.note { font-size: 14px; line-height: 1.55; color: var(--mute); margin: 0; }
+
+.beat { margin: 0 0 70svh; }
+.kicker { color: var(--sat); font-size: 15px; margin: 0 0 8px; }
+.beat h2 { font-size: 30px; line-height: 1.15; font-weight: 600; margin: 0 0 16px; }
+.beat p { font-size: 18px; line-height: 1.6; margin: 0 0 14px; }
+.beat em { font-style: italic; }
+
+.sources { font-size: 14px; line-height: 1.55; color: var(--mute); }
+.sources h2 { font-size: 18px; color: var(--ink); font-weight: 600; margin: 0 0 12px; }
+.sources ol { padding-left: 1.2em; margin: 0 0 16px; }
+.sources a { color: var(--ink); text-decoration-color: var(--faint); text-underline-offset: 3px; }
+.sources a:hover { text-decoration-color: var(--ink); }
