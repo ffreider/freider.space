@@ -8,6 +8,7 @@
   --faint: #4c5a6c;
   --fs: #a9d6ff;
   color-scheme: dark;
+  text-shadow: none; /* the site's light-theme glow would haze on dark */
   min-height: 100svh;
   display: flex;
   flex-direction: column;

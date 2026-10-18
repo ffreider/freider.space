@@ -55,8 +55,8 @@ async function note(now: Date) {
 export async function vcard(card: Card, request: Request) {
   const now = new Date();
   const [image, text] = await Promise.all([photo(request.url), note(now)]);
-  // A print of FramSat-1's radio signal from around the minute they saved it.
-  const postcard = `Your postcard from FramSat-1: ${CONTACT.website}/postcard/${stampOf(now)}`;
+  // The sky over a station that heard FramSat-1 around the minute they saved it.
+  const postcard = `${CONTACT.website}/postcard/${stampOf(now)}`;
 
   const lines = [
     "BEGIN:VCARD",
@@ -74,7 +74,9 @@ export async function vcard(card: Card, request: Request) {
     `X-SOCIALPROFILE;TYPE=linkedin:${CONTACT.linkedin}`,
     `item1.URL:${CONTACT.signal}`,
     "item1.X-ABLabel:Signal",
-    `NOTE:${escape(`${text}\n\n${postcard}`)}`,
+    `item3.URL:${postcard}`,
+    "item3.X-ABLabel:FramSat-1 postcard",
+    `NOTE:${escape(text)}`,
     `UID:${CONTACT.uid}`,
     ...(image ? [fold(`PHOTO;ENCODING=b;TYPE=JPEG:${image}`)] : []),
     "END:VCARD",

@@ -45,7 +45,7 @@ export default async function PostcardPage({ params }: Props) {
       <div className={styles.frame}>
         {card.card ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={`/postcard/${stamp}/card.png`} width={CARD.width} height={CARD.height} alt={card.label} className={styles.card} />
+          <img src={`/postcard/${stamp}/card.png?v=2`} width={CARD.width} height={CARD.height} alt={card.label} className={styles.card} />
         ) : (
           <div className={styles.blank}>
             <p className={styles.blankTitle}>{card.message?.[0]}</p>

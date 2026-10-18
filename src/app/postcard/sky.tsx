@@ -132,22 +132,11 @@ async function googleFont(spec: string) {
 
 const hhmm = (ms: number) => new Date(ms).toISOString().slice(11, 16);
 
-function gap(ms: number) {
-  const m = Math.round(Math.abs(ms) / 60000);
-  return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`;
-}
-
 async function captions(card: Card, w: number, h: number, s: number) {
-  const { pass, moment, mine, where } = card;
+  const { pass, where } = card;
   const start = Date.parse(pass.start);
   const name = pass.station.length <= 22 ? pass.station : pass.station.split(/\s+/)[0];
   const date = new Date(start).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
-  const t = moment.getTime();
-  const end = Date.parse(pass.end);
-  const yours =
-    mine >= 0
-      ? `The warm dash is your moment, ${hhmm(t)} UTC`
-      : `Your moment, ${hhmm(t)} UTC, was ${gap(t < start ? start - t : t - end)} ${t < start ? "before" : "after"} this pass`;
   const font = await googleFont("Schibsted+Grotesk:wght@500");
   const line = (text: string, size: number, color: string, y: number) => (
     <div style={{ position: "absolute", left: 0, right: 0, top: y * s, display: "flex", justifyContent: "center", fontSize: size * s, color }}>{text}</div>
@@ -158,7 +147,6 @@ async function captions(card: Card, w: number, h: number, s: number) {
         {line(`FramSat-1 over ${name}`, 32, "#dce6f2", 1520)}
         {line(`${where ? `${where}, ` : ""}${date}, ${hhmm(start)} UTC`, 22, "#7c8c9e", 1566)}
         {line("Each dash is a radio packet the station received", 19, "#4c5a6c", 1622)}
-        {line(yours, 19, mine >= 0 ? "#c9a274" : "#4c5a6c", 1652)}
       </div>
     ),
     { width: w, height: h, fonts: [{ name: "Schibsted", data: font, weight: 500 }] },
@@ -167,7 +155,7 @@ async function captions(card: Card, w: number, h: number, s: number) {
 }
 
 export async function renderCard(card: Card, scale = 1, fallbackTle?: { line1: string; line2: string }) {
-  const { pass, mine } = card;
+  const { pass } = card;
   const s = scale;
   const w = CARD.width * s;
   const h = CARD.height * s;
@@ -300,7 +288,6 @@ export async function renderCard(card: Card, scale = 1, fallbackTle?: { line1: s
   // The pass: a faint trace, and a dash of light for every packet heard.
   const tle = pass.tle ?? fallbackTle;
   const dashes = new Float32Array(w * h);
-  const warm = new Float32Array(w * h);
   const trace = new Float32Array(w * h);
   const segment = (buf: Float32Array, x0: number, y0: number, x1: number, y1: number, width: number, value: number) => {
     const half = width / 2;
@@ -332,15 +319,15 @@ export async function renderCard(card: Card, scale = 1, fallbackTle?: { line1: s
     const lo = heardS[Math.floor(heardS.length * 0.05)] ?? 0;
     const hi = heardS[Math.floor(heardS.length * 0.95)] ?? 1;
     lines.forEach((_, i) => {
-      if (!heard[i] && i !== mine) return;
+      if (!heard[i]) return;
       const t0 = start + (phase + i * PERIOD_S) * 1000;
       const a = at(t0);
       const b = at(t0 + 5000);
       if (!a || !b || a.alt <= 0) return;
       const [x0, y0] = proj(a.alt, a.az);
       const [x1, y1] = proj(b.alt, b.az);
-      const v = heard[i] ? Math.max(0.3, Math.min(1, (strength[i] - lo) / (hi - lo || 1))) : 0.4;
-      segment(i === mine ? warm : dashes, x0, y0, x1, y1, 4.5 * s, i === mine ? 1 : v);
+      const v = Math.max(0.3, Math.min(1, (strength[i] - lo) / (hi - lo || 1)));
+      segment(dashes, x0, y0, x1, y1, 4.5 * s, v);
     });
   }
   for (let i = 0; i < w * h; i++) add(i, 169 * trace[i], 214 * trace[i], 255 * trace[i]);
@@ -350,15 +337,11 @@ export async function renderCard(card: Card, scale = 1, fallbackTle?: { line1: s
     return [g1, g2];
   };
   const [dWide, dNear] = glowOf(dashes, 14, 3);
-  const [wWide, wNear] = glowOf(warm, 14, 3);
   for (let i = 0; i < w * h; i++) {
     const a = dWide[i] * 3.2;
     const b = dNear[i] * 1.1;
     const d = dashes[i];
-    const c = wWide[i] * 3.2;
-    const e = wNear[i] * 1.1;
-    const f = warm[i];
-    add(i, 70 * a + 150 * b + 235 * d + 230 * c + 255 * e + 255 * f, 130 * a + 200 * b + 245 * d + 150 * c + 210 * e + 236 * f, 220 * a + 255 * b + 255 * d + 80 * c + 150 * e + 205 * f);
+    add(i, 70 * a + 150 * b + 235 * d, 130 * a + 200 * b + 245 * d, 220 * a + 255 * b + 255 * d);
   }
 
   // The horizon, a gentle vignette, and the night's floor.
