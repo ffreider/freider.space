@@ -26,7 +26,7 @@ export type Shot =
 
 // What a beat shows besides the globe, placed full-width before its text.
 export type Credit = { text: string; url: string };
-export type Picture = { src: string; alt: string; width: number; height: number };
+export type Picture = { src: string; srcSmall?: string; alt: string; width: number; height: number };
 
 export type Media =
   | { kind: "archive"; picture: Picture; caption: string; credit: Credit }

@@ -8,7 +8,7 @@ import type { Beat } from "./chapter1";
 import { ActCard } from "./act-card";
 import { ColdOpenSection } from "./cold-open";
 import { ACTS, COLD_OPEN } from "./acts";
-import { MEDIA } from "./media";
+import { LICENCES, MEDIA } from "./media";
 import { MediaBlock } from "./media-blocks";
 import { Rail } from "./rail";
 import { Stage } from "./stage";
@@ -48,7 +48,12 @@ const actBefore = new Map(ACTS.map((a) => [a.before, a]));
 export function Story({ beats }: { beats: Beat[] }) {
   // Every credit printed in the story, once per beat, for the list at the end.
   const pictures = beats.flatMap((beat) =>
-    (MEDIA[beat.id] ?? []).flatMap((m) => (m.kind === "number" || m.kind === "map" ? [] : [{ beat, credit: m.credit }])),
+    (MEDIA[beat.id] ?? []).flatMap((m) => {
+      if (m.kind === "archive") return [{ beat, what: m.picture.alt, credit: m.credit, licence: LICENCES[m.picture.src] }];
+      if (m.kind === "sound") return [{ beat, what: m.label, credit: m.credit, licence: LICENCES[m.src] }];
+      if (m.kind === "compare") return [{ beat, what: m.caption, credit: m.credit, licence: LICENCES[m.after.src] }];
+      return [];
+    }),
   );
   return (
     <main className={styles.page}>
@@ -131,12 +136,13 @@ export function Story({ beats }: { beats: Beat[] }) {
             <>
               <h2 className={styles.picturesHeading}>Pictures</h2>
               <ul>
-                {pictures.map(({ beat, credit }) => (
+                {pictures.map(({ beat, what, credit, licence }) => (
                   <li key={`${beat.id}-${credit.url}`}>
-                    <a href={`#${beat.id}`}>{beat.kicker}</a>:{" "}
+                    <a href={`#${beat.id}`}>{beat.kicker}</a>: {what}. Credit:{" "}
                     <a href={credit.url} target="_blank" rel="noopener">
                       {credit.text}
                     </a>
+                    {licence && <>; {licence}</>}.
                   </li>
                 ))}
               </ul>

@@ -18,12 +18,28 @@ export function MediaBlock({ media, fill }: { media: Media; fill: (text: string)
   switch (media.kind) {
     case "archive": {
       const { picture, caption, credit } = media;
+      // Wide, large pictures run edge to edge. Portraits, squares and small
+      // files are shown whole, centred, no larger than their own size, so
+      // nothing is cropped or blown up; the small ones get a thin frame, like
+      // a document.
+      const full = picture.width >= 1200 && picture.width / picture.height >= 1.3;
+      const small = picture.width < 1200;
+      const srcSet = picture.srcSmall && picture.width > 900 ? `${picture.srcSmall} 900w, ${picture.src} ${picture.width}w` : undefined;
       return (
-        <figure className={`${styles.bleed} ${styles.archive}`}>
-          <div className={styles.archiveFrame} style={{ aspectRatio: `${picture.width} / ${picture.height}` }}>
-            {/* A plain img: the pictures are fixed files in public/, sized when they were prepared. */}
+        <figure className={`${styles.bleed} ${full ? styles.archive : styles.archiveWhole} ${small ? styles.archiveSmall : ""}`}>
+          <div className={styles.archiveFrame} style={full ? { aspectRatio: `${picture.width} / ${picture.height}` } : undefined}>
+            {/* A plain img: the pictures are fixed files in public/, prepared in two sizes. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={picture.src} alt={picture.alt} width={picture.width} height={picture.height} loading="lazy" decoding="async" sizes="100vw" />
+            <img
+              src={picture.src}
+              srcSet={srcSet}
+              sizes={full ? "100vw" : `min(100vw, ${picture.width}px)`}
+              alt={picture.alt}
+              width={picture.width}
+              height={picture.height}
+              loading="lazy"
+              decoding="async"
+            />
           </div>
           <figcaption className={styles.mediaNote}>
             <span>{caption}</span>

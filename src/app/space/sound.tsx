@@ -26,7 +26,7 @@ export function Sound({ src, label, credit }: { src: string; label: string; cred
       {live ? (
         <button type="button" className={styles.soundButton} onClick={toggle} aria-pressed={playing}>
           <span className={styles.soundIcon} aria-hidden="true" data-playing={playing ? "" : undefined} />
-          {playing ? "Stop" : "Play"}: {label}
+          {label}
         </button>
       ) : (
         <p>{label}</p>
