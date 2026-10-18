@@ -48,8 +48,9 @@ export function Story({ beats }: { beats: Beat[] }) {
             Every dot is a real object from the public satellite catalogue, as CelesTrak published it on {snapshotDate}.
             Its height and the tilt of its orbit are real. Where it is along that orbit, and which way the orbit faces, the
             catalogue doesn&rsquo;t say, so those are spread out evenly. Blue is a satellite, working or not; warm grey is a
-            spent rocket stage; the faint dots are debris, shown from the launch or break-up that made them, though much of
-            it was only catalogued years later.
+            spent rocket stage; the faint dots are debris. The catalogue doesn&rsquo;t record when a piece of debris was
+            made, so fragments from the major break-ups appear on the day of the break-up, and the rest on about the day
+            they were first catalogued, which can be years later.
           </p>
         </header>
 

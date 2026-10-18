@@ -10,6 +10,7 @@
 // the page quotes it, and every count in the story comes from this file.
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { appearDay, cataloguedBy } from "../src/lib/space/appear.ts";
 
 const [csvPath, snapshot] = process.argv.slice(2);
 if (!csvPath || !/^\d{4}-\d\d-\d\d$/.test(snapshot ?? "")) {
@@ -25,6 +26,16 @@ const MAX_APOGEE = 400_000; // km; a few objects head out toward the Moon
 const [header, ...lines] = readFileSync(csvPath, "utf8").trim().split(/\r?\n/);
 const col = Object.fromEntries(header.split(",").map((name, i) => [name, i]));
 const end = day(snapshot);
+const KIND_OF = (type) => KIND[type] ?? 3;
+
+// When each catalogue number was given out, estimated from every launched
+// object, also those this page doesn't draw (see src/lib/space/appear.ts).
+const all = lines
+  .map((line) => line.split(","))
+  .filter((f) => f[col.LAUNCH_DATE])
+  .map((f) => ({ norad: +f[col.NORAD_CAT_ID], intl: f[col.OBJECT_ID], name: f[col.OBJECT_NAME], kind: KIND_OF(f[col.OBJECT_TYPE]), launchDay: day(f[col.LAUNCH_DATE]) }));
+const catalogued = cataloguedBy(all);
+
 const rows = [];
 let skipped = 0;
 for (const line of lines) {
@@ -42,7 +53,14 @@ for (const line of lines) {
   }
   if (apogee < perigee) [apogee, perigee] = [perigee, apogee];
   apogee = Math.min(apogee, MAX_APOGEE);
-  rows.push({ norad: +f[col.NORAD_CAT_ID], launch, decay, kind: KIND[f[col.OBJECT_TYPE]] ?? 3, perigee, apogee, incl, period });
+  const kind = KIND_OF(f[col.OBJECT_TYPE]);
+  const norad = +f[col.NORAD_CAT_ID];
+  const appear = appearDay({ norad, intl: f[col.OBJECT_ID], name: f[col.OBJECT_NAME], kind, launchDay: launch }, catalogued);
+  if (appear > end) {
+    skipped++;
+    continue;
+  }
+  rows.push({ norad, launch: appear, decay, kind, perigee, apogee, incl, period });
 }
 
 const buf = Buffer.alloc(8 + 32 * rows.length);

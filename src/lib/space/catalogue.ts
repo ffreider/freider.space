@@ -6,6 +6,11 @@
 // Sputnik's launch; 0xFFFF = still in orbit), kind (u8: 0 satellite,
 // 1 rocket body, 2 debris, 3 unknown), 3 bytes padding, perigee, apogee
 // (km), inclination (degrees), period (minutes) as f32, 4 bytes reserved.
+//
+// The launch day is the day the object appears in the story: for debris,
+// the day of the break-up that made it where that's known, otherwise the
+// day it was catalogued (see appear.ts), since the catalogue gives every
+// fragment its parent's launch date.
 
 export const EPOCH = Date.UTC(1957, 9, 4); // Sputnik 1
 const MAGIC = 0x53504331;
