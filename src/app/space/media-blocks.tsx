@@ -24,6 +24,11 @@ export function MediaBlock({ media, fill }: { media: Media; fill: (text: string)
       // a document.
       const full = picture.width >= 1200 && picture.width / picture.height >= 1.3;
       const small = picture.width < 1200;
+      const ratio = picture.width / picture.height;
+      // The width a whole picture is shown at: its own size, no wider than the
+      // screen, no taller than 88% of it. Setting it (with aspect-ratio) lets the
+      // browser hold the place before the file arrives.
+      const shown = `min(100%, ${picture.width}px, calc(88svh * ${ratio.toFixed(4)}))`;
       const srcSet = picture.srcSmall && picture.width > 900 ? `${picture.srcSmall} 900w, ${picture.src} ${picture.width}w` : undefined;
       return (
         <figure className={`${styles.bleed} ${full ? styles.archive : styles.archiveWhole} ${small ? styles.archiveSmall : ""}`}>
@@ -33,10 +38,11 @@ export function MediaBlock({ media, fill }: { media: Media; fill: (text: string)
             <img
               src={picture.src}
               srcSet={srcSet}
-              sizes={full ? "100vw" : `min(100vw, ${picture.width}px)`}
+              sizes={full ? "100vw" : `min(100vw, ${picture.width}px, calc(88vh * ${ratio.toFixed(4)}))`}
               alt={picture.alt}
               width={picture.width}
               height={picture.height}
+              style={full ? { aspectRatio: `${picture.width} / ${picture.height}` } : { aspectRatio: `${picture.width} / ${picture.height}`, width: shown }}
               loading="lazy"
               decoding="async"
             />

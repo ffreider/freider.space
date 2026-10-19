@@ -12,13 +12,18 @@ const noop = () => () => {};
 export function Sound({ src, label, credit }: { src: string; label: string; credit: Credit }) {
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
+  const [failed, setFailed] = useState(false);
   const live = useSyncExternalStore(noop, () => true, () => false);
 
   const toggle = () => {
     const el = audio.current;
     if (!el) return;
-    if (el.paused) void el.play();
-    else el.pause();
+    if (!el.paused) return el.pause();
+    setFailed(false);
+    el.play().catch(() => {
+      setPlaying(false);
+      setFailed(true);
+    });
   };
 
   return (
@@ -30,6 +35,11 @@ export function Sound({ src, label, credit }: { src: string; label: string; cred
         </button>
       ) : (
         <p>{label}</p>
+      )}
+      {failed && (
+        <p role="status" className={styles.soundError}>
+          Couldn&rsquo;t play the recording.
+        </p>
       )}
       <audio ref={audio} src={src} preload="none" controls={!live} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} />
       <figcaption className={styles.mediaNote}>

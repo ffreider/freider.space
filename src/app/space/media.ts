@@ -106,7 +106,7 @@ export const MEDIA: Record<string, Media[]> = {
     {
       kind: "map",
       map: "ferdinand",
-      caption: "A side view of Ferdinand 1's flight on 18 August 1962. The scale runs from sea level to 400 km.",
+      caption: "A side view of Ferdinand 1's flight on 18 August 1962. The scale runs from sea level to 120 km.",
     },
   ],
   "break-ups": [
@@ -116,11 +116,11 @@ export const MEDIA: Record<string, Media[]> = {
   // The cold open already shows the map; this beat is the return to it.
   "black-brant": [archive("black-brant", "A four-stage Black Brant XII leaving Wallops, Virginia. It is the same type as the rocket launched from Andøya in 1995, not that rocket.")],
   "fengyun-1c": [
-    { kind: "number", from: "{count:2007-01-10}", to: "{count:2007-01-11}", label: "objects in orbit, the day before and the day of the test" },
+    { kind: "number", from: "{count:2007-01-10}", to: "{count:2007-01-11}", label: "objects in orbit, the day before and the day of the test, counting the pieces catalogued afterwards" },
     archive("fengyun-1c", "The orbits of the Fengyun-1C debris a month after the test, with the space station's orbit in white."),
   ],
   "iridium-kosmos": [
-    { kind: "number", from: "{count:2009-02-09}", to: "{count:2009-02-10}", label: "objects in orbit, the day before and the day of the collision" },
+    { kind: "number", from: "{count:2009-02-09}", to: "{count:2009-02-10}", label: "objects in orbit, the day before and the day of the collision, counting the pieces catalogued afterwards" },
     archive("iridium-kosmos", "A simulation of the debris twenty minutes after the collision. The dots are simulated, not tracked objects."),
   ],
   // The last beat: the Starlink trails, then the witness one more time.

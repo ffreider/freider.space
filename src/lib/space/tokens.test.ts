@@ -20,13 +20,14 @@ test("text without tokens is left alone", () => {
 // Expected values counted separately: python reading the catalogue bytes,
 // Vanguard 1 (NORAD 5) launched on day 164 (17 March 1958), period 132.59
 // minutes, floor((day - 164) * 1440 / period) with day counted from
-// 4 October 1957.
-test("Vanguard 1's orbits to the end of each act", () => {
-  assert.equal(fillTokens("{orbits:5:1961-12-31}", objs), "15,041");
-  assert.equal(fillTokens("{orbits:5:1969-12-31}", objs), "46,776");
-  assert.equal(fillTokens("{orbits:5:1989-12-31}", objs), "126,112");
-  assert.equal(fillTokens("{orbits:5:2006-12-31}", objs), "193,545");
-  assert.equal(fillTokens("{orbits:5:2019-05-24}", objs), "242,711");
+// 4 October 1957 (15,041 / 46,776 / 126,112 / 193,545 / 242,711), then
+// rounded to three significant figures.
+test("Vanguard 1's orbits to the end of each act, to three significant figures", () => {
+  assert.equal(fillTokens("{orbits:5:1961-12-31}", objs), "15,000");
+  assert.equal(fillTokens("{orbits:5:1969-12-31}", objs), "46,800");
+  assert.equal(fillTokens("{orbits:5:1989-12-31}", objs), "126,000");
+  assert.equal(fillTokens("{orbits:5:2006-12-31}", objs), "194,000");
+  assert.equal(fillTokens("{orbits:5:2019-05-24}", objs), "243,000");
 });
 
 test("a token that can't be filled throws", () => {

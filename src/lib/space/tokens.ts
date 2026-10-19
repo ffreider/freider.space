@@ -32,9 +32,10 @@ export function fillTokens(text: string, objs: SpaceObject[]): string {
     if (!obj) throw new Error(`no object ${norad} in the catalogue for ${token}`);
     if (day < obj.launchDay) throw new Error(`${token}: the object had not launched yet`);
     if (obj.decayDay !== null && obj.decayDay <= day) throw new Error(`${token}: the object had already fallen`);
-    // A day is 1,440 minutes. The period is the catalogue's, held fixed, so
-    // this is a count to the nearest few hundred over 60 years, not a
-    // measurement (the real period shortened slightly with drag).
-    return fmt(Math.floor(((day - obj.launchDay) * 1440) / obj.periodMin));
+    // A day is 1,440 minutes. The period is the catalogue's, held fixed, but
+    // the real one shortened slightly with drag, so the count is only good to
+    // about 1%: three significant figures, not a false precision.
+    const orbits = Math.floor(((day - obj.launchDay) * 1440) / obj.periodMin);
+    return fmt(Number(orbits.toPrecision(3)));
   });
 }

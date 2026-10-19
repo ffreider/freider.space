@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import type { ReactNode } from "react";
-import { geoAzimuthalEquidistant, geoCentroid, geoCircle, geoDistance, geoGraticule10, geoInterpolate, geoPath, type GeoProjection } from "d3-geo";
+import { geoAzimuthalEquidistant, geoCentroid, geoCircle, geoDistance, geoGraticule, geoInterpolate, geoPath, type GeoProjection } from "d3-geo";
 import { feature } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import { ScrollProgress } from "./scroll-progress";
@@ -58,13 +58,58 @@ function project(f: Frame, fit: Parameters<GeoProjection["fitExtent"]>[1], centr
       fit,
     );
   p.clipExtent([
-    [0, 0],
-    [f.w, f.h],
+    [-20, -20],
+    [f.w + 20, f.h + 20],
   ]);
   return p;
 }
 
-const pathOf = (p: GeoProjection) => geoPath(p).digits(1);
+// Whole units, and a coarse resampling: the maps are drawn large but are only
+// there to place a few points, and the page carries every map in its HTML.
+const pathOf = (p: GeoProjection) => {
+  const draw = geoPath(p.precision(2)).digits(0);
+  return (object: Parameters<typeof draw>[0]) => {
+    const d = draw(object);
+    return d && thin(d);
+  };
+};
+
+// Drops points that lie within a unit or two of the straight line between
+// their neighbours (Ramer-Douglas-Peucker), subpath by subpath. At the size
+// the maps are drawn, nobody can tell, and it takes most of the weight off.
+function thin(d: string, tolerance = 4): string {
+  const keep = (pts: number[][]): number[][] => {
+    if (pts.length < 3) return pts;
+    const [ax, ay] = pts[0];
+    const [bx, by] = pts[pts.length - 1];
+    const len = Math.hypot(bx - ax, by - ay) || 1;
+    let worst = 0;
+    let at = 0;
+    for (let i = 1; i < pts.length - 1; i++) {
+      const dist = Math.abs((by - ay) * pts[i][0] - (bx - ax) * pts[i][1] + bx * ay - by * ax) / len;
+      if (dist > worst) [worst, at] = [dist, i];
+    }
+    if (worst <= tolerance) return [pts[0], pts[pts.length - 1]];
+    return [...keep(pts.slice(0, at + 1)).slice(0, -1), ...keep(pts.slice(at))];
+  };
+  return d
+    .split("M")
+    .filter(Boolean)
+    .map((sub) => {
+      const closed = sub.endsWith("Z");
+      const pts = sub
+        .replace("Z", "")
+        .split("L")
+        .map((pt) => pt.split(",").map(Number));
+      const out = keep(pts);
+      // Specks of island smaller than a few units go too (not the graticule's lines).
+      const xs = out.map((pt) => pt[0]);
+      const ys = out.map((pt) => pt[1]);
+      if (closed && Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)) < 8) return "";
+      return out.length < (closed ? 3 : 2) ? "" : "M" + out.map((pt) => pt.join(",")).join("L") + (closed ? "Z" : "");
+    })
+    .join("");
+}
 const at = (p: GeoProjection, c: Lonlat) => p(c)!;
 const fixed = (n: number) => n.toFixed(1);
 
@@ -72,7 +117,7 @@ function Ground({ p }: { p: GeoProjection }) {
   const draw = pathOf(p);
   return (
     <>
-      <path d={draw(geoGraticule10())!} className={styles.mapGrid} />
+      <path d={draw(geoGraticule().step([15, 15]).precision(5)())!} className={styles.mapGrid} />
       <path d={draw(land)!} className={styles.mapLand} />
     </>
   );
@@ -134,12 +179,12 @@ function BlackBrant({ f: frame, still }: { f: Frame; still?: boolean }) {
   );
 }
 
-// A side view, not a map: height above Andøya, to scale from 0 to 400 km.
+// A side view, not a map: height above Andøya, to scale from 0 to 120 km.
 function Ferdinand({ f }: { f: Frame }) {
   const x0 = f.tall ? 130 : 330;
   const ground = f.h - f.bottom + 20;
   const topY = f.top - 20;
-  const y = (km: number) => ground - (km / 400) * (ground - topY);
+  const y = (km: number) => ground - (km / 120) * (ground - topY);
   const x = f.tall ? 200 : 640;
   const label = (km: number, text: string) => (
     <text x={x0 - 14} y={fixed(y(km) + 5)} textAnchor="end" className={styles.mapLabel}>
@@ -149,15 +194,10 @@ function Ferdinand({ f }: { f: Frame }) {
   const climb = `M${x} ${fixed(ground)}V${fixed(y(100))}`;
   return (
     <>
-      <rect x="0" y={fixed(y(300))} width={f.w} height={fixed(y(100) - y(300))} className={styles.mapBand} />
-      <line x1="0" x2={f.w} y1={fixed(y(300))} y2={fixed(y(300))} className={styles.mapGuide} />
-      <line x1="0" x2={f.w} y1={fixed(y(100))} y2={fixed(y(100))} className={styles.mapGuide} />
-      <line x1={x0} x2={f.w - f.px / 2} y1={fixed(y(400))} y2={fixed(y(400))} className={styles.mapGuide} />
+      <line x1={x0} x2={f.w - f.px / 2} y1={fixed(y(100))} y2={fixed(y(100))} className={styles.mapGuide} />
       <line x1={x0} x2={f.w - f.px / 2} y1={fixed(ground)} y2={fixed(ground)} className={styles.mapGround} />
       {label(0, "sea level")}
       {label(100, "100 km")}
-      {label(300, "300 km")}
-      {label(400, "400 km")}
       <path d={climb} data-track className={styles.mapUp} />
       <circle cx={x} cy={fixed(y(100))} r="6" className={styles.mapRocket} data-dot data-mode="updown" />
       <text x={x + 24} y={fixed(y(100) - 12)} className={styles.mapLabelStrong}>
@@ -185,31 +225,31 @@ function Telstar({ f }: { f: Frame }) {
       <path d={link} pathLength="1" className={styles.mapLink} data-track />
       <Place p={p} c={ANDOVER} label="Andover, Maine" dx={-8} dy={34} anchor="start" />
       <Place p={p} c={PLEUMEUR} label="Pleumeur-Bodou, Brittany" dx={8} dy={f.tall ? -20 : 34} anchor="end" />
-      <circle cx={fixed(ex)} cy={fixed(ey)} r="6" className={styles.mapSatellite} data-dot />
+      <circle cx={fixed(ex)} cy={fixed(ey)} r="9" className={styles.mapPulse} data-dot />
       <text x={f.tall ? f.w / 2 : fixed(mx)} y={f.tall ? f.top - 40 : fixed(my - 22)} textAnchor="middle" className={styles.mapLabelStrong}>
         {km.toLocaleString("en-GB")} km apart on the ground
+      </text>
+      <text x={f.tall ? f.w / 2 : fixed(mx)} y={f.tall ? f.top - 10 : fixed(my + 8)} textAnchor="middle" className={styles.mapLabel}>
+        The moving ring is the signal, via the satellite
       </text>
     </>
   );
 }
 
-// Coastal stations hear ships a few tens of kilometres out; a satellite sees
-// everything to its horizon. The station sites and the range are indicative,
-// which the map says in its own words.
+// Coastal stations hear ships only near the coast; a satellite sees everything
+// to its horizon. The station marks are schematic (their sites and reach are
+// not measured), which the map says in its own words.
 const COAST: Lonlat[] = [
   [6.15, 62.47],
   [10.4, 63.43],
-  [12.1, 67.5],
   [14.4, 67.28],
-  [14.57, 68.23],
   [16.12, 69.31],
   [18.96, 69.65],
   [23.68, 70.66],
-  [25.97, 70.98],
   [31.11, 70.37],
 ];
-const STATION_KM = 74; // 40 nautical miles
-const SATELLITE_KM = 600;
+// AISSat-1 flew at about 567 by 580 km (research brief 23).
+const SATELLITE_KM = 570;
 const deg = (rad: number) => (rad * 180) / Math.PI;
 
 function Aissat({ f }: { f: Frame }) {
@@ -219,7 +259,7 @@ function Aissat({ f }: { f: Frame }) {
   const p = project(f, footprint, centre);
   const draw = pathOf(p);
   const reach = Math.round(((horizon * Math.PI) / 180) * EARTH_KM / 100) * 100;
-  const [ax, ay] = at(p, COAST[5]);
+  const [ax, ay] = at(p, COAST[3]);
   const [cx, cy] = at(p, centre);
   const lx = f.tall ? f.w / 2 : ax - 110;
   // On a phone the label goes under the circle, clear of it.
@@ -229,7 +269,7 @@ function Aissat({ f }: { f: Frame }) {
       <Ground p={p} />
       <path d={draw(footprint)!} className={styles.mapFootprint} />
       {COAST.map((c, k) => (
-        <path key={k} d={draw(geoCircle().center(c).radius(deg(STATION_KM / EARTH_KM))())!} className={styles.mapRing} />
+        <circle key={k} cx={fixed(at(p, c)[0])} cy={fixed(at(p, c)[1])} r="6" className={styles.mapRing} />
       ))}
       <circle cx={fixed(cx)} cy={fixed(cy)} r="5" className={styles.mapSatellite} />
       <text x={fixed(cx)} y={fixed(cy - 18)} textAnchor="middle" className={styles.mapLabelStrong}>
@@ -238,7 +278,7 @@ function Aissat({ f }: { f: Frame }) {
       {f.tall ? (
         <>
           <text x={f.w / 2} y={f.top - 110} textAnchor="middle" className={styles.mapLabelStrong}>
-            A satellite at {SATELLITE_KM} km sees
+            A satellite about {SATELLITE_KM} km up sees
           </text>
           <text x={f.w / 2} y={f.top - 80} textAnchor="middle" className={styles.mapLabelStrong}>
             about {reach.toLocaleString("en-GB")} km in every direction
@@ -250,7 +290,7 @@ function Aissat({ f }: { f: Frame }) {
       ) : (
         <>
           <text x={f.w / 2} y={f.top - 70} textAnchor="middle" className={styles.mapLabelStrong}>
-            A satellite at {SATELLITE_KM} km sees about {reach.toLocaleString("en-GB")} km in every direction
+            A satellite about {SATELLITE_KM} km up sees about {reach.toLocaleString("en-GB")} km in every direction
           </text>
           <text x={f.w / 2} y={f.top - 40} textAnchor="middle" className={styles.mapLabel}>
             the large circle, illustrative
@@ -262,7 +302,7 @@ function Aissat({ f }: { f: Frame }) {
         A coastal station hears only ships near the coast
       </text>
       <text x={fixed(lx)} y={fixed(ly + (f.tall ? 28 : 24))} textAnchor="middle" className={styles.mapLabel}>
-        the small rings, sites and range illustrative
+        the small marks, sites and reach illustrative
       </text>
     </>
   );
@@ -276,7 +316,7 @@ const SCENES: Record<Kind, { title: string; desc: string; scene: (f: Frame) => R
   },
   ferdinand: {
     title: "Ferdinand 1's height above Andøya",
-    desc: "A side view of height from sea level to 400 kilometres. The rocket climbs straight up to about 100 kilometres above Andøya and comes back down.",
+    desc: "A side view of height from sea level to 120 kilometres. The rocket climbs straight up to about 100 kilometres above Andøya and comes back down.",
     scene: (f) => <Ferdinand f={f} />,
   },
   telstar: {
@@ -286,7 +326,7 @@ const SCENES: Record<Kind, { title: string; desc: string; scene: (f: Frame) => R
   },
   aissat: {
     title: "What AISSat-1 could hear that coastal stations could not",
-    desc: "A map of the Norwegian and Barents seas. Small rings along the Norwegian coast show the short reach of coastal radio stations. One large circle shows the area a satellite at 600 kilometres can see. Both are illustrative.",
+    desc: "A map of the Norwegian and Barents seas. Small marks along the Norwegian coast stand for coastal radio stations, which hear ships only near the coast. One large circle shows the area a satellite about 570 kilometres up can see. Both are illustrative.",
     scene: (f) => <Aissat f={f} />,
   },
 };
