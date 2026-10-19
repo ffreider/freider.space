@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { bunchElements, GEO_RADIUS, poseFor, sunBelow, toward, type Pose } from "@/lib/space/camera";
 import type { SpaceObject } from "@/lib/space/catalogue";
 import { elements, positionAt } from "@/lib/space/orbits";
+import { eveningSky } from "@/lib/space/sidereal";
 import { BELT_FRAG, BELT_VERT, DOTS_FRAG, DOTS_VERT, EARTH_FRAG, EARTH_VERT, HALO_FRAG, RING_FRAG, RING_VERT, SKY_FRAG, SKY_VERT, STARS_FRAG, STARS_VERT } from "./shaders";
 import styles from "./space.module.css";
+import label from "./stage.module.css";
 import type { Shot } from "./types";
 
 // The globe behind the story: Earth, and every catalogued object that is in
@@ -46,8 +48,11 @@ type Props = {
   highlight?: number[];
   // The day a break-up shot's cloud appears on, for the spread.
   spreadDay?: number;
-  // Nothing is drawn while the stage is faded out.
+  // Nothing is drawn, and the loop stops, while the stage is faded out or
+  // something opaque covers the screen.
   paused?: boolean;
+  // Told when a break-up's cloud starts and stops spreading.
+  onSpreading?: (on: boolean) => void;
 };
 
 // The sun's declination on a story day (days since 4 October 1957).
@@ -58,16 +63,17 @@ function declination(day: number) {
   return Math.asin(Math.sin(rad(23.439)) * Math.sin(L)) * (180 / Math.PI);
 }
 
-export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) {
+export function Globe({ objs, day, shot, highlight, spreadDay, paused, onSpreading }: Props) {
   const host = useRef<HTMLDivElement>(null);
-  const want = useRef({ day, shot, highlight, spreadDay, paused });
+  const ringLabel = useRef<HTMLSpanElement>(null);
+  const want = useRef({ day, shot, highlight, spreadDay, paused, onSpreading });
   const [engine, setEngine] = useState<{ setObjects(objs: SpaceObject[]): void; setHighlight(ids: number[]): void; invalidate(): void } | null>(null);
   const [failed, setFailed] = useState(false);
 
   // Whatever changes, with reduced motion the next frame is the only one
   // drawn, so ask for it.
   useEffect(() => {
-    want.current = { day, shot, highlight, spreadDay, paused };
+    want.current = { day, shot, highlight, spreadDay, paused, onSpreading };
     engine?.invalidate();
   });
 
@@ -96,11 +102,12 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
       const reduce = matchMedia("(prefers-reduced-motion: reduce)");
 
       // With reduced motion the loop runs only when asked to; otherwise it
-      // asks for itself every frame.
+      // asks for itself every frame. While the stage is paused it does not
+      // run at all, and starts again when a change arrives.
       let frame = 0;
       let tick: (now: number) => void = () => {};
       const invalidate = () => {
-        if (!frame && !dead) frame = requestAnimationFrame((now) => tick(now));
+        if (!frame && !dead && !want.current.paused) frame = requestAnimationFrame((now) => tick(now));
       };
 
       // Earth and its glow.
@@ -132,9 +139,13 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
       dome.visible = false;
       scene.add(dome);
 
-      // The objects turn with the stars; the camera turns with the ground.
+      // The objects turn with the Earth's spin, over the ground the camera
+      // stands on; the stars turn with it too, from where the sky really
+      // stood on the beat's evening.
       const sky = new THREE.Group();
       scene.add(sky);
+      const starGroup = new THREE.Group();
+      scene.add(starGroup);
 
       const starUniforms = { uPx: { value: px }, uUp: { value: up }, uDusk: skyUniforms.uDusk, uFade: skyUniforms.uFade };
       let stars: { visible: boolean } | null = null;
@@ -160,7 +171,7 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
             p.frustumCulled = false;
             p.visible = false;
             stars = p;
-            sky.add(p);
+            starGroup.add(p);
             invalidate();
           })
           .catch((err) => console.error(err));
@@ -207,6 +218,9 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
         new THREE.ShaderMaterial({ uniforms: dotUniforms(scale, ring), vertexShader: DOTS_VERT, fragmentShader: DOTS_FRAG, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
       const dotsMat = dotMaterial(1, 0);
       const ringMat = dotMaterial(5, 1);
+
+      // One material for every highlighted orbit's line.
+      const lineMat = new THREE.LineBasicMaterial({ color: 0xa9d6ff, transparent: true, opacity: 0.35, depthWrite: false });
 
       // three.js is untyped here (src/types/three.d.ts); these are the parts used.
       type Drawn = { geometry: { dispose(): void }; visible: boolean };
@@ -264,7 +278,7 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
           rings = pointsFor(list, ringMat);
           sky.add(rings);
           // Each named object's orbit, drawn once round.
-          const lineMat = new THREE.LineBasicMaterial({ color: 0xa9d6ff, transparent: true, opacity: list.length > 8 ? 0.12 : 0.35, depthWrite: false });
+          lineMat.opacity = list.length > 8 ? 0.12 : 0.35;
           for (const o of list) {
             const T = o.periodMin > 0 ? o.periodMin * 60 : (2 * Math.PI) / elements(o).n;
             const pts: number[] = [];
@@ -285,8 +299,9 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
 
       // Size, with the globe set to the right of the text on wide screens.
       let shifted = false;
+      let width = 1, height = 1;
       const resize = () => {
-        const w = el.clientWidth, h = el.clientHeight;
+        const w = (width = el.clientWidth), h = (height = el.clientHeight);
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
         shifted = w >= 900;
@@ -342,13 +357,15 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
       let last = performance.now();
       let lastShot: Shot | null = null;
       let lastAll: SpaceObject[] | null = null;
-      let spreadStart = 0;
+      let spreadElapsed = 0; // visible milliseconds since the cloud began to spread
+      let spreadingNow = false;
+      let starTurn = 0; // the sidereal angle of the latest ground shot's evening
+      const labelPoint = new THREE.Vector3();
 
       // A break-up's pieces start bunched at one point over the beat's place
       // (as the ground stood at that moment), on an orbit of the cloud's
       // tilt, and spread out over SPREAD_MS to where they really are.
-      const startSpread = (now: number, shot: Shot, spreadDay: number | undefined) => {
-        spreadStart = now;
+      const startSpread = (shot: Shot, spreadDay: number | undefined) => {
         if (shot.kind !== "orbit" || !shot.spread || spreadDay === undefined) return;
         const tilts = all.filter((o) => o.kind === 2 && Math.abs(o.launchDay - spreadDay) < 0.5).map((o) => o.inclinationDeg).sort((a, b) => a - b);
         const f = shot.focus ?? lastFocus;
@@ -362,13 +379,17 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
 
       tick = (now: number) => {
         frame = 0;
+        if (want.current.paused) {
+          last = now;
+          return;
+        }
         const instant = reduce.matches;
         const dt = instant ? 0 : Math.min(0.1, (now - last) / 1000);
         last = now;
         if (!instant) simTime += dt * SPEED;
         const ease = (rate: number) => (instant ? 1 : 1 - Math.exp(-dt * rate));
 
-        const { day: d, shot: s, spreadDay: sd, paused: hold } = want.current;
+        const { day: d, shot: s, spreadDay: sd } = want.current;
         if (s.kind === "orbit" && s.focus) lastFocus = s.focus;
         if (s.kind === "sky" && !starsAsked) loadStars();
 
@@ -403,6 +424,8 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
         // to the afternoon side of the view at the season's declination, and
         // on the ground it stands below the horizon at dusk or night.
         sky.rotation.y = -spin;
+        if (s.kind === "sky") starTurn = eveningSky(d, s.place.lon, s.light);
+        starGroup.rotation.y = -(starTurn + spin);
         const [ox, oy, oz] = toward(dec, lon + 35 - deg(spin));
         const [gx, gy, gz] = sunBelow(lat, lon, dec, depression);
         sun.set(ox + (gx - ox) * ground, oy + (gy - oy) * ground, oz + (gz - oz) * ground).normalize();
@@ -424,14 +447,24 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
         ringUniforms.uAmount.value = geoAmount;
         ringUniforms.uSky.value = ground;
 
-        // The spread of a break-up's cloud, from when its beat comes in.
+        // The spread of a break-up's cloud. It runs on time spent looking
+        // at it (this loop stops while something covers the globe) and only
+        // once the camera has arrived.
         if (s !== lastShot || all !== lastAll) {
           lastShot = s;
           lastAll = all;
-          startSpread(now, s, sd);
+          spreadElapsed = 0;
+          startSpread(s, sd);
         }
-        const spreading = s.kind === "orbit" && s.spread && sd !== undefined && !instant;
-        const progress = spreading ? clamp((now - spreadStart) / SPREAD_MS, 0, 1) : 1;
+        const spreading = s.kind === "orbit" && !!s.spread && sd !== undefined && !instant;
+        const arrived = Math.abs(cam.r - goal.r) < 0.03 * goal.r && cam.dir.dot(goal.dir) > 0.995;
+        if (spreading && arrived) spreadElapsed += dt * 1000;
+        const progress = spreading ? clamp(spreadElapsed / SPREAD_MS, 0, 1) : 1;
+        const spreadOn = spreading && progress < 1;
+        if (spreadOn !== spreadingNow) {
+          spreadingNow = spreadOn;
+          want.current.onSpreading?.(spreadOn);
+        }
 
         for (const m of [dotsMat, ringMat]) {
           m.uniforms.uTime.value = simTime;
@@ -442,7 +475,24 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
           m.uniforms.uSpreadDay.value = sd ?? -1;
         }
         for (const l of lines) l.line.visible = l.launch <= d && d < l.decay && ground < 0.5;
-        if (!hold) renderer.render(scene, camera);
+
+        // The geostationary ring's label, at the ring's edge as seen: the
+        // point on it at right angles to the view.
+        const tag = ringLabel.current;
+        if (tag) {
+          const show = geoAmount > 0.05 && ground < 0.5;
+          if (show) {
+            const n = Math.hypot(cam.dir.x, cam.dir.z) || 1;
+            labelPoint.set((-cam.dir.z / n) * GEO_RADIUS, 0, (cam.dir.x / n) * GEO_RADIUS);
+            camera.updateMatrixWorld();
+            labelPoint.project(camera);
+            const x = (labelPoint.x * 0.5 + 0.5) * width, y = (-labelPoint.y * 0.5 + 0.5) * height;
+            tag.style.transform = `translate(${Math.round(Math.min(x + 8, width - 130))}px, ${Math.round(y - 20)}px)`;
+          }
+          tag.style.opacity = show ? String(Math.min(1, geoAmount / 0.3) * 0.8) : "0";
+        }
+
+        renderer.render(scene, camera);
         if (!instant) invalidate();
       };
 
@@ -455,7 +505,16 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
         cancelAnimationFrame(frame);
         reduce.removeEventListener("change", wake);
         watch.disconnect();
+        // Free what the GPU holds: geometries, materials, the Earth's maps.
+        scene.traverse((o: { geometry?: { dispose(): void }; material?: { dispose(): void } | { dispose(): void }[] }) => {
+          o.geometry?.dispose();
+          for (const m of [o.material].flat()) m?.dispose();
+        });
+        lineMat.dispose();
+        earthMat.uniforms.tDay.value.dispose();
+        earthMat.uniforms.tNight.value.dispose();
         renderer.dispose();
+        renderer.forceContextLoss();
         renderer.domElement.remove();
       };
     })().catch(() => setFailed(true));
@@ -476,6 +535,9 @@ export function Globe({ objs, day, shot, highlight, spreadDay, paused }: Props) 
 
   return (
     <div ref={host} className={styles.globe}>
+      <span ref={ringLabel} className={label.ringLabel} aria-hidden="true">
+        geostationary orbit
+      </span>
       {failed && <p className={styles.fallback}>The globe needs WebGL, which this browser doesn&rsquo;t offer. The story reads the same without it.</p>}
     </div>
   );

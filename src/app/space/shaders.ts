@@ -103,7 +103,10 @@ void main() {
   float size = kind < 0.5 ? 3.0 : kind < 1.5 ? 2.5 : 1.5;
   gl_PointSize = size * uPx * uScale;
   vColor = kind < 0.5 ? vec3(0.663, 0.839, 1.0) : kind < 1.5 ? vec3(0.722, 0.671, 0.596) : vec3(0.42, 0.48, 0.56);
-  vAlpha = (kind < 0.5 ? 0.95 : kind < 1.5 ? 0.8 : 0.55) * seen;
+  // From the ground, debris is mostly too faint to see, so it is dimmed hard
+  // and the sky reads as satellites and rocket stages.
+  float faint = kind > 1.5 && kind < 2.5 ? mix(1.0, 0.08, uSky) : 1.0;
+  vAlpha = (kind < 0.5 ? 0.95 : kind < 1.5 ? 0.8 : 0.55) * seen * faint;
 }`;
 
 export const DOTS_FRAG = /* glsl */ `

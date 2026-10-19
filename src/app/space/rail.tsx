@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { subscribe } from "./scroll-store";
 import styles from "./space.module.css";
 
 // Where you are in the chapter: the five acts as segments of a thin rail
@@ -20,41 +21,37 @@ export function Rail({ acts, beats }: { acts: RailAct[]; beats: RailBeat[] }) {
   }, [acts, beats]);
 
   // index: the beat across the middle of the screen (-1 before the first);
-  // local: how far through it.
-  const [at, setAt] = useState({ index: -1, local: 0, on: false });
+  // local: how far through it; act: the act whose card or beats are the
+  // latest to have reached the middle of the screen.
+  const [at, setAt] = useState({ index: -1, local: 0, on: false, act: -1 });
 
-  useEffect(() => {
-    let frame = 0;
-    const measure = () => {
-      frame = 0;
-      const mid = innerHeight / 2;
-      const boxes = Array.from(document.querySelectorAll<HTMLElement>("[data-beat]"), (el) => el.getBoundingClientRect());
-      let index = -1;
-      let local = 0;
-      for (let k = 0; k < boxes.length; k++) {
-        if (boxes[k].top > mid) break;
-        index = k;
-        local = Math.max(0, Math.min(1, (mid - boxes[k].top) / Math.max(1, boxes[k].height)));
-      }
-      // Quiet while the cold open still fills the screen.
-      const cold = document.querySelector("[data-cold-open]");
-      const on = !cold || cold.getBoundingClientRect().bottom < innerHeight * 0.5;
-      setAt((s) => (s.index === index && s.on === on && Math.abs(s.local - local) < 0.01 ? s : { index, local, on }));
-    };
-    const queue = () => {
-      if (!frame) frame = requestAnimationFrame(measure);
-    };
-    measure();
-    addEventListener("scroll", queue, { passive: true });
-    addEventListener("resize", queue);
-    return () => {
-      cancelAnimationFrame(frame);
-      removeEventListener("scroll", queue);
-      removeEventListener("resize", queue);
-    };
-  }, []);
+  useEffect(
+    () =>
+      subscribe(({ mid, height, beats: boxes, acts: cards, cold }) => {
+        let index = -1;
+        let local = 0;
+        for (let k = 0; k < boxes.length; k++) {
+          if (boxes[k].top > mid) break;
+          index = k;
+          local = Math.max(0, Math.min(1, (mid - boxes[k].top) / Math.max(1, boxes[k].height)));
+        }
+        // An act's card comes before its first beat, so the label changes
+        // when the card reaches the middle, not when the beat does.
+        let act = segments.findIndex((s) => index >= s.start && index < s.end);
+        for (let k = cards.length - 1; k > act; k--) {
+          if (cards[k].top <= mid) {
+            act = k;
+            break;
+          }
+        }
+        // Quiet while the cold open still fills the screen.
+        const on = !cold || cold.bottom < height * 0.5;
+        setAt((s) => (s.index === index && s.on === on && s.act === act && Math.abs(s.local - local) < 0.01 ? s : { index, local, on, act }));
+      }),
+    [segments],
+  );
 
-  const current = segments.find((s) => at.index >= s.start && at.index < s.end);
+  const current = segments[at.act];
   const next = beats[at.index + 1];
   return (
     <div className={styles.rail} data-on={at.on ? "" : undefined} aria-hidden="true">

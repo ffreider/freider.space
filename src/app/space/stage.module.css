@@ -5,3 +5,11 @@
 @media (prefers-reduced-motion: reduce) {
   .fade { transition: none; }
 }
+
+/* The label on the geostationary guide ring, placed by the globe. */
+.ringLabel { position: absolute; left: 0; top: 0; opacity: 0; font-size: 12px; letter-spacing: .04em; white-space: nowrap; color: rgb(147 162 179 / .8); pointer-events: none; }
+
+/* What the stage says about how it is drawn: quiet, under the counter's text. */
+.note { grid-column: 1 / -1; margin: 10px 0 0 !important; font-size: 12px; line-height: 1.45; color: #8394a7; max-width: 240px; }
+.note span { display: block; }
+@media (max-width: 899px) { .note { max-width: none; } }

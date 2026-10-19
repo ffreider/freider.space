@@ -29,15 +29,37 @@ const month = (day: number) =>
   new Date(EPOCH + Math.floor(day) * 86_400_000).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
 const fmt = (n: number) => n.toLocaleString("en-GB");
 
+// What the stage owns up to about how the current shot is drawn. Everything
+// staged (the sky from a place, the belts, the spread, the guide ring) says
+// so, in a line each.
+function noteFor(shot: Shot, spreading: boolean): string[] {
+  if (shot.kind === "sky") {
+    const when = shot.light === "dusk" ? "dusk" : "night";
+    return [
+      `Seen from ${shot.place.name} at ${when}. Positions along each orbit are illustrative; time runs 60 times faster. Debris is dimmed, as most of it would be too faint to see.`,
+      "The faint arc is geostationary orbit.",
+    ];
+  }
+  const notes: string[] = [];
+  if (shot.belts) notes.push("The radiation belts, sketched.");
+  if (spreading) notes.push("The cloud\u2019s spread is drawn faster than it happened.");
+  return notes;
+}
+
 export function Stage({ marks }: { marks: Mark[] }) {
-  const { day, beat } = useStoryDate(marks);
-  const cover = useCover();
-  const now = marks[Math.max(0, beat)];
+  const { day, beat, shotBeat } = useStoryDate(marks);
+  const { cover, hidden } = useCover();
+  const [spreading, setSpreading] = useState(false);
+  // The date follows the beat's section; the camera, the highlight and the
+  // spread follow its text, which arrives after any photo or number that
+  // opens the beat and hides the globe.
+  const shotMark = marks[Math.max(0, shotBeat)];
   // Before the first beat the globe looks down on the first beat's place; an
   // act card pulls it back to show Vanguard 1, the story's witness.
   const intro = useMemo<Shot>(() => ({ kind: "orbit", view: "default", focus: marks[0].focus }), [marks]);
-  const shot = cover === "act" ? WITNESS_SHOT : beat < 0 ? intro : (SHOTS[now.id] ?? DEFAULT_SHOT);
-  const highlight = cover === "act" ? WITNESS_IDS : beat < 0 ? undefined : now.highlight;
+  const shot = cover === "act" ? WITNESS_SHOT : shotBeat < 0 ? intro : (SHOTS[shotMark.id] ?? DEFAULT_SHOT);
+  const highlight = cover === "act" ? WITNESS_IDS : shotBeat < 0 ? undefined : shotMark.highlight;
+  const notes = noteFor(shot, spreading);
   const [objs, setObjs] = useState<SpaceObject[] | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -64,7 +86,15 @@ export function Stage({ marks }: { marks: Mark[] }) {
 
   return (
     <div className={`${styles.stage} ${fade.fade} ${cover === "cold" ? fade.faded : ""}`} aria-hidden="true">
-      <Globe objs={objs} day={day} shot={shot} highlight={highlight} spreadDay={beat < 0 ? undefined : dayOf(new Date(`${now.date}T00:00:00Z`))} paused={cover === "cold"} />
+      <Globe
+        objs={objs}
+        day={day}
+        shot={shot}
+        highlight={highlight}
+        spreadDay={shotBeat < 0 ? undefined : dayOf(new Date(`${shotMark.date}T00:00:00Z`))}
+        paused={hidden}
+        onSpreading={setSpreading}
+      />
       {failed && <p className={styles.fallback}>The catalogue of objects didn&rsquo;t load, so the globe is empty. The story reads the same without it.</p>}
       <div className={styles.counter} data-ready={counts ? "" : undefined}>
         <p className={styles.when}>{beat < 0 ? "Before October 1957" : month(day)}</p>
@@ -85,6 +115,13 @@ export function Stage({ marks }: { marks: Mark[] }) {
               Debris <span>{fmt(counts.debris)}</span>
             </li>
           </ul>
+        )}
+        {notes.length > 0 && (
+          <p className={fade.note}>
+            {notes.map((n) => (
+              <span key={n}>{n}</span>
+            ))}
+          </p>
         )}
       </div>
     </div>
