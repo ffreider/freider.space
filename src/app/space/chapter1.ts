@@ -32,7 +32,7 @@ export const CHAPTER1: Beat[] = [
     kicker: "4 October 1957",
     title: "Two objects",
     body: [
-      "At 19:28 UTC a modified R-7 missile lifted off from Tyuratam, a test range on the steppe of Soviet Kazakhstan. On top was a polished aluminium ball 58 centimetres across, weighing 83.6 kilograms, with four long antennas swept back behind it. Sergei Korolev's design bureau had kept it simple: two radio transmitters and their batteries.",
+      "At 19:28 UTC a modified R-7 missile lifted off from Tyuratam, a test range on the steppe of Soviet Kazakhstan. On top was a polished aluminium ball 58 centimetres across, weighing 83.6 kilograms, with four long antennas. The satellite was simple: two radio transmitters and their batteries.",
       "Its signal was a pulse, on and off three tenths of a second at a time, on frequencies an ordinary shortwave set could pick up. Radio amateurs recorded it and followed its path by how the pitch of the beeps changed as it passed.",
       "What people saw crossing the evening sky was something else. The rocket's core stage had reached orbit too, and it was far brighter than the sphere, which sat near the limit of what the eye can see. The catalogue of objects in orbit starts here, with {count:1957-10-04} entries. The rocket is number 1 and the satellite number 2.",
       "Five days later President Eisenhower told reporters that the satellite did not raise his apprehensions, “not one iota.” Much of his country did not share his calm. The batteries ran out after about three weeks, and Sputnik 1 went on circling in silence, once every 96 minutes, until it fell back into the atmosphere in the first days of 1958. Less than a month after it launched, a second satellite went up, and it was not empty.",
@@ -53,7 +53,7 @@ export const CHAPTER1: Beat[] = [
     body: [
       "Less than a month later another R-7 carried Sputnik 2: a 508-kilogram cone with instruments for the Sun's ultraviolet light, X-rays and cosmic rays, and a sealed cabin holding a dog. Laika was a stray from Moscow. A television camera sent pictures of her back to the ground, ten frames a second.",
       "There was no way to bring her back. Soviet statements at the time implied she lived for days. Russian sources from 1999 and 2002 said the cabin overheated and that she died within hours of launch.",
-      "The R-7 had been built to carry nuclear warheads, and it could now put half a tonne into orbit. That worried Washington more than the dog did. Sputnik 2 never separated from the rocket's core stage, so the catalogue lists them as one object, number 3. It came down on 14 April 1958, after 162 days.",
+      "The R-7 had been built to carry nuclear warheads, and it could now put half a tonne into orbit. That deepened American fears about Soviet missiles. Sputnik 2 never separated from the rocket's core stage, so the catalogue lists them as one object, number 3. It came down on 14 April 1958, after 162 days.",
     ],
     focus: TYURATAM,
     highlight: [3],
@@ -72,7 +72,7 @@ export const CHAPTER1: Beat[] = [
       "America's first satellite went up late in the evening of 31 January in Florida, which was already 1 February by the clock the catalogue keeps. Explorer 1 rode a Jupiter-C, an Army Redstone missile with three stages of small solid rockets on top, built by Wernher von Braun's team in Huntsville. The Jet Propulsion Laboratory built the satellite: a slim tube of about 14 kilograms, still attached to its last rocket stage.",
       "When it reached orbit there were {count:1958-02-01} objects up there, Sputnik 2 and Explorer 1 itself. Sputnik 1 and the first rocket stage had already fallen.",
       "Its main instrument was a Geiger counter from James Van Allen's group at the University of Iowa, meant to count cosmic rays. At times it read zero. Van Allen's team proposed that the tube was being swamped, not starved: radiation far stronger than anyone expected was saturating it. Explorer 3 carried a tape recorder in March that could hold a whole orbit of readings, and it confirmed the idea.",
-      "The belt of charged particles they had found, held in place by Earth's magnetic field, was announced on 1 May 1958. A second, outer belt was found later that year. Both carry Van Allen's name. Electronics and crews that pass through them need shielding, and that still shapes where satellites are put.",
+      "The belt of charged particles they had found, held in place by Earth's magnetic field, was announced on 1 May 1958. A second, outer belt was found later that year. Electronics and crews that pass through them need shielding, and that still shapes where satellites are put.",
     ],
     focus: CANAVERAL,
     highlight: [4],
@@ -90,7 +90,7 @@ export const CHAPTER1: Beat[] = [
     body: [
       "The rocket rose about four feet.",
       "The Navy's Vanguard was supposed to be first. On 6 December 1957, on live television, it lost thrust and exploded. Newspapers called it Flopnik.",
-      "On 17 March 1958 a Vanguard worked. Its satellite was a sphere about 16 centimetres across, weighing 1.46 kilograms, with six thin antennas. One of its two radios ran on batteries and went quiet within weeks. The other ran on six solar cells, each about five centimetres square, and kept transmitting until May 1964. It was the first satellite powered by sunlight, and nearly every one since has been.",
+      "On 17 March 1958 a Vanguard worked. Its satellite was a sphere about 16 centimetres across, weighing 1.46 kilograms, with six thin antennas. One of its two radios ran on batteries and soon went quiet. The other ran on six solar cells, each about five centimetres square, and kept transmitting until May 1964. It was the first satellite powered by sunlight, and nearly every one since has been.",
       "Its orbit was watched closely enough to show that the Earth is very slightly pear-shaped, a little fuller in the south than in the north.",
       "Sputnik 1, Sputnik 2 and Explorer 1 have all come down. Vanguard 1 has not. It is the oldest object made by people that is still in orbit, and its third stage, launched with it, is the oldest rocket body. Its orbit is expected to last about 240 years.",
     ],
@@ -109,8 +109,8 @@ export const CHAPTER1: Beat[] = [
     title: "Clouds",
     body: [
       "By 1960 the question was no longer whether something could be put in orbit, but what it could do there. TIROS-1 was a drum about a metre across, covered in solar cells, with two small television cameras looking down. It was one of {count:1960-04-01} objects in orbit on the day it launched.",
-      "Its first picture, taken about two hours after launch, showed a blurred and almost featureless disc of cloud. The picture usually printed as the first, captioned 1 April, was taken the next day.",
-      "Over 78 days it sent down tens of thousands of images: about 23,000 by NASA's count, 19,389 usable ones by NOAA's. For the first time forecasters could see weather systems across whole oceans, where there were no weather stations and few ships to report. The early pictures showed the spiral cloud bands around large storms.",
+      "Its first picture, taken about two hours after launch, showed an almost featureless disc of cloud.",
+      "Over 78 days it sent down some 20,000 images. NASA counts about 23,000; NOAA counts 19,389 usable ones. For the first time forecasters could see weather systems across whole oceans, where there were no weather stations and few ships to report. The early pictures showed the spiral cloud bands around large storms.",
       "TIROS-1 stopped working in June 1960 and is still in orbit. The weather satellites forecasters use today came out of it.",
     ],
     focus: CANAVERAL,
@@ -147,7 +147,7 @@ export const CHAPTER1: Beat[] = [
     title: "The first explosion",
     body: [
       "A Thor-Ablestar rocket from Cape Canaveral put three satellites into orbit, among them the navigation satellite Transit 4A. About 77 minutes later its spent upper stage blew apart, about 990 kilometres up. Some 100 kilograms of propellant were still in its tanks. It was the first Ablestar flight that hadn't vented them.",
-      "A tracking camera in New Mexico photographed it happen. It was the first known break-up of anything in orbit. The day before, there were {count:1961-06-28} objects in orbit. That evening there were {count:1961-06-29}.",
+      "A tracking camera in New Mexico photographed it happen. It was the first known break-up of anything in orbit. The day before, there were {count:1961-06-28} objects in orbit. By the end of the day there were {count:1961-06-29}.",
       "The catalogue holds 316 pieces of that stage today, and more than half are still in orbit. Fragments from it are still being found and added, decades later. Seventeen years later two NASA scientists would write down where such explosions could lead.",
       "The investigators recommended that spent stages vent their leftover fuel. It became one of the basic rules of keeping orbit clean, long before anyone wrote debris guidelines.",
     ],
@@ -182,7 +182,7 @@ export const CHAPTER1: Beat[] = [
     kicker: "10 July 1962",
     title: "Live across the Atlantic",
     body: [
-      "The next day Telstar 1 went up. Bell Labs built it for AT&T, which paid NASA for the launch. Unlike Echo it didn't just reflect signals: it received them, amplified them and sent them back down.",
+      "The next day Telstar 1 went up. Bell Labs built it for AT&T, which paid NASA for the launch. Unlike Echo, it received signals, amplified them and sent them back.",
       "Test pictures went from Andover in Maine to Pleumeur-Bodou in Brittany the same week. On 23 July the first public live programme crossed the Atlantic, and the Smithsonian estimates that several hundred million people in 16 countries watched. The feed to Europe joined partway through a press conference by President Kennedy, after he had finished talking about Telstar.",
       "Telstar flew in a low, stretched orbit and was in view of both sides of the ocean for only about 20 minutes of each two-and-a-half-hour circuit, so programmes were scheduled around its passes. In November its command system failed from radiation damage, after a launch into the belt Starfish had just filled. Engineers revived it, and in February 1963 it went silent for good.",
     ],
@@ -200,9 +200,9 @@ export const CHAPTER1: Beat[] = [
     kicker: "18 August 1962",
     title: "Ferdinand",
     body: [
-      "At 07:09 on a Saturday morning in August, a rocket left a slope called Oksebåsen on Andøya, about six kilometres from Andenes in Vesterålen. Ferdinand 1 was a two-stage American Nike-Cajun. It climbed to about 100 kilometres, measured the lower ionosphere, and came back down.",
-      "Andøya was chosen because it lies under the aurora. When the aurora disturbed the ionosphere, the long-distance radio that northern Norway depended on failed, and the point of the programme was to understand why. The rocket was American, the payload Danish and Norwegian, and the agreement three-way, between Norway's research council for science and technology, the Danish Ionospheric Laboratory and NASA. The rocket was named after the bull in the children's book who would rather smell flowers than fight, partly to make clear that this was peaceful research.",
-      "Ferdinand never reached orbit, so it has no number in the catalogue and no dot on this globe. The range it opened is now Andøya Space. In Eivind Thrane's history of the range, this is the morning “Norway had entered the space age.” More than thirty years later, a rocket from the same range would turn up on a Russian radar screen.",
+      "At 07:09 on a Saturday morning in August, a rocket left Oksebåsen on Andøya, about six kilometres from Andenes in Vesterålen. Ferdinand 1 was a two-stage American Nike-Cajun. It climbed to about 100 kilometres, measured the lower ionosphere, and came back down.",
+      "Andøya lies in the auroral zone. When the aurora disturbed the ionosphere, the long-distance radio that northern Norway depended on failed, and the point of the programme was to understand why. The rocket was American, the payload Danish and Norwegian, and the agreement three-way, between Norway's research council for science and technology, the Danish Ionospheric Laboratory and NASA. The rocket was named after the bull in the children's book who would rather smell flowers than fight, partly to make clear that this was peaceful research.",
+      "Ferdinand never reached orbit, so it has no number in the catalogue and no dot on this globe. The range it opened is now Andøya Space. Eivind Thrane's history of the range says that with it Norway “had entered the space age.” More than thirty years later, a rocket from the same range would turn up on a Russian radar screen.",
     ],
     focus: ANDOYA,
     sources: [
@@ -270,7 +270,7 @@ export const CHAPTER1: Beat[] = [
     title: "An orbit for the north",
     body: [
       "A satellite over the equator sits lower in the sky the further north you are. Seen from Moscow, a geostationary satellite due south stands about 26 degrees above the horizon. From Andenes it is about 12 degrees, and from Longyearbyen about 3, low enough for any hill to block it.",
-      "Most of the Soviet Union lay far north, and its launch site at Tyuratam was at 46 degrees north, far from the equator. Molniya 1-1, launched on 23 April 1965, took a different route. Its orbit is long and narrow: it climbs to about 40,000 kilometres over the northern hemisphere and swings round the south much lower, between a few hundred and about 2,000 kilometres up. A satellite moves slowly at the top of such an orbit, so it spends most of each twelve-hour circuit high over the north. Two circuits a day, a few satellites spaced out, and there is always one in view.",
+      "Most of the Soviet Union lay far north, and its launch site at Tyuratam was at 46 degrees north, far from the equator. Molniya 1-1, launched on 23 April 1965, took a different route. Its orbit is long and narrow: it climbs to about 40,000 kilometres over the northern hemisphere and swings round the south much lower, between a few hundred and about 2,000 kilometres up. A satellite moves slowly at the top of such an orbit, so it spends most of each twelve-hour circuit high over the north. Two circuits a day, several satellites spaced out, and there is always one in view.",
       "The tilt of 63.4 degrees keeps the high point of the orbit from drifting. From 1967 Molniya satellites fed the Orbita network, which brought Moscow television to Siberia and the Far East. The orbit carries the satellites' name; *molniya* is Russian for lightning.",
       "Norway reached the same answer for the same reason. Space Norway's two Arctic broadband satellites, launched in 2024, loop up to about 44,000 kilometres above the Arctic.",
     ],
@@ -288,9 +288,9 @@ export const CHAPTER1: Beat[] = [
     kicker: "15 October 1965",
     title: "Pieces",
     body: [
-      "NASA counts 22 known break-ups in orbit between 1961 and 1969, the first being the Ablestar stage that blew up in June 1961. Nearly all were explosions, mostly of spent rocket stages. The largest happened on this day, when a Titan transtage that had carried the satellite OV2-1 broke into 473 catalogued fragments.",
-      "Some were deliberate. The Soviet Union destroyed Kosmos 50 on command in November 1964, and in 1968 it blew up Kosmos 249 and Kosmos 252 in tests of a weapon for destroying satellites.",
-      "None of them was as famous as Sputnik, but they show on the globe as the faint grey dust that builds up between the bright dots. At the end of the decade there were {count:1969-12-31} objects in orbit, and {count:1969-12-31:debris} of them were debris.",
+      "NASA counts 22 known break-ups in orbit between 1961 and 1969, the first being the Ablestar stage that blew up in June 1961. Nearly all were explosions or deliberate destruction. The largest happened on this day, when a Titan transtage that had carried the satellite OV2-1 broke into 473 catalogued fragments.",
+      "Some were deliberate. The Soviet Union destroyed Kosmos 50 on purpose in November 1964, and in 1968 it blew up Kosmos 249 and Kosmos 252 in tests of a weapon for destroying satellites.",
+      "They show on the globe as the faint grey dust that builds up between the bright dots. At the end of the decade there were {count:1969-12-31} objects in orbit, and {count:1969-12-31:debris} of them were debris.",
     ],
     focus: CANAVERAL,
     sources: [{ label: "NASA ODPO, History of On-orbit Satellite Fragmentations, 16th ed. (2022)", url: "https://orbitaldebris.jsc.nasa.gov/library/HOOSF_16e.pdf" }],
@@ -301,7 +301,6 @@ export const CHAPTER1: Beat[] = [
     kicker: "16 July 1969",
     title: "Visitors",
     body: [
-      "This is the story of what stays in orbit, and people mostly don't.",
       "Yuri Gagarin made one orbit on 12 April 1961, in 108 minutes; the catalogue lists his Vostok 1 as launched and fallen on the same day. The Mercury, Gemini, Vostok, Voskhod, Soyuz and Apollo flights of the 1960s were all visits.",
       "Apollo 11 left on 16 July 1969. Most of its Saturn V never reached orbit: the first two stages fell into the Atlantic. The third stage sent the crew towards the Moon and went on into orbit around the Sun. Eagle's ascent stage was left in orbit around the Moon; where it ended up is unknown. None of it is on this globe.",
       "The pictures of the landing reached other countries through Intelsat satellites.",
@@ -321,7 +320,7 @@ export const CHAPTER1: Beat[] = [
     body: [
       "ERTS-1, launched from Vandenberg in California and later renamed Landsat 1, was the first satellite built to map the land, again and again. It circled about 900 kilometres up, over the poles, and passed over each place at the same time of day every 18 days.",
       "Its main instrument, three television cameras, caused an electrical surge and was shut down within weeks. The second instrument, a scanner in four colour bands, turned out to be the better instrument. Its first image, two days after launch, showed Dallas and Fort Worth.",
-      "Landsat 1 was designed to last a year and worked for nearly six. Landsats 2 to 9 followed, and the record they keep has run without a break since 1972. Deforestation, cities spreading and glaciers retreating are measured against it. When the archive was made free in 2008, use went from about 25,000 scenes in its best year to more than a million downloads in 2009.",
+      "Landsat 1 was designed to last a year and worked for nearly six. Landsats 2 to 9 followed, apart from Landsat 6, which failed at launch. The record they keep has run without a break since 1972. Deforestation, cities spreading and glaciers retreating are measured against it. When the archive was made free in 2008, use went from about 25,000 scenes in fiscal 2001, its best year, to more than a million downloads in fiscal 2009.",
       "Landsat 1 was switched off in January 1978. It is still in orbit.",
     ],
     focus: { lat: 32.8, lon: -96.8 },
@@ -340,7 +339,7 @@ export const CHAPTER1: Beat[] = [
     body: [
       "An Atlas rocket from Vandenberg launched Navstar 1, the first of eleven test satellites for the US Air Force's Global Positioning System. It circles about 20,000 kilometres up, twice a day. Each GPS satellite carries atomic clocks and broadcasts the time; a receiver that hears several of them works out where it is from the differences.",
       "After the Soviet Union shot down Korean Air Lines Flight 007, which had strayed into its airspace in September 1983, the White House announced that civilian aircraft would be able to use GPS once it was running. It took until 1995 for the full system to be declared ready.",
-      "Civilians could use it, but the signal they got carried a deliberate error. At about 04:05 UTC on 2 May 2000 that error was switched off. At one measuring station the error fell from 45 metres on 1 May to 6.3 metres on 3 May. That is the GPS in phones and cars.",
+      "Civilians could use it, but the signal they got carried a deliberate error. At about 04:05 UTC on 2 May 2000 that error was switched off. At one measuring station the 95 per cent error radius fell from 45 metres on 1 May to 6.3 metres on 3 May. That is the GPS in phones and cars.",
     ],
     focus: VANDENBERG,
     highlight: [10684, 10893, 11054, 11141],
@@ -357,8 +356,8 @@ export const CHAPTER1: Beat[] = [
     title: "A warning",
     body: [
       "Two NASA scientists in Houston, Donald Kessler and Burton Cour-Palais, published a paper with a dry title: “Collision frequency of artificial satellites: The creation of a debris belt.”",
-      "The argument was short. The more objects there are in orbit, the likelier they are to hit each other. Each collision makes fragments, and each fragment raises the odds of the next collision. Past some point the process feeds itself, and a belt of debris forms around the Earth. Small, untracked fragments from explosions, of the kind the Ablestar had left in 1961, would bring that date forward. They thought it “could begin to form within this century” and become “a significant problem during the next century.” When they wrote it, the catalogue held {count:1978-06-01} objects in orbit, {count:1978-06-01:debris} of them debris.",
-      "By Kessler's own account a NORAD analyst, John Gabbard, gave it the name it is known by, the Kessler syndrome, while talking to a reporter. Kessler later had to explain what it didn't mean: “It was never intended to mean that the cascading would occur over a period of time as short as days or months.”",
+      "The argument was short. The more objects there are in orbit, the likelier they are to hit each other. Each collision makes fragments, and each fragment raises the odds of the next collision. The process could feed itself, and a belt of debris would form around the Earth. Small, untracked fragments from explosions, of the kind the Ablestar had left in 1961, would bring that date forward. They thought it “could begin to form within this century” and become “a significant problem during the next century.” When they wrote it, the catalogue held {count:1978-06-01} objects in orbit, {count:1978-06-01:debris} of them debris.",
+      "By Kessler's own account John Gabbard of NORAD gave it the name it is known by, the Kessler syndrome, while talking to a reporter. Kessler later had to explain what it didn't mean: “It was never intended to mean that the cascading would occur over a period of time as short as days or months.”",
     ],
     focus: { lat: 29.56, lon: -95.09 },
     sources: [
@@ -374,7 +373,7 @@ export const CHAPTER1: Beat[] = [
     title: "A ferry and a house",
     body: [
       "Twenty years to the day after Gagarin, Columbia launched from Florida with John Young and Robert Crippen on board. It flew 37 orbits in a little over two days and landed at Edwards Air Force Base in California.",
-      "The shuttle was meant to make getting to orbit routine and cheap. It never reached the launch rate or the price that had been promised. Until the Challenger accident in 1986 it also carried commercial satellites: on its fifth flight, in November 1982, Columbia released two communications satellites from its payload bay.",
+      "The shuttle was meant to make getting to orbit routine and cheap. It never flew as often, or as cheaply, as had been promised. Until the Challenger accident in 1986 it also carried commercial satellites: on its fifth flight, in November 1982, Columbia released two communications satellites from its payload bay.",
       "In February 1986 the Soviet Union launched the core of Mir. Its first crew arrived in March, and over the next 15 years it was enlarged and made long stays in orbit routine. It came down on 23 March 2001.",
     ],
     focus: CANAVERAL,
@@ -426,8 +425,8 @@ export const CHAPTER1: Beat[] = [
     title: "A second-hand satellite",
     body: [
       "Marcopolo 2 was launched from Cape Canaveral to beam British satellite television for BSB. When BSB merged with Sky, it wasn't needed. In 1992 Televerket, the Norwegian state telecom company that became Telenor, bought it in orbit and named it Thor. From about 1 degree west it broadcast television and radio to northern Europe for eleven years.",
-      "Thor 2 followed in May 1997 and Thor 3 in June 1998, the first satellite Telenor controlled itself. Canal Digital's Nordic satellite television came from them, and NRK's channels still come from the same spot in the sky, 0.8 degrees west.",
-      "The catalogue lists all three as Norwegian. All three are still up there, parked a little above the geostationary ring.",
+      "Thor 2 followed in May 1997 and Thor 3 in June 1998, the first satellite Telenor controlled itself. Canal Digital's Nordic satellite television came from them, and NRK's channels still come from almost the same spot, 0.8 degrees west.",
+      "The catalogue lists Thor 1 as Norwegian. All three are still up there, parked a little above the geostationary ring.",
     ],
     focus: { lat: 60, lon: 5 },
     highlight: [20762, 24808, 25358],
@@ -444,9 +443,9 @@ export const CHAPTER1: Beat[] = [
     title: "The black suitcase",
     body: [
       "More than thirty years after Ferdinand, the range on Andøya was still sending up science rockets, and the notice for this one had gone out well ahead. On 21 December 1994 Norway's foreign ministry sent a note to every foreign embassy in Oslo. Scientific rockets would be launched from Andøya between 15 January and 10 February, between 05:00 and 12:00, with impact zones out towards Svalbard. One of them would be a four-stage Black Brant XII.",
-      "Nothing about the rocket itself was hidden. Its payload, NASA's experiment on the ion fountain above the aurora, came down near Svalbard as planned, about 24 minutes after launch. It never reached orbit and isn't on the globe. By that morning there were {count:1995-01-25} objects in orbit.",
-      "What happened at Olenegorsk is where the accounts part. In Peter Pry's 1999 book *War Scare*, the radar saw a path like that of an American Trident missile, and the alert went up the chain to President Boris Yeltsin. The next day Yeltsin told reporters he had used his black suitcase for the first time.",
-      "Other readers are less sure. The MIT arms-control analyst Geoffrey Forden argued that Russia's early-warning satellites would have shown there was no mass attack. Russian early-warning officers have since said the briefcase was not activated, and a 2026 review in the *Bulletin of the Atomic Scientists* asks whether Yeltsin's remark was about the rocket or about politics. Why Norway's note never reached the radar crews is unclear too.",
+      "The rocket never reached orbit and isn't on the globe. By that morning there were {count:1995-01-25} objects in orbit.",
+      "What happened at Olenegorsk is where the accounts part. In Peter Pry's 1999 book *War Scare*, the alert went up the chain to President Boris Yeltsin. The next day Yeltsin told reporters he had used his black suitcase for the first time.",
+      "Other readers are less sure. The MIT arms-control analyst Geoffrey Forden argued that Russia's early-warning satellites would have shown there was no mass attack. A 2026 review in the *Bulletin of the Atomic Scientists* asks whether Yeltsin's remark was about the rocket or about politics. Why the note may not have reached the radar crews is unclear too.",
     ],
     focus: ANDOYA,
     sources: [
@@ -484,7 +483,7 @@ export const CHAPTER1: Beat[] = [
     body: [
       "A Proton rocket from Baikonur launched Zarya, a Russian-built module with power, engines and radios. Two weeks later the shuttle Endeavour brought up Unity, built in the United States, and the crew joined the two with the shuttle's robot arm. They had never been fitted together on the ground. In NASA's words: “Former adversaries on Earth were now working together to build the largest laboratory in space.”",
       "The station stood empty for almost two years, waiting for the Russian service module, Zvezda. On 2 November 2000 the first crew docked: William Shepherd, Yuri Gidzenko and Sergei Krikalev. Someone has been on board ever since.",
-      "Assembly took 13 years. The station now weighs about 420 tonnes and spans 109 metres. In the catalogue it is still one object, number 25544, the number Zarya was given in 1998; every module since is listed as docked to it. From Norway it is easy to see, the brightest satellite in the night sky.",
+      "Assembly took 13 years. The station now weighs about 420 tonnes and spans 109 metres. In the catalogue it is still one object, number 25544, the number Zarya was given in 1998; later modules such as Unity and Zvezda are listed as docked to it. From Norway it is easy to see, the brightest satellite in the night sky.",
     ],
     focus: TYURATAM,
     highlight: [25544],
@@ -520,8 +519,8 @@ export const CHAPTER1: Beat[] = [
     body: [
       "At about 22:26 UTC a missile launched from China struck Fengyun-1C, a retired Chinese weather satellite of about 960 kilograms, at about 860 kilometres. It was a test of a weapon for destroying satellites, and the first by any country in about two decades.",
       "The satellite became a cloud. On the globe the count goes from {count:2007-01-10} objects to {count:2007-01-11} in a day. More than 1,200 pieces were catalogued within months; the catalogue now holds 3,531. NASA's orbital debris office called it “the single worst contamination of low Earth orbit (LEO) during the past 50 years.”",
-      "The cloud reaches from about 200 to almost 4,000 kilometres and crosses the orbits of hundreds of working satellites, and the height where people fly. Nearly twenty years later, about two thirds of the catalogued pieces are still up. A month after the test, the UN's space committee adopted guidelines asking countries not to destroy satellites in ways that leave long-lived debris.",
-      "Every one of those pieces is one more thing for the next satellite to hit, which is the arithmetic Kessler and Cour-Palais had set out in 1978. Two years and a month later, two whole satellites collided at about 790 kilometres, a height the cloud also covers.",
+      "The cloud reaches from about 200 to almost 4,000 kilometres and crosses the orbits of hundreds of working satellites, and the height where people fly. Nearly twenty years later, about two thirds of the catalogued pieces are still up. A month after the test, a subcommittee of the UN's space committee adopted guidelines asking countries not to destroy satellites in ways that leave long-lived debris.",
+      "Every one of those pieces is one more thing for the next satellite to hit. Two years and a month later, two whole satellites collided at about 790 kilometres, a height the cloud also covers.",
     ],
     focus: { lat: 28.25, lon: 102.03 },
     highlight: [25730],
@@ -539,7 +538,7 @@ export const CHAPTER1: Beat[] = [
     body: [
       "At 16:56 UTC, about 790 kilometres above northern Siberia, Iridium 33, a working communications satellite, and Kosmos 2251, a Russian military satellite that had been dead for years, crossed paths at nearly a right angle and hit at more than 11 kilometres a second.",
       "Debris had hit satellites before. This was the first accidental collision between two whole ones. The pair had shown up in public screening reports for days, with predicted misses between 117 metres and 1.8 kilometres, but the data weren't precise enough to act on, and that week other Iridium satellites had closer predicted passes.",
-      "The collision left 2,370 catalogued fragments; the count on the globe goes from {count:2009-02-09} to {count:2009-02-10}. It was the second new cloud in two years, after Fengyun-1C. Kessler called it “the first clear example” of what he had predicted in 1978. Afterwards, the US Air Force says, it began screening all active satellites for close approaches, not just a hundred or so, and passing on the warnings.",
+      "The collision left 2,370 catalogued fragments; the count on the globe goes from {count:2009-02-09} to {count:2009-02-10}. It was the second new cloud in two years, after Fengyun-1C. Kessler called it “the first clear example” of what he had predicted in 1978.",
     ],
     focus: { lat: 72, lon: 98 },
     highlight: [24946, 22675],
@@ -558,7 +557,7 @@ export const CHAPTER1: Beat[] = [
     body: [
       "Among the passengers on an Indian rocket from Sriharikota was a cube 20 centimetres across, weighing about 6 kilograms: AISSat-1. Ships over 300 gross tonnes have to broadcast their identity, position, speed and heading on a radio system called AIS. Stations on land only hear the ships near the coast. AISSat-1 was built to listen from orbit, over the Barents Sea and the Norwegian Sea.",
       "The next day, at 10:56, red arrows marking ships began appearing on a screen at the Norwegian Coastal Administration. An officer at the Norwegian Joint Headquarters later said the first two years were like turning on the light in those seas.",
-      "It cost 28 million kroner, including the launch and three years of operation, and it worked for about ten. Norway already owned satellites; AISSat-1 was its first national one, paid for by the state and made to Norwegian requirements, though the satellite itself was built in Toronto. Trond Giske called it “one small satellite but one giant leap for Norwegian space travel.” It came 48 years after Ferdinand left Andøya. AISSat-2 and a line of NorSats followed.",
+      "It cost 28 million kroner, including the launch and three years of operation, and it worked for about ten. Norway already owned satellites; AISSat-1 was its first national one, paid for by the state and made to Norwegian requirements, though the satellite itself was built in Toronto. Trond Giske called it “one small satellite but one giant leap for Norwegian space travel.” It came almost 48 years after Ferdinand left Andøya. AISSat-2 and a line of NorSats followed.",
     ],
     focus: { lat: 72, lon: 25 },
     highlight: [36797, 40075, 42826, 42828],
@@ -574,7 +573,7 @@ export const CHAPTER1: Beat[] = [
     kicker: "15 February 2017",
     title: "A flock",
     body: [
-      "Planet's first Doves went up in 2013: satellites the size of a loaf of bread, three of the ten-centimetre cubes long, built mostly from parts you could buy. In February 2014, 28 of them were pushed out of the space station. On 15 February 2017 one Indian rocket carried 104 satellites into orbit, and 88 of them were Doves.",
+      "Planet's first Doves went up in 2013: satellites three of the ten-centimetre cubes long, built mostly from parts you could buy. In February 2014, 28 of them were pushed out of the space station. On 15 February 2017 one Indian rocket carried 104 satellites into orbit, and 88 of them were Doves.",
       "That November the company announced it could photograph all of the Earth's land every day. With a new picture of almost any place on land every day, you could follow a flood or a building site as it happened instead of waiting weeks for one expensive image.",
       "Small satellites changed the numbers. The catalogue records 109 satellites launched in 2007, 132 in 2012 and 453 in 2017. Many of them don't last: of the 657 Doves and Flocks catalogued, 114 are still in orbit.",
     ],

@@ -158,15 +158,6 @@ function Ferdinand({ f }: { f: Frame }) {
       {label(100, "100 km")}
       {label(300, "300 km")}
       {label(400, "400 km")}
-      <text x={x + 24} y={fixed(y(200) + 5)} className={styles.mapLabelStrong}>
-        Aurora, 100 to 300 km up
-      </text>
-      <text x={x + 24} y={fixed(y(400) - 12)} className={styles.mapLabel}>
-        Space station today, 400 km
-      </text>
-      <text x={x + 24} y={fixed(y(10) - 12)} className={styles.mapLabel}>
-        Airliners, 10 km
-      </text>
       <path d={climb} data-track className={styles.mapUp} />
       <circle cx={x} cy={fixed(y(100))} r="6" className={styles.mapRocket} data-dot data-mode="updown" />
       <text x={x + 24} y={fixed(y(100) - 12)} className={styles.mapLabelStrong}>
@@ -268,7 +259,7 @@ function Aissat({ f }: { f: Frame }) {
       )}
       <line x1={fixed(ax)} y1={fixed(ay)} x2={fixed(lx)} y2={fixed(ly - 28)} className={styles.mapGuide} />
       <text x={fixed(lx)} y={fixed(ly)} textAnchor="middle" className={styles.mapLabelStrong}>
-        A coastal station hears about {STATION_KM} km
+        A coastal station hears only ships near the coast
       </text>
       <text x={fixed(lx)} y={fixed(ly + (f.tall ? 28 : 24))} textAnchor="middle" className={styles.mapLabel}>
         the small rings, sites and range illustrative
@@ -285,7 +276,7 @@ const SCENES: Record<Kind, { title: string; desc: string; scene: (f: Frame) => R
   },
   ferdinand: {
     title: "Ferdinand 1's height above Andøya",
-    desc: "A side view of height from sea level to 400 kilometres. The rocket climbs straight up to about 100 kilometres, the bottom of the aurora, which spans 100 to 300 kilometres, and comes back down. The space station's height, 400 kilometres, is marked for scale.",
+    desc: "A side view of height from sea level to 400 kilometres. The rocket climbs straight up to about 100 kilometres above Andøya and comes back down.",
     scene: (f) => <Ferdinand f={f} />,
   },
   telstar: {

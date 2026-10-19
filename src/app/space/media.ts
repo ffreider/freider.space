@@ -34,10 +34,10 @@ export const LICENCES: Record<string, string> = {
 
 export const MEDIA: Record<string, Media[]> = {
   "doves": [
-    archive("doves", "The first pair of Planet's Doves leaving the space station, 11 February 2014."),
+    archive("doves", "The first two of the 28 Flock 1 Doves leaving the space station, 11 February 2014."),
   ],
   "cubesats": [
-    archive("cubesats", "CUTE-I from the Tokyo Institute of Technology, one of the first six CubeSats, on display in a museum."),
+    archive("cubesats", "A museum copy of CUTE-I from the Tokyo Institute of Technology, one of the first six CubeSats."),
   ],
   "iss": [
     archive("iss", "Sergei Krikalev and Robert Cabana at a hatch inside Zarya, during the shuttle visit of December 1998."),
@@ -52,13 +52,13 @@ export const MEDIA: Record<string, Media[]> = {
     archive("sts-1", "Columbia lifting off from Pad 39A at the Kennedy Space Center on STS-1, 12 April 1981."),
   ],
   "kessler": [
-    archive("kessler", "A NASA plot of the objects tracked in low orbit, made long after Kessler's paper. The dots are drawn far larger than the objects they stand for."),
+    archive("kessler", "A NASA plot of the objects tracked in low orbit today, long after Kessler's paper."),
   ],
   "landsat-1": [
-    archive("landsat-1", "Landsat 1's first image, in false colour, taken on 25 July 1972, two days after launch."),
+    archive("landsat-1", "The scanner's first-light image, shown in false colour and dated 25 July 1972."),
   ],
   "apollo-11": [
-    archive("apollo-11", "The third stage of Apollo 11's Saturn V, photographed by the crew after they separated from it on 16 July 1969. It went on into orbit around the Sun.", 2),
+    archive("apollo-11", "The third stage of Apollo 11's Saturn V, photographed by the crew after they separated from it.", 2),
   ],
   "molniya": [
     archive("molniya", "A Molniya satellite on display in a building of Siberian Federal University."),
@@ -76,22 +76,22 @@ export const MEDIA: Record<string, Media[]> = {
     archive("tiros-1", "The print NASA long captioned as the first television picture from space, 1 April 1960. It was taken on 2 April, at 16:08 UTC, according to the European weather centre ECMWF's check of NASA's records."),
   ],
   "vanguard-1": [
-    archive("vanguard-1", "The Vanguard TV-3 rocket at Cape Canaveral on 6 December 1957, just after it lost thrust and exploded."),
+    archive("vanguard-1", "A US Navy photograph of the Vanguard TV-3 rocket exploding on its launch pad."),
   ],
   "explorer-1": [
     archive("explorer-1", "William Pickering, James Van Allen and Wernher von Braun hold up a model of Explorer 1 at the press conference after the launch."),
   ],
   "sputnik-1": [
-    archive("sputnik-1", "A replica of Sputnik 1 in the National Museum of the US Air Force. The satellite itself fell back into the atmosphere in January 1958."),
+    archive("sputnik-1", "A replica of Sputnik 1 in the Missile and Space Gallery of the National Museum of the US Air Force."),
     {
       kind: "sound",
       src: "/space/audio/sputnik-beep.mp3",
-      label: "Hear Sputnik's signal",
+      label: "Hear a recording of Sputnik's signal",
       credit: { text: "NASA, a recording of Sputnik's signal", url: "https://commons.wikimedia.org/wiki/File:Sputnik_-_Beep.mp3" },
     },
   ],
   "first-break-up": [
-    { kind: "number", from: "{count:1961-06-28}", to: "{count:1961-06-29}", label: "objects in orbit, the day before and the evening after" },
+    { kind: "number", from: "{count:1961-06-28}", to: "{count:1961-06-29}", label: "objects in orbit, the day before and at the end of that day" },
   ],
   telstar: [
     archive("telstar", "A Telstar satellite in the Musée des Arts et Métiers in Paris. Telstar 1 itself is still in orbit."),
@@ -106,13 +106,13 @@ export const MEDIA: Record<string, Media[]> = {
     {
       kind: "map",
       map: "ferdinand",
-      caption: "Ferdinand 1, 18 August 1962: straight up from Andøya to about 100 km, the bottom of the aurora, and back down.",
+      caption: "A side view of Ferdinand 1's flight on 18 August 1962. The scale runs from sea level to 400 km.",
     },
   ],
   "break-ups": [
     { kind: "number", from: "{count:1969-12-31:debris}", to: "of {count:1969-12-31}", label: "objects in orbit at the end of 1969 were debris" },
   ],
-  "navstar-1": [{ kind: "number", from: "45 m", to: "6.3 m", label: "the error of one GPS receiver on 1 May and on 3 May 2000" }],
+  "navstar-1": [{ kind: "number", from: "45 m", to: "6.3 m", label: "the 95 per cent error radius at one GPS station on 1 May and on 3 May 2000" }],
   // The cold open already shows the map; this beat is the return to it.
   "black-brant": [archive("black-brant", "A four-stage Black Brant XII leaving Wallops, Virginia. It is the same type as the rocket launched from Andøya in 1995, not that rocket.")],
   "fengyun-1c": [
@@ -132,7 +132,7 @@ export const MEDIA: Record<string, Media[]> = {
     {
       kind: "map",
       map: "aissat",
-      caption: "Why a satellite: coastal stations hear ships a few tens of kilometres out, and AISSat-1 listened from orbit over the Barents and Norwegian seas. Sites and ranges are illustrative.",
+      caption: "Why a satellite: coastal stations only hear ships near the coast, while one in orbit sees far out to sea. Sites and ranges are illustrative.",
     },
   ],
 };

@@ -31,7 +31,7 @@ export const ACTS: Act[] = [
     before: "landsat-1",
     count: "{count:1989-12-31}",
     witness:
-      "Vanguard 1 has been silent since May 1964 and keeps going round: {orbits:5:1989-12-31} times by the end of 1989.",
+      "Vanguard 1 has been silent since May 1964 and keeps going round. By the end of 1989 it will have gone round the Earth {orbits:5:1989-12-31} times.",
   },
   {
     id: "act-4",
@@ -40,7 +40,7 @@ export const ACTS: Act[] = [
     years: "1990 to 2006",
     before: "hubble",
     count: "{count:2006-12-31}",
-    witness: "Same orbit, same silence. By the end of 2006 Vanguard 1 will have made {orbits:5:2006-12-31} circuits.",
+    witness: "Still silent. By the end of 2006 Vanguard 1 will have made {orbits:5:2006-12-31} circuits.",
   },
   {
     id: "act-5",
@@ -49,7 +49,7 @@ export const ACTS: Act[] = [
     years: "2007 to 2019",
     before: "fengyun-1c",
     count: "{count:2019-05-24}",
-    witness: "Vanguard 1 is still there. By the day this chapter ends it will have gone round the Earth {orbits:5:2019-05-24} times.",
+    witness: "Vanguard 1 is still circling. By the day this chapter ends it will have gone round the Earth {orbits:5:2019-05-24} times.",
   },
 ];
 
