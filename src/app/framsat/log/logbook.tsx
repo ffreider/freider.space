@@ -152,6 +152,7 @@ export async function Logbook({ lang }: { lang: Lang }) {
                   </span>
                   <Link
                     href={`/postcard/${stampOf(new Date(e.start))}`}
+                    rel="nofollow"
                     className={`col-start-3 row-start-2 text-right text-xs text-fg-2 sm:col-start-auto sm:row-start-auto ${linkClass}`}
                   >
                     {t.postcard}
