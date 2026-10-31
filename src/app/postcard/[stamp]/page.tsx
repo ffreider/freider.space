@@ -4,6 +4,7 @@ import { parseStamp } from "@/lib/postcard";
 import { loadPostcard } from "../load";
 import { CARD } from "../sky";
 import { CardImage } from "./card-image";
+import { SaveButton } from "./save-button";
 import styles from "../postcard.module.css";
 
 // freider.space/postcard/20261014T0732Z: the sky over the radio station that
@@ -56,9 +57,7 @@ export default async function PostcardPage({ params }: Props) {
       <p className={styles.when}>{when(card.moment)}</p>
       <div className={styles.actions}>
         {card.card && (
-          <a href={`/postcard/${stamp}/print`} className={styles.primary} download={`framsat-1-postcard-${stamp}.png`}>
-            Save image
-          </a>
+          <SaveButton stamp={stamp} className={styles.primary} />
         )}
         <a href="/hear" className={styles.secondary}>
           Hear FramSat-1
