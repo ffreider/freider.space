@@ -1,4 +1,4 @@
-import { get } from "@vercel/edge-config";
+import { get } from "@vercel/global-config";
 
 export type Slot = 1 | 2 | 3;
 export const SLOTS: Slot[] = [1, 2, 3];
@@ -25,19 +25,19 @@ export const PRESETS: Record<string, { label: string; target: string }> = {
   home: { label: "Homepage", target: "/" },
 };
 
-// What /switch writes to Edge Config, under one key: per slot, the preset
+// What /switch writes to Global Config, under one key: per slot, the preset
 // and when it runs out (ms since 1970), or null to keep it until changed.
-export const EDGE_KEY = "shortLinks";
+export const CONFIG_KEY = "shortLinks";
 export type Override = { preset: string; until: number | null };
 export type Overrides = Partial<Record<`${Slot}`, Override>>;
 
-// The overrides that still apply. Anything that goes wrong (no Edge Config
+// The overrides that still apply. Anything that goes wrong (no Global Config
 // on this deployment, the store unreachable, a preset since removed) falls
 // back to the defaults, so a broken switch never breaks a printed code.
 export async function readOverrides(): Promise<Overrides> {
-  if (!process.env.EDGE_CONFIG) return {};
+  if (!process.env.GLOBAL_CONFIG && !process.env.EDGE_CONFIG) return {};
   try {
-    return stillLive((await get<Overrides>(EDGE_KEY)) ?? {});
+    return stillLive((await get<Overrides>(CONFIG_KEY)) ?? {});
   } catch {
     return {};
   }

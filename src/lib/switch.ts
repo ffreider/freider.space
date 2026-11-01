@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
-import { EDGE_KEY, type Overrides } from "./short-links";
+import { CONFIG_KEY, type Overrides } from "./short-links";
 
 // /switch is mine alone. Logging in once with SWITCH_SECRET leaves a cookie
 // that holds a hash of the secret, not the secret, and lasts half a year.
@@ -33,15 +33,16 @@ export async function signedIn() {
   return Boolean(real && value && same(value, token(real)));
 }
 
-// Edge Config is read through its SDK everywhere else, which is fast but
-// can lag a write by a few seconds. /switch reads and writes through
-// Vercel's API instead, so it always shows what it just stored.
+// Global Config (called Edge Config until July 2026) is read through its
+// SDK everywhere else, which is fast but can lag a write by a few seconds.
+// /switch reads and writes through Vercel's API instead, so it always shows
+// what it just stored.
 function api(path: string, init?: RequestInit) {
-  const id = process.env.EDGE_CONFIG_ID;
+  const id = process.env.GLOBAL_CONFIG_ID;
   const auth = process.env.VERCEL_API_TOKEN;
-  if (!id || !auth) throw new Error("EDGE_CONFIG_ID and VERCEL_API_TOKEN must be set");
+  if (!id || !auth) throw new Error("GLOBAL_CONFIG_ID and VERCEL_API_TOKEN must be set");
   const team = process.env.VERCEL_TEAM_ID ? `?teamId=${process.env.VERCEL_TEAM_ID}` : "";
-  return fetch(`https://api.vercel.com/v1/edge-config/${id}${path}${team}`, {
+  return fetch(`https://api.vercel.com/v1/global-config/${id}${path}${team}`, {
     ...init,
     cache: "no-store",
     headers: { Authorization: `Bearer ${auth}`, "Content-Type": "application/json" },
@@ -49,16 +50,16 @@ function api(path: string, init?: RequestInit) {
 }
 
 export async function fetchOverrides(): Promise<Overrides> {
-  const res = await api(`/item/${EDGE_KEY}`);
+  const res = await api(`/item/${CONFIG_KEY}`);
   if (res.status === 404) return {};
-  if (!res.ok) throw new Error(`Edge Config read failed: ${res.status}`);
+  if (!res.ok) throw new Error(`Global Config read failed: ${res.status}`);
   return ((await res.json()) as { value?: Overrides }).value ?? {};
 }
 
 export async function storeOverrides(value: Overrides) {
   const res = await api("/items", {
     method: "PATCH",
-    body: JSON.stringify({ items: [{ operation: "upsert", key: EDGE_KEY, value }] }),
+    body: JSON.stringify({ items: [{ operation: "upsert", key: CONFIG_KEY, value }] }),
   });
-  if (!res.ok) throw new Error(`Edge Config write failed: ${res.status} ${await res.text()}`);
+  if (!res.ok) throw new Error(`Global Config write failed: ${res.status} ${await res.text()}`);
 }
