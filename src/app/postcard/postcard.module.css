@@ -65,6 +65,7 @@
 }
 .primary { background: var(--fs); color: #0a2440; border: 0; font-family: inherit; cursor: pointer; }
 .primary:hover { background: #c4e3ff; }
+.primary:disabled { cursor: progress; opacity: 0.7; }
 .secondary { color: var(--ink); border: 1px solid rgba(147, 164, 180, 0.3); }
 .secondary:hover { background: rgba(169, 214, 255, 0.08); }
 .primary:active, .secondary:active { transform: scale(0.98); }
