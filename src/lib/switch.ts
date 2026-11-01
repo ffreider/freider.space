@@ -51,7 +51,8 @@ function api(path: string, init?: RequestInit) {
 
 export async function fetchOverrides(): Promise<Overrides> {
   const res = await api(`/item/${CONFIG_KEY}`);
-  if (res.status === 404) return {};
+  // A key that was never stored comes back as 204 with no body, not 404.
+  if (res.status === 204 || res.status === 404) return {};
   if (!res.ok) throw new Error(`Global Config read failed: ${res.status}`);
   return ((await res.json()) as { value?: Overrides }).value ?? {};
 }
