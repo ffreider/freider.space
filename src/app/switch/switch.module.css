@@ -1,0 +1,72 @@
+/* The contact page's look, made for thumbs: black space, Schibsted Grotesk,
+   one glacier-blue accent, panels 12px, buttons fully round. */
+:global(html):has(.page), :global(body):has(.page) { background: #000; }
+
+.page {
+  --ink: #eef2f5;
+  --ink-2: rgba(238, 242, 245, 0.78);
+  --ink-3: #93a4b4;
+  --rule: rgba(147, 164, 180, 0.2);
+  --fs: #a9d6ff;
+  color-scheme: dark;
+  text-shadow: none;
+  width: 100%;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background: #000;
+  color: var(--ink);
+  font-family: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.col { width: 100%; max-width: 420px; display: grid; gap: 16px; }
+
+.title { margin: 0 0 4px; font-size: 34px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; }
+
+.secret {
+  min-height: 56px; padding: 0 22px; border-radius: 999px;
+  border: 1px solid rgba(169, 214, 255, 0.45); background: transparent;
+  color: var(--ink); font: inherit; font-size: 17px;
+}
+.note { margin: 0; text-align: center; color: var(--ink-3); font-size: 15px; }
+.error { margin: 0; padding: 14px 16px; border-radius: 12px; background: rgba(255, 110, 90, 0.12); color: #ffb4a8; font-size: 14px; overflow-wrap: anywhere; }
+
+.timers { margin: 0; padding: 0; border: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.legend { width: 100%; margin-bottom: 8px; font-size: 14px; color: var(--ink-3); }
+.timer { position: relative; }
+.timer input { position: absolute; opacity: 0; inset: 0; margin: 0; }
+.timer span {
+  display: block; padding: 9px 14px; border-radius: 999px;
+  border: 1px solid var(--rule); font-size: 15px; color: var(--ink-2);
+}
+.timer input:checked + span { border-color: var(--fs); color: var(--ink); background: rgba(169, 214, 255, 0.1); }
+.timer input:focus-visible + span { outline: 2px solid var(--fs); outline-offset: 2px; }
+
+.slot { padding: 18px; border-radius: 12px; border: 1px solid var(--rule); background: rgba(10, 18, 32, 0.6); }
+.head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.badge {
+  flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--fs); color: #0a1220;
+  font-weight: 700; font-size: 17px;
+}
+.current { font-size: 18px; font-weight: 600; }
+.meta { font-size: 14px; color: var(--ink-3); }
+
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.preset, .on, .reset {
+  min-height: 44px; padding: 0 16px; border-radius: 999px;
+  font: inherit; font-size: 15px; font-weight: 500; cursor: pointer;
+  transition: background .2s, transform .15s;
+}
+.preset { border: 1px solid rgba(169, 214, 255, 0.35); background: transparent; color: var(--ink); }
+.preset:hover { background: rgba(169, 214, 255, 0.08); }
+.on { border: 1px solid var(--fs); background: var(--fs); color: #0a1220; }
+.reset { border: 1px dashed var(--rule); background: transparent; color: var(--ink-3); }
+.preset:active, .on:active, .reset:active { transform: scale(0.97); }
+
+.logout { justify-self: center; border: 0; background: none; color: var(--ink-3); font: inherit; font-size: 14px; padding: 8px; cursor: pointer; }
