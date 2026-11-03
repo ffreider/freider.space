@@ -1,4 +1,5 @@
 import { Descent } from "./descent/descent";
+import { LettersButton } from "./letters/button";
 import type { L, Lang } from "./i18n";
 
 // The homepage, in English (/) or Norwegian (/no): the content (timeline and
@@ -314,6 +315,8 @@ export function Home({ lang }: { lang: Lang }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData(lang)) }}
       />
       <Descent lang={lang} timeline={timeline} text={TEXT} />
+      {/* the letters are in English, so the sign-up is only on / */}
+      {lang === "en" && <LettersButton />}
     </>
   );
 }

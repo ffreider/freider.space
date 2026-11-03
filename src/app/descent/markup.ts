@@ -114,6 +114,9 @@ body.looking { cursor: grabbing; user-select: none; }
 /* the other language: a plain link, like the rest */
 .chip { pointer-events: auto; font: 500 15px/1 var(--f-body); color: var(--ink-2); padding: 8px 0; text-decoration: none; }
 .chip:hover { color: var(--ink); }
+/* the right end: "Get my letters" (src/app/letters/button.tsx, English only), then the other language */
+.top-end { display: flex; align-items: center; gap: 18px; }
+#lettersSlot:empty { display: none; }
 
 /* route */
 .route { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; transition: opacity .5s; }
@@ -381,7 +384,7 @@ export const DESCENT_BODY = String.raw`
 
 <div class="top">
   <a class="mark" href="#top">freider.space</a>
-  <a class="chip" id="langBtn" href="/no" hreflang="nb">Norsk</a>
+  <div class="top-end"><span id="lettersSlot"></span><a class="chip" id="langBtn" href="/no" hreflang="nb">Norsk</a></div>
 </div>
 
 <aside class="side" id="side" aria-label="What you are passing">
