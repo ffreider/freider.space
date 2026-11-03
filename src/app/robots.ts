@@ -6,7 +6,7 @@ import type { MetadataRoute } from "next";
 // nothing to read: crawlers working through every postcard's print image
 // used up the month's Hobby CPU on 29–31 Oct 2026. A crawler obeys only the
 // group that names it, so both groups list them.
-const disallow = ["/postcard/*/print", "/postcard/*/card.png", "/framsat/log/waterfall/"];
+const disallow = ["/postcard/*/print", "/postcard/*/card.png", "/postcard/*/email.jpg", "/framsat/log/waterfall/"];
 
 export default function robots(): MetadataRoute.Robots {
   return {

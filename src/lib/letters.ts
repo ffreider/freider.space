@@ -1,4 +1,8 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { after } from "next/server";
+import { confirmEmail, type EmailPostcard } from "@/app/letters/confirm-email";
+import { loadPostcard } from "@/app/postcard/load";
+import { stampOf } from "@/lib/stamp";
 
 // The newsletter, through Resend's API (no SDK: four plain calls). People
 // sign up with their email, get a link to confirm, and only then become a
@@ -62,29 +66,38 @@ export function checkLink(params: Record<string, string | string[] | undefined>)
   return { ok: true as const, email };
 }
 
+// The postcard in the confirmation email: the latest pass that's ready, a
+// day back so it's settled and its image cached for good. A whole hour, so
+// everyone signing up in the same hour shares one drawing. If SatNOGS is
+// slow or had nothing, the email simply goes without.
+async function latestPostcard(): Promise<EmailPostcard | null> {
+  const hour = 3600_000;
+  const stamp = stampOf(new Date(Math.floor((Date.now() - 25 * hour) / hour) * hour));
+  const loaded = await Promise.race([loadPostcard(stamp), new Promise<null>((r) => setTimeout(() => r(null), 8000))]).catch(() => null);
+  if (!loaded?.card) return null;
+  const { pass, where } = loaded.card;
+  const when = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }).format(new Date(pass.start));
+  const image = `${SITE}/postcard/${stamp}/email.jpg`;
+  // Draw it now, so it's ready by the time the email is opened.
+  after(() => fetch(image).then((r) => r.arrayBuffer()).catch(() => {}));
+  return {
+    image,
+    page: `${SITE}/postcard/${stamp}`,
+    caption: `FramSat-1 over ${pass.station}${where ? ` in ${where}` : ""}, ${when} UTC. The real sky above the station; each dash is a radio packet it heard.`,
+  };
+}
+
 // One confirmation email per address per day, however often the form is
-// sent: Resend answers a repeated Idempotency-Key with the first send, so
-// the form can't be used to flood someone's inbox.
+// sent: Resend answers a repeated Idempotency-Key with the first send (or a
+// 409 if the postcard has changed since), so the form can't be used to
+// flood someone's inbox.
 export async function sendConfirmation(email: string) {
-  const link = confirmLink(email);
+  const { subject, html, text } = confirmEmail(confirmLink(email), await latestPostcard());
   const res = await resend("/emails", {
     method: "POST",
     headers: { "Idempotency-Key": `letters-confirm/${email}/${new Date().toISOString().slice(0, 10)}` },
-    body: JSON.stringify({
-      from: FROM,
-      to: [email],
-      subject: "Confirm your subscription",
-      text: `Hi,\n\nSomeone (hopefully you) asked to get my letters at this address. To confirm, open this link:\n\n${link}\n\nIf it wasn't you, just ignore this email and you won't hear from me.\n\nFreider\nhttps://freider.space`,
-      html: `<div style="font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:1.55;color:#0a1220;max-width:480px">
-<p>Hi,</p>
-<p>Someone (hopefully you) asked to get my letters at this address.</p>
-<p><a href="${link}" style="display:inline-block;background:#0a1220;color:#eef2f5;text-decoration:none;font-weight:600;padding:12px 22px;border-radius:999px">Confirm subscription</a></p>
-<p style="color:#5a6b7c">If it wasn't you, just ignore this email and you won't hear from me.</p>
-<p>Freider<br><a href="${SITE}" style="color:#5a6b7c">freider.space</a></p>
-</div>`,
-    }),
+    body: JSON.stringify({ from: FROM, to: [email], subject, text, html }),
   });
-  // A repeat inside the same day comes back as the first send: still fine.
   if (!res.ok && res.status !== 409) throw new Error(`Resend /emails ${res.status}: ${await res.text()}`);
 }
 
