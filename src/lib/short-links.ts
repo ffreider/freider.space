@@ -11,7 +11,7 @@ export const SLOTS: Slot[] = [1, 2, 3];
 export const SHORT_LINKS: Record<Slot, string> = {
   1: "/contact", // kept for the Meso pitch deck, once it's ready
   2: "/contact", // save my contact, or connect on LinkedIn
-  3: "/hear", // hear FramSat-1
+  3: "/letters", // sign up for my letters
 };
 
 // The only places /switch can send a slot. It stores the name, never a
@@ -19,6 +19,7 @@ export const SHORT_LINKS: Record<Slot, string> = {
 // page of theirs. Add a target here and push to make it a button.
 export const PRESETS: Record<string, { label: string; target: string }> = {
   contact: { label: "Contact", target: "/contact" },
+  letters: { label: "Letters", target: "/letters" },
   hear: { label: "Hear FramSat-1", target: "/hear" },
   framsat: { label: "FramSat-1 tracker", target: "/framsat" },
   space: { label: "The space age", target: "/space" },
