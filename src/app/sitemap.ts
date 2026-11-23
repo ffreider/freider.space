@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: framsat.nb, changeFrequency: "daily", priority: 0.7, alternates: { languages: framsat } },
     { url: log.en, changeFrequency: "daily", priority: 0.6, alternates: { languages: log } },
     { url: log.nb, changeFrequency: "daily", priority: 0.5, alternates: { languages: log } },
+    { url: `${site}/space`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${site}/letters`, changeFrequency: "monthly", priority: 0.6 },
   ];
 }

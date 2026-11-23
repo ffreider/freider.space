@@ -35,6 +35,11 @@ Personal website: https://freider.space (English), https://freider.space/no (Nor
 
 FramSat-1 is a student satellite from Orbit NTNU, launched on 5 September 2026 (NORAD catalogue number 98914). It orbits every 95.8 minutes, 516 to 596 km up, in a polar orbit inclined 97.4°, with a downlink on 435.141 MHz. The website has a live tracker at https://freider.space/framsat (Norwegian: https://freider.space/no/framsat): its position on a globe computed from its orbital elements with the SGP4 model, upcoming passes over Trondheim, Doppler shift, recent receptions by SatNOGS ground stations and the annotated TLE. Project page: https://orbitntnu.com/projects/FramSat-1
 
+## Other pages
+
+- How we got here (the space age, 1957 to 2019): an interactive visual story told through every object ever tracked in orbit, from Sputnik 1 to the first Starlinks. https://freider.space/space
+- Letters: a personal newsletter and archive of past letters. https://freider.space/letters
+
 ## Press
 
 - "The extracurricular that left Earth", Trondheim.com, 3 September 2026, by McKenna Starck: https://trondheim.com/journal/the-extracurricular-that-left-earth

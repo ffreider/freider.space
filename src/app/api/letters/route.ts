@@ -8,8 +8,15 @@ export async function POST(request: Request) {
   if (!lettersEnabled()) return NextResponse.json({ error: "Sign-ups aren't open yet." }, { status: 503 });
 
   // Only this site's own pages may send the form.
-  const origin = request.headers.get("origin");
-  if (origin && new URL(origin).host !== new URL(request.url).host) {
+  const source = request.headers.get("origin") ?? request.headers.get("referer");
+  if (!source) {
+    return NextResponse.json({ error: "Not allowed." }, { status: 403 });
+  }
+  try {
+    if (new URL(source).host !== new URL(request.url).host) {
+      return NextResponse.json({ error: "Not allowed." }, { status: 403 });
+    }
+  } catch {
     return NextResponse.json({ error: "Not allowed." }, { status: 403 });
   }
 

@@ -133,11 +133,20 @@ type Broadcast = {
   text?: string | null;
 };
 
-// The archive is read again at most once an hour.
+// The archive list is read again at most once an hour; individual sent
+// broadcasts don't change, so they stay cached for a day.
 const REVALIDATE = 3600;
+const BROADCAST_REVALIDATE = 86_400;
 
 async function broadcast(id: string): Promise<Letter | null> {
-  const res = await resend(`/broadcasts/${encodeURIComponent(id)}`, { next: { revalidate: REVALIDATE } });
+  const path = `/broadcasts/${encodeURIComponent(id)}`;
+  let res = await resend(path, { next: { revalidate: BROADCAST_REVALIDATE } });
+  if (res.status === 429) {
+    const retryAfter = Number(res.headers.get("retry-after"));
+    const waitMs = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter * 1000, 3000) : 600;
+    await new Promise((r) => setTimeout(r, waitMs));
+    res = await resend(path, { next: { revalidate: BROADCAST_REVALIDATE } });
+  }
   if (!res.ok) return null;
   const b = (await res.json()) as Broadcast;
   if (!isLetter(b)) return null;
@@ -156,7 +165,8 @@ async function broadcast(id: string): Promise<Letter | null> {
 const isLetter = (b: Broadcast) =>
   b.status === "sent" && !!b.sent_at && (b.segment_id ?? b.audience_id) === process.env.RESEND_SEGMENT_ID;
 
-// Every letter sent so far, newest first.
+// Every letter sent so far, newest first. Fetched sequentially so a growing
+// archive doesn't burst past Resend's per-second rate limit on revalidation.
 export async function letters(): Promise<Letter[]> {
   if (!lettersEnabled()) return [];
   try {
@@ -164,8 +174,12 @@ export async function letters(): Promise<Letter[]> {
     if (!res.ok) return [];
     const { data } = (await res.json()) as { data: Broadcast[] };
     const sent = data.filter(isLetter).sort((a, b) => b.sent_at!.localeCompare(a.sent_at!));
-    const full = await Promise.all(sent.map((b) => broadcast(b.id)));
-    return full.filter((l): l is Letter => !!l);
+    const full: Letter[] = [];
+    for (const b of sent) {
+      const item = await broadcast(b.id);
+      if (item) full.push(item);
+    }
+    return full;
   } catch {
     return [];
   }
